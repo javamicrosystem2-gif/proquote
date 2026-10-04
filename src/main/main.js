@@ -166,11 +166,12 @@ function createMainWindow() {
       .then(async (dirty) => {
         if (!dirty) { mainWindow.__forceClose = true; mainWindow.close(); return; }
         const r = await dialog.showMessageBox(mainWindow, {
-          type: 'warning', title: 'بيانات غير محفوظة',
-          message: 'هناك تعديلات أو بيانات لم يتم حفظها. هل تود بالتأكيد الخروج دون حفظ؟',
-          buttons: ['الخروج دون حفظ', 'إلغاء (البقاء والحفظ)'], defaultId: 1, cancelId: 1, noLink: true
+          type: 'question', title: 'حفظ قبل الإغلاق',
+          message: 'لديك تعديلات غير محفوظة. ماذا تريد أن تفعل؟',
+          detail: 'اختر «البقاء والحفظ» للعودة للبرنامج وحفظ عملك يدوياً، أو «الخروج دون حفظ» لإغلاق البرنامج فوراً مع فقدان التعديلات غير المحفوظة.',
+          buttons: ['البقاء والحفظ', 'الخروج دون حفظ'], defaultId: 1, cancelId: 1, noLink: true
         });
-        if (r.response === 0) { mainWindow.__forceClose = true; mainWindow.close(); }
+        if (r.response === 1) { mainWindow.__forceClose = true; mainWindow.close(); }
       })
       .catch(() => { mainWindow.__forceClose = true; mainWindow.close(); });
   });
