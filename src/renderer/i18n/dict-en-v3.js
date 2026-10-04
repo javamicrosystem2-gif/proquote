@@ -815,8 +815,7 @@ window.__I18N_DICT.en = Object.assign(window.__I18N_DICT.en || {}, {
 "شركات صغيرة — حتى 3 مستخدم":"Small Businesses — up to 3 users",
 "شركات متوسطة — حتى 8 مستخدم":"Medium-sized — up to 8 users",
 "غير محدود — مستخدمون بلا حدود":"Unlimited — unlimited users",
-"لا يوجد مستخدمون — أنشئ المسؤول الأول":"No users — create the first admin",
-"__v3_complete": "1"
+"لا يوجد مستخدمون — أنشئ المسؤول الأول":"No users — create the first admin"
 ,
 "تيليجرام":"Telegram","مشاركة عبر تيليجرام":"Share via Telegram","تم تنزيل PDF وفتح تيليجرام — أرفق الملف المحفوظ":"PDF downloaded & Telegram opened — attach the saved file","تم فتح تيليجرام (تعذّر إنشاء PDF)":"Telegram opened (PDF failed)","فاتورة ضريبية":"Tax Invoice","إيصال استلام نقدية":"Cash Receipt Voucher","بطاقة عميل":"Client Card"
 ,
