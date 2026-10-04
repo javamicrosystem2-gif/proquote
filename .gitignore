@@ -1,0 +1,61 @@
+# ============================================================
+# ProQuote — .gitignore
+# يمنع رفع الملفات السرية والملفات المؤقتة إلى GitHub
+# ============================================================
+
+# 🔒 ملفات سرية — ممنوع رفعها نهائياً
+admin-panel.html
+
+# 🔒 بيانات مستخدمين فعلية
+sync-data.json
+**/sync-data.json
+*.pqbak
+*.pqbackup
+
+# 🔒 مفاتيح وبيئات
+.env
+.env.*
+*.pem
+
+# 📦 ملفات البناء — توزع عبر GitHub Releases فقط
+dist/
+release/
+out/
+
+# 📦 التبعيات
+node_modules/
+
+# 📦 ملفات مؤقتة للتطوير
+_*.js
+_*.ps1
+_*.json
+_broken.js
+_chk.js
+_ls.txt
+*.log
+*.bak
+*.tmp
+
+# 📦 سجلات electron-builder
+electron-builder-*.yml
+*-Setup-*.exe
+*.blockmap
+*.appx
+*.nupkg
+
+# 📦 نظام التشغيل
+Thumbs.db
+.DS_Store
+desktop.ini
+*.swp
+*~
+
+# 📦 محرر النصوص
+.vscode/
+.idea/
+
+# 📦 حزمة نشر aaPanel (تولد عند الحاجة)
+web-dist.zip
+
+# 📦 ملف نشر Cloudflare Worker (يحتوي بيانات النشر)
+cloudflare/

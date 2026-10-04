@@ -1,0 +1,82 @@
+{
+  "name": "proquote",
+  "version": "9.7.0",
+  "description": "ProQuote — نظام إدارة عروض الأسعار والمستندات",
+  "main": "src/main/main.js",
+  "author": {
+    "name": "ProQuote",
+    "email": "info@proquote.app"
+  },
+  "license": "UNLICENSED",
+  "private": true,
+  "scripts": {
+    "start": "electron .",
+    "dev": "set NODE_ENV=development&& electron .",
+    "pack": "electron-builder --dir",
+    "dist:win": "electron-builder --win nsis",
+    "dist:win-portable": "electron-builder --win portable",
+    "tailwind": "npx tailwindcss -i ./tailwind.input.css -o ./src/renderer/assets/tailwind.css --minify",
+    "postinstall": "electron-builder install-app-deps"
+  },
+  "devDependencies": {
+    "electron": "^31.0.0",
+    "electron-builder": "^24.13.3",
+    "tailwindcss": "^3.4.4"
+  },
+  "dependencies": {
+    "electron-updater": "^6.2.1"
+  },
+  "build": {
+    "appId": "com.proquote.app",
+    "productName": "ProQuote",
+    "copyright": "Copyright © 2026 Amr Nada <amrnada@mail.ru>",
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "files": [
+      "src/**/*",
+      "package.json"
+    ],
+    "publish": null,
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "build/icon.ico",
+      "artifactName": "ProQuote-Setup-${version}.${ext}",
+      "signAndEditExecutable": false
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "allowElevation": true,
+      "installerIcon": "build/icon.ico",
+      "uninstallerIcon": "build/icon.ico",
+      "installerHeaderIcon": "build/icon.ico",
+      "installerHeader": "build/installerHeader.bmp",
+      "installerSidebar": "build/installerSidebar.bmp",
+      "uninstallerSidebar": "build/installerSidebar.bmp",
+      "license": "build/license_ar.txt",
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "ProQuote",
+      "deleteAppDataOnUninstall": false,
+      "include": "build/installer.nsh",
+      "runAfterFinish": true,
+      "menuCategory": "ProQuote",
+      "uninstallDisplayName": "ProQuote v${version}",
+      "multiLanguageInstaller": true,
+      "installerLanguages": [
+        "ar",
+        "en"
+      ]
+    }
+  }
+}

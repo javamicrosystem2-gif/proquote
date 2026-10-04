@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ProQuote — نظام إدارة عروض الأسعار والمستندات</title>
+<style>
+:root{--acc:#00a885;--acc2:#e6f9f3;--bg:#060b14;--bg2:#0b1420;--card:#0f1a28;--brd:#1c2a3d;--tx:#e8eef5;--t2:#9fb0c3;--t3:#67788c;--gold:#f5b942}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Tahoma,Arial,sans-serif}
+body{background:var(--bg);color:var(--tx);line-height:1.7}
+.wrap{max-width:1080px;margin:0 auto;padding:0 20px}
+header{position:sticky;top:0;z-index:50;background:rgba(6,11,20,.85);backdrop-filter:blur(10px);border-bottom:1px solid var(--brd);padding:14px 0}
+header .wrap{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.logo{display:flex;align-items:center;gap:10px;font-size:20px;font-weight:800}
+.logo i{width:38px;height:38px;border-radius:10px;background:var(--acc);color:#fff;display:flex;align-items:center;justify-content:center;font-size:18px}
+nav{display:flex;gap:8px;flex-wrap:wrap}
+nav a{color:var(--t2);text-decoration:none;font-size:13.5px;padding:8px 14px;border-radius:8px;border:1px solid transparent;transition:.2s}
+nav a:hover{color:var(--acc);border-color:var(--acc)}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:12px 22px;border-radius:10px;font-weight:700;font-size:14.5px;text-decoration:none;transition:.2s;cursor:pointer;border:none}
+.btn-p{background:var(--acc);color:#fff}.btn-p:hover{filter:brightness(1.1)}
+.btn-o{border:1px solid var(--acc);color:var(--acc);background:transparent}.btn-o:hover{background:var(--acc2)}
+.btn-g{border:1px solid var(--brd);color:var(--t2);background:transparent}
+.btn-g:hover{border-color:var(--t2)}
+.hero{text-align:center;padding:80px 20px 60px;background:radial-gradient(60% 60% at 50% 0%,rgba(0,168,133,.12),transparent)}
+.hero h1{font-size:42px;font-weight:900;margin-bottom:14px}
+.hero h1 span{color:var(--acc)}
+.hero p{color:var(--t2);font-size:17px;max-width:640px;margin:0 auto 28px}
+.hero .cta{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.badges{display:flex;gap:10px;justify-content:center;margin-top:26px;flex-wrap:wrap}
+.badge{font-size:11.5px;color:var(--t2);border:1px solid var(--brd);border-radius:20px;padding:5px 14px;background:var(--bg2)}
+.badge b{color:var(--acc)}
+section{padding:56px 0}
+h2.sec{text-align:center;font-size:28px;font-weight:800;margin-bottom:8px}
+p.sub{text-align:center;color:var(--t3);margin-bottom:36px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px}
+.card{background:var(--card);border:1px solid var(--brd);border-radius:14px;padding:22px;transition:.2s}
+.card:hover{border-color:var(--acc);transform:translateY(-3px)}
+.card i.ic{width:42px;height:42px;border-radius:10px;background:var(--acc2);color:var(--acc);display:flex;align-items:center;justify-content:center;font-size:18px;margin-bottom:12px}
+.card h3{font-size:15.5px;margin-bottom:6px}
+.card p{font-size:12.5px;color:var(--t2)}
+.plans{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;align-items:stretch}
+.plan{background:var(--card);border:1px solid var(--brd);border-radius:16px;padding:26px;display:flex;flex-direction:column;position:relative}
+.plan.hot{border-color:var(--acc);box-shadow:0 0 40px rgba(0,168,133,.15)}
+.plan .tag{position:absolute;top:-12px;right:50%;transform:translateX(50%);background:var(--acc);color:#fff;font-size:11px;font-weight:800;padding:3px 14px;border-radius:14px}
+.plan h3{font-size:17px;margin-bottom:2px}
+.plan .pr{font-size:30px;font-weight:900;color:var(--acc);margin:8px 0 2px}
+.plan .pr small{font-size:12px;color:var(--t3);font-weight:400}
+.plan ul{list-style:none;margin:14px 0 20px;flex:1}
+.plan li{font-size:13px;color:var(--t2);padding:5px 0;border-bottom:1px dashed var(--brd)}
+.plan li::before{content:'✓ ';color:var(--acc);font-weight:800}
+.dl{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+.dl .card{text-align:center}
+.dl i.ic{margin:0 auto 10px}
+.steps{counter-reset:st}
+.step{display:flex;gap:14px;padding:14px 0;border-bottom:1px dashed var(--brd)}
+.step .n{counter-increment:st;flex:none;width:34px;height:34px;border-radius:50%;background:var(--acc);color:#fff;font-weight:800;display:flex;align-items:center;justify-content:center}
+.step .n::before{content:counter(st)}
+.step p{color:var(--t2);font-size:13.5px}
+.step b{color:var(--tx)}
+footer{border-top:1px solid var(--brd);padding:26px 0;text-align:center;color:var(--t3);font-size:12px}
+.wa{position:fixed;bottom:22px;left:22px;z-index:60;width:52px;height:52px;border-radius:50%;background:#25d366;color:#fff;display:flex;align-items:center;justify-content:center;font-size:24px;text-decoration:none;box-shadow:0 6px 20px rgba(37,211,102,.4)}
+.cyc{cursor:pointer;border:1px solid var(--brd);background:transparent;color:var(--t2);font-weight:700;font-size:13.5px;padding:10px 22px;transition:.2s}
+.cyc.on{background:var(--acc);border-color:var(--acc);color:#fff}
+.btn-pp{background:#0070ba;color:#fff}.btn-pp:hover{filter:brightness(1.15)}
+@media(max-width:640px){.hero h1{font-size:30px}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <div class="logo"><i>📄</i> ProQuote</div>
+    <nav>
+      <a href="#features">المزايا</a><a href="#plans">الاشتراكات</a><a href="#download">التحميل</a><a href="#activate">التفعيل</a><a href="#contact">تواصل</a> <a href="#" id="lngT" onclick="setLang(document.documentElement.lang==='ar'?'en':'ar');return false" style="color:var(--acc);border-color:var(--acc)">EN</a>
+    </nav>
+  </div>
+</header>
+
+<div class="hero">
+  <h1>نظام كامل لإدارة <span>عروض الأسعار</span> والمستندات</h1>
+  <p>أكثر من 24 قسماً متكاملاً — عروض، توريد، تصنيع، مخزن، مناقصات، مدفوعات ومستحقات، عينات بشفرة QR، بوالص شحن، صلاحيات موظفين — يعمل أوفلاين بالكامل ويتزامن سحابياً</p>
+  <div class="cta">
+    <a class="btn btn-p" href="#download">⬇ تحميل نسخة الكمبيوتر</a>
+    <a class="btn btn-o" href="#plans">خطط الاشتراك</a>
+  </div>
+  <div class="badges">
+    <span class="badge">🛡️ يعمل <b>أوفلاين 100%</b></span>
+    <span class="badge">🎁 تجربة مجانية <b>30 يوماً</b></span>
+    <span class="badge">🔄 مزامنة سحابية تلقائية</span>
+    <span class="badge">🌐 عربي / English</span>
+    <span class="badge">🔐 ترخيص مرتبط بالجهاز</span>
+    <span class="badge">🖥️ Windows</span>
+  </div>
+</div>
+
+<section id="features">
+  <div class="wrap">
+    <h2 class="sec">كل ما تحتاجه شركتك في مكان واحد</h2>
+    <p class="sub">من عرض السعر حتى التسليم والتحصيل</p>
+    <div class="grid">
+      <div class="card"><i class="ic">💼</i><h3>عروض أسعار احترافية</h3><p>قوالب متعددة، ضريبة وخصم، أعمدة مخصصة، QR، PDF وطباعة</p></div>
+      <div class="card"><i class="ic">🏭</i><h3>تصنيع وتوزيع مصانع</h3><p>توزيع بنود أمر التوريد على مصانع متعددة بالمقاسات والألوان مع قفل الكميات</p></div>
+      <div class="card"><i class="ic">📦</i><h3>مخزن بذكاء</h3><p>مدخلات ومخرجات تراكمية، تقارير نواقص تلقائية، رول/توب، ملصقات باركود</p></div>
+      <div class="card"><i class="ic">🧪</i><h3>عينات بتتبع كامل</h3><p>خط 7 حالات، QR ومسح بالكاميرا أو الليزر، صور إثبات، تنبيهات بت واسترداد</p></div>
+      <div class="card"><i class="ic">🚚</i><h3>شحن وبوالص</h3><p>مولد بوليصات شحن متعدد الأصناف محكوم بالمتاح من المخزن + مندوبون</p></div>
+      <div class="card"><i class="ic">💰</i><h3>مدفوعات ومستحقات</h3><p>دفعات مجزأة بأكواد فريدة، إيصالات نقدية، كشوف مفلترة بالتفقيط العربي</p></div>
+      <div class="card"><i class="ic">🛡️</i><h3>إدارة وصلاحيات</h3><p>مستخدمون وأدوار (مسؤول/مشرف/موظف/مشاهدة) ومصفوفة أقسام لكل مستخدم</p></div>
+      <div class="card"><i class="ic">☁️</i><h3>أوفلاين + سحابة</h3><p>يعمل بدون إنترنت بالكامل، وعند الاتصال يرفع ويجلب تلقائياً (Supabase)</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="plans" style="background:var(--bg2)">
+  <div class="wrap">
+    <h2 class="sec" data-ar="خطط الاشتراك" data-en="Subscription Plans">خطط الاشتراك</h2>
+    <p class="sub" data-ar="🎁 تجربة مجانية 30 يوماً — بدون رسوم خفية، اشتراك مباشر عبر PayPal" data-en="🎁 30-day free trial — no hidden fees, subscribe directly via PayPal">🎁 تجربة مجانية 30 يوماً — بدون رسوم خفية، اشتراك مباشر عبر PayPal</p>
+    <div style="text-align:center;margin-bottom:26px">
+      <button class="cyc on" id="cyM" onclick="cyc('m')">شهري</button>
+      <button class="cyc" id="cyY" onclick="cyc('y')">سنوي — وفّر أكثر</button>
+    </div>
+    <div class="plans">
+      <div class="plan" id="solo">
+        <h3>Individual Package</h3><small style="color:var(--t3)" data-ar="الفرد — مستخدم واحد" data-en="Individual — 1 user">الفرد — مستخدم واحد</small>
+        <div class="pr"><span class="pv" data-m="19.99" data-y="199">19.99</span> <span class="pcu">ج.م</span> <small class="pc">شهرياً</small></div>
+        <ul><li>عروض الأسعار والعملاء والأصناف</li><li>PDF والطباعة</li><li>المزامنة السحابية</li><li>دعم عبر تلجرام</li></ul>
+        <a class="btn btn-pp" data-ar="💳 اشترك عبر PayPal" data-en="💳 Subscribe via PayPal" data-m="https://www.paypal.com/webapps/billing/plans/subscribe?plan_id=P-79Y10184HV8984701NK6QOHA" data-y="https://www.paypal.com/webapps/billing/plans/subscribe?plan_id=P-6F9852959W923042YNK6QXOY" href="https://www.paypal.com/webapps/billing/plans/subscribe?plan_id=P-79Y10184HV8984701NK6QOHA" target="_blank">💳 اشترك عبر PayPal</a>
+      </div>
+      <div class="plan hot" id="small">
+        <span class="tag">الأكثر طلباً</span>
+        <h3>Small Businesses</h3><small style="color:var(--t3)" data-ar="الشركات الصغيرة — حتى 3 موظفين" data-en="Small Businesses — up to 3 employees">الشركات الصغيرة — حتى 3 موظفين</small>
+        <div class="pr"><span class="pv" data-m="39" data-y="360">39</span> <span class="pcu">ج.م</span> <small class="pc">شهرياً</small></div>
+        <ul><li>كل مزايا الفرد</li><li>صلاحيات موظفين (3 مستخدمين)</li><li>التوريد والتصنيع والمخزن</li><li>المناقصات والشحن والعينات</li><li>المدفوعات والمستحقات</li></ul>
+        <a class="btn btn-pp" data-ar="💳 اشترك عبر PayPal" data-en="💳 Subscribe via PayPal" data-m="https://www.paypal.com/webapps/billing/plans/subscribe?plan_id=P-8BF09849DB984670MNK6QTLY" data-y="https://www.paypal.com/webapps/billing/plans/subscribe?plan_id=P-1YR373559E473603LNK6QZIQ" href="https://www.paypal.com/webapps/billing/plans/subscribe?plan_id=P-8BF09849DB984670MNK6QTLY" target="_blank">💳 اشترك عبر PayPal</a>
+      </div>
+      <div class="plan" id="med">
+        <h3>Medium-sized Companies</h3><small style="color:var(--t3)" data-ar="الشركات المتوسطة — حتى 8 موظفين" data-en="Medium-sized — up to 8 employees">الشركات المتوسطة — حتى 8 موظفين</small>
+        <div class="pr"><span class="pv" data-m="79" data-y="480">79</span> <span class="pcu">ج.م</span> <small class="pc">شهرياً</small></div>
+        <ul><li>كل مزايا الشركات الصغيرة</li><li>حتى 8 مستخدمين بصلاحيات</li><li>الفاتورة الإلكترونية</li><li>أولوية الدعم</li></ul>
+        <a class="btn btn-pp" data-ar="💳 اشترك عبر PayPal" data-en="💳 Subscribe via PayPal" data-m="https://www.paypal.com/webapps/billing/plans/subscribe?plan_id=P-3AM723754L7800622NK6QVGA" data-y="https://www.paypal.com/webapps/billing/plans/subscribe?plan_id=P-1YR373559E473603LNK6QZIQ" href="https://www.paypal.com/webapps/billing/plans/subscribe?plan_id=P-3AM723754L7800622NK6QVGA" target="_blank">💳 اشترك عبر PayPal</a>
+      </div>
+      <div class="plan" id="ulim">
+        <h3>Major Companies</h3><small style="color:var(--t3)" data-ar="الشركات الكبرى — موظفون بلا حدود" data-en="Major Companies — unlimited employees">الشركات الكبرى — موظفون بلا حدود</small>
+        <div class="pr"><span class="pv" data-m="99" data-y="999">99</span> <span class="pcu">ج.م</span> <small class="pc">شهرياً</small></div>
+        <ul><li>كل المزايا بلا حدود</li><li>عدد مستخدمين غير محدود</li><li>مركز المستندات المؤرشف</li><li>التحديث التلقائي وأعلى أولوية دعم</li></ul>
+        <a class="btn btn-pp" data-ar="💳 اشترك عبر PayPal" data-en="💳 Subscribe via PayPal" data-m="https://www.paypal.com/webapps/billing/plans/subscribe?plan_id=P-00T60558V0503131NNK6QWJQ" data-y="https://www.paypal.com/webapps/billing/plans/subscribe?plan_id=P-67859581MF821035CNK6QZ7A" href="https://www.paypal.com/webapps/billing/plans/subscribe?plan_id=P-00T60558V0503131NNK6QWJQ" target="_blank">💳 اشترك عبر PayPal</a>
+      </div>
+    </div>
+  </div>
+</section>
+<script>
+var LANG="ar",CYC="m",RATE=50;/* USD→EGP */
+var LD={"نظام كامل لإدارة":"A complete system for managing","عروض الأسعار":"Quotations","والمستندات":"and documents","أكثر من 24 قسماً متكاملاً — عروض، توريد، تصنيع، مخزن، مناقصات، مدفوعات ومستحقات، عينات بشفرة QR، بوالص شحن، صلاحيات موظفين — يعمل أوفلاين بالكامل ويتزامن سحابياً":"Over 24 fully integrated modules — quotations, supply, manufacturing, inventory, tenders, payments & receivables, QR-coded samples, shipping waybills, employee permissions — works fully offline and syncs to the cloud","⬇ تحميل نسخة الكمبيوتر":"⬇ Download for Windows","خطط الاشتراك":"View Plans","🛡️ يعمل":"🛡️ Works","أوفلاين 100%":"100% offline","🎁 تجربة مجانية":"🎁 Free trial","30 يوماً":"30 days","🔄 مزامنة سحابية تلقائية":"🔄 Automatic cloud sync","🔐 ترخيص مرتبط بالجهاز":"🔐 Device-bound license","المزايا":"Features","التحميل":"Download","التفعيل":"Activation","تواصل":"Contact","الاشتراكات":"Pricing","🌐 عربي / English":"🌐 English / Arabic","كل ما تحتاجه شركتك في مكان واحد":"Everything your company needs in one place","من عرض السعر حتى التسليم والتحصيل":"From quotation to delivery and collection","عروض أسعار احترافية":"Professional Quotations","قوالب متعددة، ضريبة وخصم، أعمدة مخصصة، QR، PDF وطباعة":"Multiple templates, VAT & discounts, custom columns, QR, PDF & print","تصنيع وتوزيع مصانع":"Manufacturing & Factory Distribution","توزيع بنود أمر التوريد على مصانع متعددة بالمقاسات والألوان مع قفل الكميات":"Distribute supply order items across multiple factories by size & color with quantity locking","مخزن بذكاء":"Smart Inventory","مدخلات ومخرجات تراكمية، تقارير نواقص تلقائية، رول/توب، ملصقات باركود":"Cumulative in/out movements, automatic shortage reports, roll/bobbin tracking, barcode labels","عينات بتتبع كامل":"Fully Tracked Samples","خط 7 حالات، QR ومسح بالكاميرا أو الليزر، صور إثبات، تنبيهات بت واسترداد":"7-stage pipeline, QR camera/laser scanning, proof photos, deposit & retrieval alerts","شحن وبوالص":"Shipping & Waybills","مولد بوليصات شحن متعدد الأصناف محكوم بالمتاح من المخزن + مندوبون":"Multi-item waybill generator governed by available stock + couriers","مدفوعات ومستحقات":"Payments & Receivables","دفعات مجزأة بأكواد فريدة، إيصالات نقدية، كشوف مفلترة بالتفقيط العربي":"Split payments with unique codes, cash receipts, Arabic-styled filtered statements","إدارة وصلاحيات":"Management & Permissions","مستخدمون وأدوار (مسؤول/مشرف/موظف/مشاهدة) ومصفوفة أقسام لكل مستخدم":"Users & roles (admin/supervisor/employee/viewer) with a per-user section matrix","أوفلاين + سحابة":"Offline + Cloud","يعمل بدون إنترنت بالكامل، وعند الاتصال يرفع ويجلب تلقائياً (Supabase)":"Works fully offline; on connect it auto-pushes and pulls (Supabase)","الأكثر طلباً":"Most Popular","عروض الأسعار والعملاء والأصناف":"Quotations, clients & items","PDF والطباعة":"PDF & printing","المزامنة السحابية":"Cloud sync","دعم عبر تلجرام":"Telegram support","كل مزايا الفرد":"Everything in Individual","صلاحيات موظفين (3 مستخدمين)":"Employee permissions (3 users)","التوريد والتصنيع والمخزن":"Supply, manufacturing & inventory","المناقصات والشحن والعينات":"Tenders, shipping & samples","المدفوعات والمستحقات":"Payments & receivables","كل مزايا الشركات الصغيرة":"Everything in Small Businesses","حتى 8 مستخدمين بصلاحيات":"Up to 8 permissioned users","الفاتورة الإلكترونية":"E-invoice","أولوية الدعم":"Priority support","كل المزايا بلا حدود":"All features unlimited","عدد مستخدمين غير محدود":"Unlimited users","مركز المستندات المؤرشف":"Archived documents center","التحديث التلقائي وأعلى أولوية دعم":"Auto-updates & top-priority support","اختر نسختك — نفس الحساب والبيانات":"Pick your version — same account & data","نسخة الكمبيوتر":"Desktop Version","Windows — التثبيت الكامل مع النسخ الاحتياطي والطباعة الصامتة":"Windows — full install with backups & silent printing","⬇ تحميل المثبّت":"⬇ Download Installer","نسخة الهاتف":"Mobile Version","قريباً — Android وiOS بنفس البيانات والحساب":"Coming soon — Android & iOS with the same data & account","قريباً":"Coming soon","كيفية التفعيل":"How Activation Works","ثلاث خطوات فقط":"Just three steps","ثبّت البرنامج وافتحه":"Install & open the program","— من قسم الترخيص اضغط «طلب المفتاح» وسيُرسل لك":"— from the License section press \u201CRequest Key\u201D and your","معرف جهازك":"device ID","(8 أحرف) تلقائياً عبر تلجرام أو البريد.":"(8 characters) is sent automatically via Telegram or email.","اختر خطتك":"Choose your plan","— أرسل المعرف واسم الخطة، وسيصلك":"— send the ID and plan name, and you will receive a","مفتاح تفعيل فريد":"unique activation key","مرتبط بجهازك (لا يعمل على أي جهاز آخر).":"bound to your device (works on no other device).","ألصق المفتاح وفعّل":"Paste the key & activate","— يعمل البرنامج أوفلاين بالكامل بعد التفعيل، مدى الحياة للخطة المختارة.":"— the program works fully offline after activation, lifetime for the chosen plan.","🔐 محمي ضد التلاعب والاختراق — أي محاولة تزوير تُبطل الترخيص":"🔐 Tamper & crack protected — any forgery attempt voids the license","تواصل معنا":"Contact Us","للاشتراك أو الدعم الفني":"For subscriptions or technical support","✈️ تلجرام — اشترك الآن":"✈️ Telegram — Subscribe Now","📘 صفحتنا على فيسبوك":"📘 Our Facebook Page","البريد: amrnada@mail.ru — جميع الحقوق محفوظة © 2026 Amr Nada":"Email: amrnada@mail.ru — All rights reserved © 2026 Amr Nada","ProQuote — نظام إدارة عروض الأسعار والمستندات | صُنع بإتقان":"ProQuote — Quotation & Document Management | Crafted with care","تلجرام":"Telegram"};
+var LD_R={};Object.keys(LD).forEach(function(k){LD_R[LD[k]]=k});
+function renderPrices(){var usd=LANG==="en";document.querySelectorAll(".pv").forEach(function(e){var p=parseFloat(e.getAttribute("data-"+CYC));e.textContent=usd?(p%1?p.toFixed(2):String(p)):String(Math.round(p*RATE))});document.querySelectorAll(".pcu").forEach(function(e){e.textContent=usd?"$":"ج.م"});document.querySelectorAll(".pc").forEach(function(e){e.textContent=(CYC==="m"?(usd?"Monthly":"شهرياً"):(usd?"Yearly":"سنوياً"))});document.querySelectorAll(".btn-pp").forEach(function(a){a.href=a.getAttribute("data-"+CYC)})}
+function cyc(v){CYC=v;document.getElementById("cyM").className="cyc"+(v==="m"?" on":"");document.getElementById("cyY").className="cyc"+(v==="y"?" on":"");renderPrices()}
+function _ldApply(l){var d=l==="en"?LD:LD_R;var w=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT,{acceptNode:function(n){var p=n.parentElement;return !p||p.tagName==="SCRIPT"||p.tagName==="STYLE"||p.id==="lngT"?2:1}});var n;while((n=w.nextNode())){var v=n.nodeValue,t=v.trim();if(t&&d[t])n.nodeValue=v.replace(t,d[t])}document.querySelectorAll("[title]").forEach(function(el){var t=(el.getAttribute("title")||"").trim();if(t&&d[t])el.setAttribute("title",d[t])})}
+function setLang(l){LANG=l;document.documentElement.lang=l;document.documentElement.dir=l==="ar"?"rtl":"ltr";document.title=l==="en"?"ProQuote — Quotation & Document Management System":"ProQuote — نظام إدارة عروض الأسعار والمستندات";var t=document.getElementById("lngT");if(t)t.textContent=l==="ar"?"EN":"عربي";document.getElementById("cyM").textContent=l==="ar"?"شهري":"Monthly";document.getElementById("cyY").textContent=l==="ar"?"سنوي — وفّر أكثر":"Yearly — save more";document.querySelectorAll("[data-ar]").forEach(function(e){e.textContent=l==="ar"?e.getAttribute("data-ar"):e.getAttribute("data-en")});_ldApply(l);renderPrices()}
+</script>
+
+<section id="download">
+  <div class="wrap">
+    <h2 class="sec">التحميل</h2>
+    <p class="sub">اختر نسختك — نفس الحساب والبيانات</p>
+    <div class="dl">
+      <div class="card"><i class="ic">🖥️</i><h3>نسخة الكمبيوتر</h3><p>Windows — التثبيت الكامل مع النسخ الاحتياطي والطباعة الصامتة</p><br><a class="btn btn-p" href="#" onclick="alert('ضع رابط أحدث ProQuote-Setup-x.x.x.exe من GitHub Releases هنا')">⬇ تحميل المثبّت</a></div>
+     
+      <div class="card"><i class="ic">📱</i><h3>نسخة الهاتف</h3><p>قريباً — Android وiOS بنفس البيانات والحساب</p><br><button class="btn btn-g" disabled>قريباً</button></div>
+    </div>
+  </div>
+</section>
+
+<section id="activate" style="background:var(--bg2)">
+  <div class="wrap">
+    <h2 class="sec">كيفية التفعيل</h2>
+    <p class="sub">ثلاث خطوات فقط</p>
+    <div class="steps">
+      <div class="step"><span class="n"></span><p><b>ثبّت البرنامج وافتحه</b> — من قسم الترخيص اضغط «طلب المفتاح» وسيُرسل لك <b>معرف جهازك</b> (8 أحرف) تلقائياً عبر تلجرام أو البريد.</p></div>
+      <div class="step"><span class="n"></span><p><b>اختر خطتك</b> — أرسل المعرف واسم الخطة، وسيصلك <b>مفتاح تفعيل فريد</b> مرتبط بجهازك (لا يعمل على أي جهاز آخر).</p></div>
+      <div class="step"><span class="n"></span><p><b>ألصق المفتاح وفعّل</b> — يعمل البرنامج أوفلاين بالكامل بعد التفعيل، مدى الحياة للخطة المختارة.</p></div>
+    </div>
+    <p style="text-align:center;color:var(--t3);font-size:12px;margin-top:18px">🔐 محمي ضد التلاعب والاختراق — أي محاولة تزوير تُبطل الترخيص</p>
+  </div>
+</section>
+
+<section id="contact">
+  <div class="wrap" style="text-align:center">
+    <h2 class="sec">تواصل معنا</h2>
+    <p class="sub">للاشتراك أو الدعم الفني</p>
+    <a class="btn btn-p" style="background:#229ED9" href="https://t.me/javamicro" target="_blank">✈️ تلجرام — اشترك الآن</a>
+    <a class="btn btn-o" style="margin-right:8px" href="https://www.facebook.com/proquoteamrnada" target="_blank">📘 صفحتنا على فيسبوك</a>
+    <p style="margin-top:14px;color:var(--t3);font-size:12px">البريد: amrnada@mail.ru — جميع الحقوق محفوظة © 2026 Amr Nada</p>
+  </div>
+</section>
+
+<footer>ProQuote — نظام إدارة عروض الأسعار والمستندات | صُنع بإتقان</footer>
+<a class="wa" style="background:#229ED9;box-shadow:0 6px 20px rgba(34,158,217,.45)" href="https://t.me/javamicro" target="_blank" title="تلجرام">✈️</a>
+
+</body>
+</html>
