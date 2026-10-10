@@ -1,19 +1,25 @@
 // ============================================================
-// ProQuote — طبقة التخزين الدائم (JSON على القرص)
-// بديل SQLite نقي (لا يحتاج تجميع أصلي / Python / Build Tools)
-// الموقع: app.getPath('userData')/proquote.data.json
-// نموذج key-value يحاكي مفاتيح localStorage الـ15 الأصلية تماماً
+// ProQuote — طبقة التخزين الدائم (SQLite عبر better-sqlite3)
+// الموقع: app.getPath('userData')/proquote.data.db
+// نموذج key-value يحاكي مفاتيح localStorage الأصلية تماماً
+// الواجهة البرمجية مطابقة حرفياً للنسخة السابقة (JSON) —
+// لا يتغير أي شيء في preload أو main.js أو الواجهة.
+// الترحيل: عند أول فتح، لو وُجد proquote.data.json القديم
+// والقاعدة فارغة → استيراد كامل → إعادة تسمية الملف القديم
+// إلى .imported-<تاريخ> (لا يُحذف أبداً).
 // ============================================================
 
 const { app } = require('electron');
 const path = require('path');
 const fs = require('fs');
+const Database = require('better-sqlite3');
 
-let _cache = null;      // نسخة في الذاكرة (سريعة)
-let _dirty = false;     // هل هناك تغييرات غير محفوظة؟
-let _saveTimer = null;  // مؤقت الحفظ المؤجل
+let _db = null; // اتصال SQLite (يُفتح كسولاً عند أول استخدام)
 
-function getDataPath() {
+function getDbPath() {
+  return path.join(app.getPath('userData'), 'proquote.data.db');
+}
+function getJsonPath() {
   return path.join(app.getPath('userData'), 'proquote.data.json');
 }
 
@@ -23,152 +29,200 @@ function getBackupDir() {
   return dir;
 }
 
-// ---------- التحميل ----------
-function load() {
-  if (_cache) return _cache;
-  const dataPath = getDataPath();
+// ---------- الفتح + التهيئة + الترحيل من JSON ----------
+function open() {
+  if (_db) return _db;
+  const dbPath = getDbPath();
   try {
-    if (fs.existsSync(dataPath)) {
-      const raw = fs.readFileSync(dataPath, 'utf8');
-      _cache = JSON.parse(raw);
-    } else {
-      _cache = {};
-    }
+    fs.mkdirSync(path.dirname(dbPath), { recursive: true });
+    _db = new Database(dbPath);
+    // وضع WAL: كتابة آمنة مقاومة للانهيار + أداء عالٍ
+    _db.pragma('journal_mode = WAL');
+    _db.pragma('synchronous = NORMAL');
+    _db.pragma('busy_timeout = 5000');
+    _db.exec(`
+      CREATE TABLE IF NOT EXISTS kv (
+        key   TEXT PRIMARY KEY,
+        value TEXT NOT NULL,
+        updated_at INTEGER NOT NULL DEFAULT (strftime('%s','now') * 1000)
+      );
+    `);
   } catch (err) {
-    console.error('[db] فشل قراءة ملف البيانات، بدء جديد:', err.message);
-    // محاولة استرجاع من آخر نسخة احتياطية تلقائية
-    _cache = tryRecoverFromBackup();
+    console.error('[db] فشل فتح قاعدة SQLite، محاولة الاسترجاع من النسخ الاحتياطية:', err.message);
+    _db = recoverDbFromBackup(dbPath);
   }
-  return _cache;
+  migrateFromJsonIfNeeded();
+  return _db;
 }
 
-// ---------- الحفظ (مؤجل للحد من كتابات القرص) ----------
-function scheduleSave() {
-  _dirty = true;
-  if (_saveTimer) clearTimeout(_saveTimer);
-  _saveTimer = setTimeout(flush, 200); // حفظ بعد 200ms من آخر تعديل
-}
-
-function flush() {
-  if (!_cache || !_dirty) return;
-  const dataPath = getDataPath();
+// إعادة بناء القاعدة من آخر نسخة احتياطية عند الفساد النادر
+function recoverDbFromBackup(dbPath) {
+  try { if (fs.existsSync(dbPath)) fs.renameSync(dbPath, dbPath + '.corrupt-' + Date.now()); } catch (_) {}
+  const fresh = new Database(dbPath);
+  fresh.pragma('journal_mode = WAL');
+  fresh.pragma('synchronous = NORMAL');
+  fresh.pragma('busy_timeout = 5000');
+  fresh.exec('CREATE TABLE IF NOT EXISTS kv (key TEXT PRIMARY KEY, value TEXT NOT NULL, updated_at INTEGER NOT NULL DEFAULT (strftime(\'%s\',\'now\') * 1000));');
+  // محاولة ملئها من آخر .pqbak
   try {
-    // كتابة آمنة: اكتب لملف مؤقت ثم استبدل (atomic-ish على ويندوز)
-    const tmp = dataPath + '.tmp';
-    fs.writeFileSync(tmp, JSON.stringify(_cache), 'utf8');
-    fs.renameSync(tmp, dataPath);
-    _dirty = false;
-  } catch (err) {
-    console.error('[db] فشل الحفظ:', err.message);
-    // محاولة كتابة مباشرة كبديل
-    try {
-      fs.writeFileSync(dataPath, JSON.stringify(_cache), 'utf8');
-      _dirty = false;
-    } catch (e) {
-      console.error('[db] فشل الحفظ البديل أيضاً:', e.message);
+    const baks = listBackups();
+    if (baks.length) {
+      const parsed = JSON.parse(fs.readFileSync(baks[0].path, 'utf8'));
+      const data = parsed.data || parsed || {};
+      const ins = fresh.prepare('INSERT OR REPLACE INTO kv(key, value, updated_at) VALUES (?, ?, ?)');
+      const tx = fresh.transaction((obj) => { for (const k in obj) ins.run(k, String(obj[k]), Date.now()); });
+      tx(data);
+      console.log('[db] تمت استعادة القاعدة من:', baks[0].name);
     }
+  } catch (e) { console.error('[db] تعذرت الاستعادة من النسخ:', e.message); }
+  return fresh;
+}
+
+// ترحيل تلقائي مرة واحدة من ملف JSON القديم (بدون حذفه أبداً)
+function migrateFromJsonIfNeeded() {
+  try {
+    const jsonPath = getJsonPath();
+    if (!fs.existsSync(jsonPath)) return;
+    const count = _db.prepare('SELECT COUNT(*) AS c FROM kv').get().c;
+    if (count > 0) {
+      // القاعدة معمّرة بالفعل — الملف القديم تاريخي فقط؛ نُبقيه كما هو
+      return;
+    }
+    const raw = fs.readFileSync(jsonPath, 'utf8');
+    const data = JSON.parse(raw);
+    const keys = Object.keys(data || {});
+    if (!keys.length) return;
+    const ins = _db.prepare('INSERT OR REPLACE INTO kv(key, value, updated_at) VALUES (?, ?, ?)');
+    const tx = _db.transaction((obj) => { for (const k of keys) ins.run(k, String(obj[k]), Date.now()); });
+    tx(data);
+    // إعادة تسمية وليس حذفاً — يظل أثراً أمانياً دائماً
+    const archived = jsonPath + '.imported-' + new Date().toISOString().slice(0, 10);
+    fs.renameSync(jsonPath, archived);
+    console.log('[db] ✅ تم ترحيل ' + keys.length + ' مفتاحاً من JSON إلى SQLite — الأصل مؤرشف: ' + path.basename(archived));
+  } catch (err) {
+    console.error('[db] فشل ترحيل JSON (سيُعاد المحاولة في الإقلاع القادم):', err.message);
   }
 }
 
-// حفظ متزامن إجباري (قبل الإغلاق أو النسخ الاحتياطي)
-function forceFlush() {
-  if (_saveTimer) { clearTimeout(_saveTimer); _saveTimer = null; }
-  flush();
+// عبارات مُجهزة (تُنشأ مرة عند أول استخدام)
+let _stmt = null;
+function stmts() {
+  if (!_stmt) {
+    _stmt = {
+      get:    _db.prepare('SELECT value FROM kv WHERE key = ?'),
+      put:    _db.prepare('INSERT INTO kv(key, value, updated_at) VALUES (?, ?, ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value, updated_at = excluded.updated_at'),
+      del:    _db.prepare('DELETE FROM kv WHERE key = ?'),
+      keys:   _db.prepare('SELECT key FROM kv'),
+      has:    _db.prepare('SELECT 1 FROM kv WHERE key = ? LIMIT 1'),
+      delAll: _db.prepare('DELETE FROM kv'),
+      count:  _db.prepare('SELECT COUNT(*) AS c, COALESCE(SUM(LENGTH(value)),0) AS bytes FROM kv'),
+      all:    _db.prepare('SELECT key, value FROM kv')
+    };
+  }
+  return _stmt;
 }
 
 // ============================================================
-// عمليات key-value (توافق تام مع localStorage الأصلي)
+// عمليات key-value (توافق تام مع الواجهة السابقة)
 // ============================================================
 
 function getItem(key) {
-  load();
-  const v = _cache[key];
-  return (v === undefined) ? null : String(v);
+  open();
+  const row = stmts().get.get(key);
+  return row ? row.value : null;
 }
 
 function setItem(key, value) {
-  load();
-  _cache[key] = String(value);
-  scheduleSave();
+  open();
+  stmts().put.run(String(key), String(value), Date.now());
 }
 
 function removeItem(key) {
-  load();
-  if (key in _cache) {
-    delete _cache[key];
-    scheduleSave();
-  }
+  open();
+  stmts().del.run(key);
 }
 
 function keys() {
-  load();
-  return Object.keys(_cache);
+  open();
+  return stmts().keys.all().map(r => r.key);
 }
 
 function has(key) {
-  load();
-  return key in _cache;
+  open();
+  return !!stmts().has.get(key);
 }
 
 function clear() {
-  load();
-  _cache = {};
-  scheduleSave();
+  open();
+  stmts().delAll.run();
 }
+
+// الحفظ الفوري مضمون بكل عملية كتابة (بدون مؤجلات) —
+// نُبقي الدوال للتوافق التام مع الاستدعاءات القائمة
+function flush() {}
+function forceFlush() {
+  try { if (_db) _db.pragma('wal_checkpoint(TRUNCATE)'); } catch (_) {}
+}
+function scheduleSave() {} // موروثة من الواجهة القديمة — لم تعد مطلوبة
 
 // إحصائيات
 function stats() {
-  load();
-  const keyCount = Object.keys(_cache).length;
-  let totalBytes = 0;
-  try {
-    totalBytes = Buffer.byteLength(JSON.stringify(_cache), 'utf8');
-  } catch {}
+  open();
+  const s = stmts().count.get();
+  let fileBytes = 0;
+  try { fileBytes = fs.statSync(getDbPath()).size; } catch {}
   return {
-    keys: keyCount,
-    totalBytes,
-    dataPath: getDataPath(),
-    backupDir: getBackupDir()
+    keys: s.c,
+    totalBytes: s.bytes,
+    fileBytes,
+    dataPath: getDbPath(),
+    backupDir: getBackupDir(),
+    engine: 'sqlite'
   };
 }
 
 // كل أزواج key-value (للنسخ الاحتياطي/التصدير)
 function getAll() {
-  load();
-  // إرجاع نسخة عميقة
-  return JSON.parse(JSON.stringify(_cache));
+  open();
+  const out = {};
+  for (const row of stmts().all.all()) out[row.key] = row.value;
+  return out;
 }
 
-// استبدال كامل (للاستعادة/الاستيراد)
+// استبدال كامل (للاستعادة/الاستيراد) — معاملة واحدة ذرّية
 function replaceAll(dataObj) {
-  _cache = JSON.parse(JSON.stringify(dataObj));
-  scheduleSave();
+  open();
+  const put = stmts().put;
+  const tx = _db.transaction((obj) => {
+    stmts().delAll.run();
+    for (const k in obj) put.run(k, String(obj[k]), Date.now());
+  });
+  tx(dataObj || {});
 }
 
 // ============================================================
-// النسخ الاحتياطي والاستعادة
+// النسخ الاحتياطي والاستعادة (نفس صيغة .pqbak السابقة تماماً)
 // ============================================================
 
-// محاولة الاسترجاع من آخر نسخة تلقائية عند فساد البيانات
-function tryRecoverFromBackup() {
+// قائمة النسخ الاحتياطية المتوفرة
+function listBackups() {
+  const dir = getBackupDir();
   try {
-    const dir = getBackupDir();
-    const files = fs.readdirSync(dir)
+    return fs.readdirSync(dir)
       .filter(f => f.endsWith('.pqbak'))
-      .map(f => ({ name: f, mtime: fs.statSync(path.join(dir, f)).mtimeMs }))
+      .map(f => {
+        const p = path.join(dir, f);
+        const st = fs.statSync(p);
+        return { name: f, path: p, size: st.size, mtime: st.mtimeMs };
+      })
       .sort((a, b) => b.mtime - a.mtime);
-    if (files.length === 0) return {};
-    const latest = path.join(dir, files[0].name);
-    console.log('[db] استرجاع من النسخة الاحتياطية:', latest);
-    const parsed = JSON.parse(fs.readFileSync(latest, 'utf8'));
-    return parsed.data || parsed || {};
   } catch {
-    return {};
+    return [];
   }
 }
 
-// إنشاء نسخة احتياطية كاملة
-// الناتج: ملف .pqbak يحوي { meta, data, checksum }
+// إنشاء نسخة احتياطية كاملة — { meta, data, checksum } بصيغة JSON
+// (متوافقة قراءةً وكتابةً مع كل الإصدارات السابقة واللاحقة)
 function createBackup(destPath, isAuto = false) {
   forceFlush();
   const data = getAll();
@@ -195,7 +249,6 @@ function createBackup(destPath, isAuto = false) {
 function restoreBackup(srcPath) {
   const raw = fs.readFileSync(srcPath, 'utf8');
   const parsed = JSON.parse(raw);
-  // التحقق من التوقيع إن وُجد
   let data;
   if (parsed.data && parsed.checksum) {
     const verify = { ...parsed };
@@ -209,7 +262,6 @@ function restoreBackup(srcPath) {
   } else if (parsed.data) {
     data = parsed.data;
   } else {
-    // تنسيق قديم (مباشر)
     data = parsed;
   }
   replaceAll(data);
@@ -225,7 +277,6 @@ function autoBackup() {
     const dest = path.join(dir, fname);
     createBackup(dest, true);
 
-    // تنظيف النسخ القديمة (الاحتفاظ بآخر 7)
     const files = fs.readdirSync(dir)
       .filter(f => f.startsWith('auto-') && f.endsWith('.pqbak'))
       .map(f => ({ name: f, path: path.join(dir, f), mtime: fs.statSync(path.join(dir, f)).mtimeMs }))
@@ -242,26 +293,8 @@ function autoBackup() {
   }
 }
 
-// قائمة النسخ الاحتياطية المتوفرة
-function listBackups() {
-  const dir = getBackupDir();
-  try {
-    return fs.readdirSync(dir)
-      .filter(f => f.endsWith('.pqbak'))
-      .map(f => {
-        const p = path.join(dir, f);
-        const st = fs.statSync(p);
-        return { name: f, path: p, size: st.size, mtime: st.mtimeMs };
-      })
-      .sort((a, b) => b.mtime - a.mtime);
-  } catch {
-    return [];
-  }
-}
-
 // ميتا قاعدة البيانات (للعرض فقط)
 function getMeta() {
-  load();
   const s = stats();
   const bps = listBackups();
   return {
@@ -272,14 +305,16 @@ function getMeta() {
     totalMB: Math.round(s.totalBytes / 1048576 * 100) / 100,
     backupCount: bps.length,
     lastBackup: bps[0] ? new Date(bps[0].mtime).toISOString() : null,
-    appVersion: app.getVersion() || require('../package.json').version || '5.4.0'
+    appVersion: app.getVersion() || require('../package.json').version || '5.4.0',
+    engine: 'sqlite'
   };
 }
 
 module.exports = {
-  load, flush, forceFlush, getDataPath,
+  load: open, // توافق: الاستدعاء القديم load() يفتح القاعدة
+  open, flush, forceFlush, getDataPath: getDbPath,
   getItem, setItem, removeItem, keys, has, clear, stats,
   getAll, replaceAll,
-  createBackup, restoreBackup, autoBackup, listBackups, tryRecoverFromBackup,
+  createBackup, restoreBackup, autoBackup, listBackups,
   getMeta
 };

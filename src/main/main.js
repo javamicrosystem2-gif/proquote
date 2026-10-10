@@ -15,6 +15,16 @@ const SHOOT_MODE = process.argv.includes('--shoot');
 if (SHOOT_MODE) {
   try { require('./shoot').isolateUserData(); } catch (e) { console.error('[shoot] isolation failed:', e.message); }
 }
+
+// وضع فحص التخزين (--dbtest): تشخيص بلا نافذة — ترحيل + تكافؤ + نسخ احتياطي ذهاباً وإياباً
+// مع PQTEST_USERDATA=<مجلد> يُوجَّه الفحص لمجلد معزول بدل بيانات المستخدم
+const DBTEST_MODE = process.argv.includes('--dbtest');
+if (DBTEST_MODE) {
+  try { require('fs').writeFileSync(require('path').join(process.env.APPDATA || '.', 'dbtest-argv.txt'), JSON.stringify(process.argv), 'utf8'); } catch (e) {}
+  if (process.env.PQTEST_USERDATA) {
+    try { app.setPath('userData', process.env.PQTEST_USERDATA); } catch (e) { console.error('[dbtest] userData override failed:', e.message); }
+  }
+}
 // لغة التسطيب المختارة (يكتبها NSIS في lang.txt بجذر التثبيت)
 // ===== جسر الفاتورة الإلكترونية (شبكة + توقيع خارجي) =====
 const https = require('https');
@@ -260,6 +270,17 @@ app.whenReady().then(() => {
   // وضع الالتقاط: نافذة مستقلة + جولتان (عربي/إنجليزي) ثم خروج — بلا أي أثر جانبي
   if (SHOOT_MODE) {
     require('./shoot').run();
+    return;
+  }
+
+  // وضع فحص التخزين: بلا نافذة — تقرير نصي ثم خروج
+  if (DBTEST_MODE) {
+    try { require('./dbtest').run(); }
+    catch (e) {
+      try { require('fs').writeFileSync(require('path').join(app.getPath('userData'), 'dbtest-crash.txt'), String(e && e.stack || e), 'utf8'); } catch (_) {}
+      console.error('[dbtest] fatal:', e);
+      app.exit(1);
+    }
     return;
   }
 

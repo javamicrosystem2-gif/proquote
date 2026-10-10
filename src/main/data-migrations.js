@@ -65,31 +65,37 @@ function healthCheck() {
       results.jsonValid = true; results.hasKeys = true;
       return results;
     }
-    const raw = fs.readFileSync(dataPath, 'utf8');
-    const data = JSON.parse(raw); // throws if corrupt
-    results.jsonValid = true;
-    results.keyCount = Object.keys(data).length;
-    results.hasKeys = results.keyCount > 0;
-    if (!results.hasKeys) console.warn('[health] Data file has 0 keys');
-    console.log('[health] OK —', results.keyCount, 'keys');
-  } catch (e) {
-    console.error('[health] Data file corrupt:', e.message);
-    // محاولة الاستعادة من آخر نسخة احتياطية
+    // محرك SQLite: الفحص عبر فتح القاعدة وقراءة المفاتيح فعلياً
+    // (فساد القاعدة يُعالج داخل db.open() بالاسترجاع من آخر نسخة)
     try {
-      const backups = db.listBackups();
-      if (backups && backups.length > 0) {
-        const latest = backups[0]; // sorted by mtime desc
-        console.log('[health] Attempting recovery from:', latest.name);
-        const restoreResult = db.restoreBackup(latest.path);
-        if (restoreResult && restoreResult.success) {
-          results.recovered = true;
-          results.jsonValid = true;
-          results.keyCount = Object.keys(db.getAll()).length;
-          results.hasKeys = results.keyCount > 0;
-          console.log('[health] Recovery successful —', results.keyCount, 'keys restored');
+      const n = db.keys().length;
+      results.jsonValid = true;
+      results.keyCount = n;
+      results.hasKeys = n > 0;
+      if (!results.hasKeys) console.warn('[health] Data store has 0 keys');
+      console.log('[health] OK —', n, 'keys');
+    } catch (dbErr) {
+      console.error('[health] Data store corrupt:', dbErr.message);
+      // محاولة الاستعادة من آخر نسخة احتياطية
+      try {
+        const backups = db.listBackups();
+        if (backups && backups.length > 0) {
+          const latest = backups[0]; // sorted by mtime desc
+          console.log('[health] Attempting recovery from:', latest.name);
+          const restoreResult = db.restoreBackup(latest.path);
+          const n = (restoreResult && restoreResult.keyCount) || 0;
+          if (n > 0) {
+            results.recovered = true;
+            results.jsonValid = true;
+            results.keyCount = n;
+            results.hasKeys = true;
+            console.log('[health] Recovery successful —', n, 'keys restored');
+          }
         }
-      }
-    } catch (re) { console.error('[health] Recovery failed:', re.message); }
+      } catch (re) { console.error('[health] Recovery failed:', re.message); }
+    }
+  } catch (e) {
+    console.error('[health] Unexpected error:', e.message);
   }
   return results;
 }
