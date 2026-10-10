@@ -29,6 +29,15 @@ contextBridge.exposeInMainWorld('proquote', {
     getMeta: () => ipcRenderer.invoke('storage:getMeta')
   },
 
+  // ---------- الشركات (تعدد الشركات بعزل كامل) ----------
+  companies: {
+    list: () => ipcRenderer.invoke('companies:list'),
+    create: (name) => ipcRenderer.invoke('companies:create', name),
+    setDefault: (id) => ipcRenderer.invoke('companies:set-default', id),
+    current: () => ipcRenderer.invoke('companies:current'),
+    remove: (id) => ipcRenderer.invoke('companies:delete', id)
+  },
+
   // ---------- النسخ الاحتياطي والاستعادة ----------
   backup: {
     create: (customPath) => ipcRenderer.invoke('backup:create', customPath),
@@ -53,6 +62,9 @@ contextBridge.exposeInMainWorld('proquote', {
   // ---------- التصدير/الاستيراد ----------
   exportAll: () => ipcRenderer.invoke('export:all'),
   importAll: (dataObj) => ipcRenderer.invoke('import:all', dataObj),
+
+  // ---------- ملف سيرفر المزامنة (للعميل يرفعه على سيرفره) ----------
+  exportSyncServer: () => ipcRenderer.invoke('sync:export-server'),
 
   // ---------- الترخيص ----------
   license: {

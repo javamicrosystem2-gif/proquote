@@ -82,7 +82,35 @@ function run() {
     log('— ملف JSON مؤرشف (لم يُحذف): ' + (archived || (migrated ? '✗ غير موجود!' : 'غير مطلوب')));
 
     const meta = db.getMeta();
-    log('— ملف القاعدة: ' + path.basename(meta.dataPath) + ' (' + Math.round(meta.totalBytes / 1024) + 'KB بيانات، ' + Math.round((fs.statSync(meta.dataPath).size || 0) / 1024) + 'KB ملف)');
+    log('— ملف القاعدة: ' + path.basename(meta.dataPath) + ' (' + Math.round(meta.totalBytes / 1024) + 'KB بيانات، ' + Math.round((meta.fileBytes || 0) / 1024) + 'KB ملف)');
+    log('— الشركة النشطة: ' + (meta.company || '—') + ' (id=' + meta.companyId + ')');
+
+    // ---------- 8) عزل الشركات (إنشاء → تبديل → تحقق → عودة → حذف) ----------
+    try {
+      const companies = require('./companies');
+      const before = db.getAll();
+      const beforeHash = sha(before);
+      const beforeId = companies.active().id;
+      const tName = '__شركة_الفحص__';
+      companies.remove((companies.list().find(c => c.name === tName) || {}).id); // تنظيف أي بقايا
+      const cr = companies.create(tName);
+      if (cr.ok) {
+        const sw = companies.setDefault(cr.id);
+        const afterSwitch = db.getAll();
+        const isolated = sw.ok && Object.keys(afterSwitch).length === 0;
+        log('— إنشاء شركة جديدة والتبديل إليها: ' + (sw.ok ? '✅' : '✗ ' + (sw.error || '')));
+        log('— عزل بيانات الشركة الجديدة (فارغة تماماً من غيرها): ' + (isolated ? '✅ نعم' : '✗ تسرّب!'));
+        const back = companies.setDefault(beforeId);
+        const restored = back.ok && sha(db.getAll()) === beforeHash;
+        log('— العودة للشركة الأصلية واستعادة بياناتها حرفياً: ' + (restored ? '✅' : '✗ فقدان!'));
+        const del = companies.remove(cr.id);
+        log('— حذف شركة الفحص: ' + (del.ok ? '✅' : '✗ ' + del.error));
+        log('— عدد الشركات المسجلة: ' + companies.list().length + ' | الشركة النشطة: ' + companies.active().name);
+      } else {
+        log('— فحص الشركات: تعذر إنشاء شركة الفحص (' + cr.error + ')');
+      }
+    } catch (e) { log('— فحص الشركات فشل: ' + e.message); }
+
     log('===' + (keyCount > 0 ? '✅ اكتمل الفحص بنجاح' : '⚠ القاعدة فارغة (أول تشغيل؟)') + '===');
   } catch (e) {
     log('✗✗ فشل الفحص: ' + e.message + '\n' + e.stack);

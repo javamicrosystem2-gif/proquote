@@ -1,6 +1,6 @@
 {
   "name": "proquote",
-  "version": "9.8.0",
+  "version": "9.9.0",
   "description": "ProQuote — نظام إدارة عروض الأسعار والمستندات",
   "main": "src/main/main.js",
   "author": {
@@ -82,6 +82,16 @@
     "asarUnpack": [
       "**/node_modules/better-sqlite3/**"
     ],
-    "npmRebuild": false
+    "npmRebuild": false,
+    "extraResources": [
+      {
+        "from": "sync-server.js",
+        "to": "sync-server.js"
+      },
+      {
+        "from": "docs/ONLINE-GUIDE.md",
+        "to": "ONLINE-GUIDE.md"
+      }
+    ]
   }
 }

@@ -16,6 +16,12 @@ if (SHOOT_MODE) {
   try { require('./shoot').isolateUserData(); } catch (e) { console.error('[shoot] isolation failed:', e.message); }
 }
 
+// وضع اختبار الواجهة التشغيلي (--uitest): مجلد معزول + سيناريوهات فعلية عبر دوال الواجهة
+const UITEST_MODE = process.argv.includes('--uitest');
+if (UITEST_MODE) {
+  try { require('../../shoot/uitest').isolate(); } catch (e) { console.error('[uitest] isolation failed:', e.message); }
+}
+
 // وضع فحص التخزين (--dbtest): تشخيص بلا نافذة — ترحيل + تكافؤ + نسخ احتياطي ذهاباً وإياباً
 // مع PQTEST_USERDATA=<مجلد> يُوجَّه الفحص لمجلد معزول بدل بيانات المستخدم
 const DBTEST_MODE = process.argv.includes('--dbtest');
@@ -74,6 +80,7 @@ ipcMain.handle('app:install-lang', () => {
 
 
 const db = require('./db');
+const companies = require('./companies');
 const migration = require('./migration');
 const license = require('./license');
 const updater = require('./updater');
@@ -155,6 +162,11 @@ function createMainWindow() {
     if (process.env.NODE_ENV === 'development') {
       mainWindow.webContents.openDevTools({ mode: 'detach' });
     }
+  });
+
+  // بعد كل إعادة تحميل (بتبديل الشركة مثلاً): رفع حارس التبديل
+  mainWindow.webContents.on('did-finish-load', () => {
+    try { companies.setSwitchingDone(); } catch (_) {}
   });
 
   // فتح الروابط الخارجية في المتصفح الافتراضي بدل نافذة Electron
@@ -284,6 +296,12 @@ app.whenReady().then(() => {
     return;
   }
 
+  // وضع اختبار الواجهة: مجلد معزول + سيناريوهات DOM فعلية ثم خروج
+  if (UITEST_MODE) {
+    require('../../shoot/uitest').run();
+    return;
+  }
+
   createMainWindow();
   buildMenu();
 
@@ -367,15 +385,48 @@ ipcMain.handle('dialog:show-open', async (_evt, opts) => {
 
 // ---------- قناة IPC للتخزين الدائم (db.js) ----------
 // محاكاة localStorage على القرص — توافق تام مع دوال الواجهة الأصلية
+// حارس التبديل: أثناء التبديل بين الشركات تُرفض الكتابات منعًا لأي اختلاط
 ipcMain.handle('storage:getItem', (_evt, key) => db.getItem(key));
-ipcMain.handle('storage:setItem', (_evt, key, value) => { db.setItem(key, value); return true; });
-ipcMain.handle('storage:removeItem', (_evt, key) => { db.removeItem(key); return true; });
+ipcMain.handle('storage:setItem', (_evt, key, value) => { if (companies.isSwitching()) return false; db.setItem(key, value); return true; });
+ipcMain.handle('storage:removeItem', (_evt, key) => { if (companies.isSwitching()) return false; db.removeItem(key); return true; });
 ipcMain.handle('storage:has', (_evt, key) => db.has(key));
 ipcMain.handle('storage:keys', () => db.keys());
-ipcMain.handle('storage:clear', () => { db.clear(); return true; });
-ipcMain.handle('storage:flush', () => { db.forceFlush(); return true; });
+ipcMain.handle('storage:clear', () => { if (companies.isSwitching()) return false; db.clear(); return true; });
+ipcMain.handle('storage:flush', () => db.forceFlush());
 ipcMain.handle('storage:stats', () => db.stats());
 ipcMain.handle('storage:getMeta', () => db.getMeta());
+
+// ---------- قناتا الشركات (تعدد الشركات بعزل كامل) ----------
+ipcMain.handle('companies:list', () => companies.list());
+ipcMain.handle('companies:create', (_evt, name) => companies.create(name));
+ipcMain.handle('companies:set-default', (_evt, id) => companies.setDefault(id));
+ipcMain.handle('companies:current', () => companies.active());
+ipcMain.handle('companies:delete', (_evt, id) => companies.remove(id));
+
+// ---------- تصدير ملف سيرفر المزامنة للعميل (sync-server.js) ----------
+// الملف مرفق مع البرنامج (extraResources) — الزر في نافذة مساعدة المزامنة
+ipcMain.handle('sync:export-server', async () => {
+  const candidates = [
+    process.resourcesPath ? path.join(process.resourcesPath, 'sync-server.js') : null, // مرفق بالتثبيت
+    path.join(app.getAppPath(), 'sync-server.js'),                                     // بيئة التطوير
+    path.join(app.getAppPath(), '..', 'sync-server.js')
+  ];
+  let src = null;
+  for (const p of candidates) { try { if (p && fs.existsSync(p)) { src = p; break; } } catch (_) {} }
+  if (!src) return { ok: false, error: 'ملف السيرفر غير موجود في هذا التثبيت' };
+  const r = await dialog.showSaveDialog(mainWindow, {
+    title: 'حفظ ملف السيرفر — sync-server.js',
+    defaultPath: 'sync-server.js',
+    filters: [{ name: 'JavaScript', extensions: ['js'] }]
+  });
+  if (r.canceled || !r.filePath) return { canceled: true };
+  try {
+    fs.copyFileSync(src, r.filePath);
+    return { ok: true, path: r.filePath };
+  } catch (e) {
+    return { ok: false, error: e.message };
+  }
+});
 
 // ---------- النسخ الاحتياطي والاستعادة ----------
 ipcMain.handle('backup:create', async (_evt, customPath) => {
