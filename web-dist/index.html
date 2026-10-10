@@ -21,7 +21,7 @@ nav a:hover{color:var(--acc);border-color:var(--acc)}
 .btn-o{border:1px solid var(--acc);color:var(--acc);background:transparent}.btn-o:hover{background:var(--acc2)}
 .btn-g{border:1px solid var(--brd);color:var(--t2);background:transparent}
 .btn-g:hover{border-color:var(--t2)}
-.hero{text-align:center;padding:80px 20px 60px;background:radial-gradient(60% 60% at 50% 0%,rgba(0,168,133,.12),transparent)}
+.hero{text-align:center;padding:72px 20px 56px;background:radial-gradient(60% 60% at 50% 0%,rgba(0,168,133,.12),transparent)}
 .hero h1{font-size:42px;font-weight:900;margin-bottom:14px}
 .hero h1 span{color:var(--acc)}
 .hero p{color:var(--t2);font-size:17px;max-width:640px;margin:0 auto 28px}
@@ -62,7 +62,27 @@ footer{border-top:1px solid var(--brd);padding:26px 0;text-align:center;color:va
 .cyc{cursor:pointer;border:1px solid var(--brd);background:transparent;color:var(--t2);font-weight:700;font-size:13.5px;padding:10px 22px;transition:.2s}
 .cyc.on{background:var(--acc);border-color:var(--acc);color:#fff}
 .btn-pp{background:#0070ba;color:#fff}.btn-pp:hover{filter:brightness(1.15)}
-@media(max-width:640px){.hero h1{font-size:30px}}
+/* ===== قسم الجولة الدعائي ===== */
+.hlite{max-width:800px;margin:0 auto 20px;background:var(--card);border:1px solid var(--acc);border-radius:14px;padding:14px 20px;font-size:15px;font-weight:700;line-height:1.9}
+.fch{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:26px}
+.fch button{background:var(--bg2);border:1px solid var(--brd);color:var(--t2);font-weight:700;font-size:12.5px;padding:7px 16px;border-radius:20px;cursor:pointer;transition:.2s}
+.fch button:hover{border-color:var(--acc);color:var(--acc)}
+.fch button.on{background:var(--acc);border-color:var(--acc);color:#fff}
+.tgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+.scard{background:var(--card);border:1px solid var(--brd);border-radius:14px;overflow:hidden;cursor:zoom-in;transition:.2s}
+.scard:hover{border-color:var(--acc);transform:translateY(-3px);box-shadow:0 14px 40px rgba(0,0,0,.45)}
+.scard .scimg{position:relative;background:#0a1220;aspect-ratio:1364/811}
+.scard .scimg img{width:100%;height:100%;object-fit:cover;object-position:top;display:block}
+.szoom{position:absolute;bottom:8px;left:8px;background:rgba(6,11,20,.82);border:1px solid var(--brd);color:var(--t2);border-radius:8px;font-size:11px;padding:3px 9px}
+.scb{padding:13px 16px}
+.scb h3{font-size:14.5px;margin-bottom:4px}
+.scb p{font-size:12px;color:var(--t2)}
+.statement{max-width:840px;margin:0 auto;color:var(--t2);font-size:15.5px;line-height:2.1;text-align:center}
+#lbx{display:none;position:fixed;inset:0;z-index:100;background:rgba(3,6,12,.95);padding:20px;flex-direction:column;align-items:center;justify-content:center;gap:12px}
+#lbx.on{display:flex}
+#lbx img{max-width:min(1240px,96vw);max-height:76vh;border:1px solid var(--brd);border-radius:10px;cursor:zoom-out}
+#lbxC{color:var(--t2);font-size:14px;font-weight:700}
+@media(max-width:640px){.hero h1{font-size:30px}.tgrid{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -71,17 +91,18 @@ footer{border-top:1px solid var(--brd);padding:26px 0;text-align:center;color:va
   <div class="wrap">
     <div class="logo"><i>📄</i> ProQuote</div>
     <nav>
-      <a href="#features">المزايا</a><a href="#plans">الاشتراكات</a><a href="#download">التحميل</a><a href="#activate">التفعيل</a><a href="#contact">تواصل</a> <a href="#" id="lngT" onclick="setLang(document.documentElement.lang==='ar'?'en':'ar');return false" style="color:var(--acc);border-color:var(--acc)">EN</a>
+      <a href="#why">المزايا</a><a href="#tour">جولة</a><a href="#plans">الاشتراكات</a><a href="#download">التحميل</a><a href="#activate">التفعيل</a><a href="#contact">تواصل</a> <a href="#" id="lngT" onclick="setLang(document.documentElement.lang==='ar'?'en':'ar');return false" style="color:var(--acc);border-color:var(--acc)">EN</a>
     </nav>
   </div>
 </header>
 
 <div class="hero">
   <h1>نظام كامل لإدارة <span>عروض الأسعار</span> والمستندات</h1>
+  <div class="hlite">البرنامج الأفضل على الإطلاق لتنفيذ عرض أسعار أو عروض فنية أو أذون استلام وتفويضات بكافة أنواعها بضغطة واحدة — بدون تعقيدات وبلا موظفين: أدره بنفسك ونفّذ كل العروض بضغطة واحدة</div>
   <p>أكثر من 24 قسماً متكاملاً — عروض، توريد، تصنيع، مخزن، مناقصات، مدفوعات ومستحقات، عينات بشفرة QR، بوالص شحن، صلاحيات موظفين — يعمل أوفلاين بالكامل ويتزامن سحابياً</p>
   <div class="cta">
-    <a class="btn btn-p" href="#download">⬇ تحميل نسخة الكمبيوتر</a>
-    <a class="btn btn-o" href="#plans">خطط الاشتراك</a>
+    <a class="btn btn-p" href="#tour">🖥️ جولة داخل البرنامج</a>
+    <a class="btn btn-o" href="#download">⬇ تحميل نسخة الكمبيوتر</a>
   </div>
   <div class="badges">
     <span class="badge">🛡️ يعمل <b>أوفلاين 100%</b></span>
@@ -93,20 +114,94 @@ footer{border-top:1px solid var(--brd);padding:26px 0;text-align:center;color:va
   </div>
 </div>
 
-<section id="features">
+<section id="why">
   <div class="wrap">
-    <h2 class="sec">كل ما تحتاجه شركتك في مكان واحد</h2>
-    <p class="sub">من عرض السعر حتى التسليم والتحصيل</p>
+    <h2 class="sec">مميزات ProQuote</h2>
+    <p class="sub">سهل — سريع — بدون موظفين</p>
     <div class="grid">
-      <div class="card"><i class="ic">💼</i><h3>عروض أسعار احترافية</h3><p>قوالب متعددة، ضريبة وخصم، أعمدة مخصصة، QR، PDF وطباعة</p></div>
-      <div class="card"><i class="ic">🏭</i><h3>تصنيع وتوزيع مصانع</h3><p>توزيع بنود أمر التوريد على مصانع متعددة بالمقاسات والألوان مع قفل الكميات</p></div>
-      <div class="card"><i class="ic">📦</i><h3>مخزن بذكاء</h3><p>مدخلات ومخرجات تراكمية، تقارير نواقص تلقائية، رول/توب، ملصقات باركود</p></div>
-      <div class="card"><i class="ic">🧪</i><h3>عينات بتتبع كامل</h3><p>خط 7 حالات، QR ومسح بالكاميرا أو الليزر، صور إثبات، تنبيهات بت واسترداد</p></div>
-      <div class="card"><i class="ic">🚚</i><h3>شحن وبوالص</h3><p>مولد بوليصات شحن متعدد الأصناف محكوم بالمتاح من المخزن + مندوبون</p></div>
-      <div class="card"><i class="ic">💰</i><h3>مدفوعات ومستحقات</h3><p>دفعات مجزأة بأكواد فريدة، إيصالات نقدية، كشوف مفلترة بالتفقيط العربي</p></div>
-      <div class="card"><i class="ic">🛡️</i><h3>إدارة وصلاحيات</h3><p>مستخدمون وأدوار (مسؤول/مشرف/موظف/مشاهدة) ومصفوفة أقسام لكل مستخدم</p></div>
-      <div class="card"><i class="ic">☁️</i><h3>أوفلاين + سحابة</h3><p>يعمل بدون إنترنت بالكامل، وعند الاتصال يرفع ويجلب تلقائياً (Supabase)</p></div>
+      <div class="card"><i class="ic">🖱️</i><h3>سهل الاستخدام</h3><p>مناسب لكافة الأعمال وتستطيع استخدامه بدون موظفين</p></div>
+      <div class="card"><i class="ic">📲</i><h3>مشاركة العميل بضغطة</h3><p>الاسم ورقم الهاتف والعنوان واللوكيشن — واتساب أو تيليجرام أو طباعة بضغطة واحدة</p></div>
+      <div class="card"><i class="ic">📤</i><h3>إرسال وطباعة فورية</h3><p>شارك أو أرسل كافة العروض أو اطبعها بضغطة واحدة</p></div>
+      <div class="card"><i class="ic">🧩</i><h3>أعمدة كما تحب</h3><p>أضف أعمدة اللون والمقاس والمواصفات وغيرها لكل عرض</p></div>
+      <div class="card"><i class="ic">🏷️</i><h3>منتجات بلا حدود + QR</h3><p>أضف منتجات لا حدود لها مع إنشاء كيو آر كود تلقائي لكل منتج</p></div>
+      <div class="card"><i class="ic">🖼️</i><h3>صور المنتجات بالعروض</h3><p>أضف صور المنتجات وتظهر في عروض الأسعار وغيرها من العروض</p></div>
     </div>
+  </div>
+</section>
+
+<section id="tour" style="background:var(--bg2)">
+  <div class="wrap">
+    <h2 class="sec">جولة داخل البرنامج — 25 قسماً متكاملاً</h2>
+    <p class="sub">لقطات حقيقية من داخل البرنامج — اضغط أي صورة لمشاهدتها بالحجم الكامل</p>
+    <div class="fch">
+      <button class="on" onclick="tFilter('all',this)">الكل</button>
+      <button onclick="tFilter('docs',this)">العروض والمستندات</button>
+      <button onclick="tFilter('ops',this)">العمليات</button>
+      <button onclick="tFilter('fin',this)">المالية</button>
+      <button onclick="tFilter('mgmt',this)">الإدارة والمخزن</button>
+      <button onclick="tFilter('sys',this)">النظام</button>
+    </div>
+    <div class="tgrid">
+
+      <div class="scard" data-g="sys" onclick="shotClick(this)"><div class="scimg"><img class="shot" data-ar="img/sec-dash.png" data-en="img/sec-dash-en.png" src="img/sec-dash.png" loading="lazy" alt="لوحة التحكم"><span class="szoom">🔍 عرض مكبر</span></div><div class="scb"><h3>لوحة التحكم</h3><p>نظرة فورية لكل ما يجري — إحصائيات العروض ومعدل التحويل وأحدث الحركات في مكان واحد.</p></div></div>
+
+      <div class="scard" data-g="docs" onclick="shotClick(this)"><div class="scimg"><img class="shot" data-ar="img/sec-quotes.png" data-en="img/sec-quotes-en.png" src="img/sec-quotes.png" loading="lazy" alt="عروض الأسعار"><span class="szoom">🔍 عرض مكبر</span></div><div class="scb"><h3>عروض الأسعار</h3><p>عروض احترافية بقوالب متعددة وضريبة وخصم وQR وPDF — جاهزة للإرسال خلال دقيقة.</p></div></div>
+
+      <div class="scard" data-g="docs" onclick="shotClick(this)"><div class="scimg"><img class="shot" data-ar="img/sec-tech.png" data-en="img/sec-tech-en.png" src="img/sec-tech.png" loading="lazy" alt="عرض فني"><span class="szoom">🔍 عرض مكبر</span></div><div class="scb"><h3>عرض فني</h3><p>مستند فني كامل بالمواصفات والمقاسات لكل منتج — بضغطة واحدة من عرض السعر.</p></div></div>
+
+      <div class="scard" data-g="docs" onclick="shotClick(this)"><div class="scimg"><img class="shot" data-ar="img/sec-receipt.png" data-en="img/sec-receipt-en.png" src="img/sec-receipt.png" loading="lazy" alt="إذن استلام"><span class="szoom">🔍 عرض مكبر</span></div><div class="scb"><h3>إذن استلام</h3><p>أذون استلام رسمية جاهزة للطباعة والمشاركة بضغطة واحدة.</p></div></div>
+
+      <div class="scard" data-g="docs" onclick="shotClick(this)"><div class="scimg"><img class="shot" data-ar="img/sec-auth.png" data-en="img/sec-auth-en.png" src="img/sec-auth.png" loading="lazy" alt="تفويض"><span class="szoom">🔍 عرض مكبر</span></div><div class="scb"><h3>تفويض</h3><p>تفويضات رسمية بكل الأنواع مرتبطة بالموظفين والمناقصات.</p></div></div>
+
+      <div class="scard" data-g="docs" onclick="shotClick(this)"><div class="scimg"><img class="shot" data-ar="img/sec-custom.png" data-en="img/sec-custom-en.png" src="img/sec-custom.png" loading="lazy" alt="عرض مخصص"><span class="szoom">🔍 عرض مكبر</span></div><div class="scb"><h3>عرض مخصص</h3><p>اعتذارات وتنويهات واستفسارات وقيد موردين — قوالب جاهزة تُحرر في ثوانٍ.</p></div></div>
+
+      <div class="scard" data-g="docs" onclick="shotClick(this)"><div class="scimg"><img class="shot" data-ar="img/sec-full.png" data-en="img/sec-full-en.png" src="img/sec-full.png" loading="lazy" alt="عرض متكامل"><span class="szoom">🔍 عرض مكبر</span></div><div class="scb"><h3>عرض متكامل</h3><p>من عرض سعر واحد تولّد العرض الفني وإذن الاستلام والتفويض تلقائياً.</p></div></div>
+
+      <div class="scard" data-g="ops" onclick="shotClick(this)"><div class="scimg"><img class="shot" data-ar="img/sec-samples.png" data-en="img/sec-samples-en.png" src="img/sec-samples.png" loading="lazy" alt="العينات"><span class="szoom">🔍 عرض مكبر</span></div><div class="scb"><h3>العينات</h3><p>خط 7 حالات للعينة من التحضير حتى البت — QR وصور إثبات وتنبيهات الاسترجاع.</p></div></div>
+
+      <div class="scard" data-g="ops" onclick="shotClick(this)"><div class="scimg"><img class="shot" data-ar="img/sec-supply.png" data-en="img/sec-supply-en.png" src="img/sec-supply.png" loading="lazy" alt="أمر توريد"><span class="szoom">🔍 عرض مكبر</span></div><div class="scb"><h3>أمر توريد</h3><p>أوامر توريد بحالة تشغيل ودفعات جزئية وبوالص شحن مرتبطة.</p></div></div>
+
+      <div class="scard" data-g="ops" onclick="shotClick(this)"><div class="scimg"><img class="shot" data-ar="img/sec-returns.png" data-en="img/sec-returns-en.png" src="img/sec-returns.png" loading="lazy" alt="المرتجعات"><span class="szoom">🔍 عرض مكبر</span></div><div class="scb"><h3>المرتجعات</h3><p>مرتجعات مرتبطة بأوامر التوريد بحالات فحص واستلام.</p></div></div>
+
+      <div class="scard" data-g="ops" onclick="shotClick(this)"><div class="scimg"><img class="shot" data-ar="img/sec-tenders.png" data-en="img/sec-tenders-en.png" src="img/sec-tenders.png" loading="lazy" alt="المناقصات"><span class="szoom">🔍 عرض مكبر</span></div><div class="scb"><h3>المناقصات</h3><p>متابعة المناقصات والمواعيد النهائية وقيم المتعاقدات والضمانات.</p></div></div>
+
+      <div class="scard" data-g="ops" onclick="shotClick(this)"><div class="scimg"><img class="shot" data-ar="img/sec-shipping.png" data-en="img/sec-shipping-en.png" src="img/sec-shipping.png" loading="lazy" alt="التوصيل والشحن"><span class="szoom">🔍 عرض مكبر</span></div><div class="scb"><h3>التوصيل والشحن</h3><p>بوالص شحن متعددة الأصناف مع مندوبين وشركات وتكاليف وحالة كل شحنة.</p></div></div>
+
+      <div class="scard" data-g="fin" onclick="shotClick(this)"><div class="scimg"><img class="shot" data-ar="img/sec-payments.png" data-en="img/sec-payments-en.png" src="img/sec-payments.png" loading="lazy" alt="مدفوعات"><span class="szoom">🔍 عرض مكبر</span></div><div class="scb"><h3>مدفوعات</h3><p>كل مستحقاتك للموردين — دفعات مجزأة بطرق دفع متعددة وكشوف فورية.</p></div></div>
+
+      <div class="scard" data-g="fin" onclick="shotClick(this)"><div class="scimg"><img class="shot" data-ar="img/sec-receivables.png" data-en="img/sec-receivables-en.png" src="img/sec-receivables.png" loading="lazy" alt="مستحقات"><span class="szoom">🔍 عرض مكبر</span></div><div class="scb"><h3>مستحقات</h3><p>ما عليك تحصيله من العملاء — دفعات جزئية ومتابعة حتى الخلاص.</p></div></div>
+
+      <div class="scard" data-g="fin" onclick="shotClick(this)"><div class="scimg"><img class="shot" data-ar="img/sec-rcpt.png" data-en="img/sec-rcpt-en.png" src="img/sec-rcpt.png" loading="lazy" alt="إيصال نقدية"><span class="szoom">🔍 عرض مكبر</span></div><div class="scb"><h3>إيصال نقدية</h3><p>إيصالات استلام نقدية رسمية مربوطة بأوامر التوريد.</p></div></div>
+
+      <div class="scard" data-g="mgmt" onclick="shotClick(this)"><div class="scimg"><img class="shot" data-ar="img/sec-clients.png" data-en="img/sec-clients-en.png" src="img/sec-clients.png" loading="lazy" alt="العملاء"><span class="szoom">🔍 عرض مكبر</span></div><div class="scb"><h3>العملاء</h3><p>بطاقة عميل كاملة — هاتف وعنوان ولوكيشن وطرق دفع — تُشارك واتساب وتيليجرام بضغطة.</p></div></div>
+
+      <div class="scard" data-g="mgmt" onclick="shotClick(this)"><div class="scimg"><img class="shot" data-ar="img/sec-products.png" data-en="img/sec-products-en.png" src="img/sec-products.png" loading="lazy" alt="المنتجات"><span class="szoom">🔍 عرض مكبر</span></div><div class="scb"><h3>المنتجات</h3><p>منتجات بلا حدود بصور ومتغيرات وQR تلقائي لكل منتج.</p></div></div>
+
+      <div class="scard" data-g="mgmt" onclick="shotClick(this)"><div class="scimg"><img class="shot" data-ar="img/sec-warehouse.png" data-en="img/sec-warehouse-en.png" src="img/sec-warehouse.png" loading="lazy" alt="المخزن"><span class="szoom">🔍 عرض مكبر</span></div><div class="scb"><h3>المخزن</h3><p>مدخلات ومخرجات وعدة مستودعات وتنبيهات نواقص وملصقات باركود.</p></div></div>
+
+      <div class="scard" data-g="mgmt" onclick="shotClick(this)"><div class="scimg"><img class="shot" data-ar="img/sec-mfg.png" data-en="img/sec-mfg-en.png" src="img/sec-mfg.png" loading="lazy" alt="التصنيع"><span class="szoom">🔍 عرض مكبر</span></div><div class="scb"><h3>التصنيع</h3><p>توزيع أوامر التشغيل على مصانع متعددة واستلام الدفعات جزئياً أو كلياً.</p></div></div>
+
+      <div class="scard" data-g="mgmt" onclick="shotClick(this)"><div class="scimg"><img class="shot" data-ar="img/sec-documents.png" data-en="img/sec-documents-en.png" src="img/sec-documents.png" loading="lazy" alt="المستندات"><span class="szoom">🔍 عرض مكبر</span></div><div class="scb"><h3>المستندات</h3><p>أرشيف مستندات بمجلدات — سجل تجاري وبطاقة ضريبية وعقود — مع طباعة ومشاركة الكل.</p></div></div>
+
+      <div class="scard" data-g="mgmt" onclick="shotClick(this)"><div class="scimg"><img class="shot" data-ar="img/sec-emp.png" data-en="img/sec-emp-en.png" src="img/sec-emp.png" loading="lazy" alt="الموظفين"><span class="szoom">🔍 عرض مكبر</span></div><div class="scb"><h3>الموظفين</h3><p>ملفات موظفين بالبطاقات والبيانات — مرتبطة بالتفويضات والصلاحيات.</p></div></div>
+
+      <div class="scard" data-g="mgmt" onclick="shotClick(this)"><div class="scimg"><img class="shot" data-ar="img/sec-notes.png" data-en="img/sec-notes-en.png" src="img/sec-notes.png" loading="lazy" alt="نوتة"><span class="szoom">🔍 عرض مكبر</span></div><div class="scb"><h3>نوتة</h3><p>مهام يومية بأولويات ومواعيد استحقاق — لا ينسى فريقك شيئاً.</p></div></div>
+
+      <div class="scard" data-g="sys" onclick="shotClick(this)"><div class="scimg"><img class="shot" data-ar="img/sec-ei.png" data-en="img/sec-ei-en.png" src="img/sec-ei.png" loading="lazy" alt="الفاتورة الإلكترونية"><span class="szoom">🔍 عرض مكبر</span></div><div class="scb"><h3>الفاتورة الإلكترونية</h3><p>فواتير ضريبية إلكترونية بالضرائب ونسبها — من المسودة حتى الإرسال.</p></div></div>
+
+      <div class="scard" data-g="sys" onclick="shotClick(this)"><div class="scimg"><img class="shot" data-ar="img/sec-adm.png" data-en="img/sec-adm-en.png" src="img/sec-adm.png" loading="lazy" alt="الإدارة"><span class="szoom">🔍 عرض مكبر</span></div><div class="scb"><h3>الإدارة</h3><p>مستخدمون وأدوار وصلاحيات لكل قسم — أنت تتحكم فيمن يرى ومن يعدّل.</p></div></div>
+
+      <div class="scard" data-g="sys" onclick="shotClick(this)"><div class="scimg"><img class="shot" data-ar="img/sec-settings.png" data-en="img/sec-settings-en.png" src="img/sec-settings.png" loading="lazy" alt="الإعدادات"><span class="szoom">🔍 عرض مكبر</span></div><div class="scb"><h3>الإعدادات</h3><p>هوية الشركة والقوالب والشروط والضرائب — كل شيء يخرج باسم شركتك.</p></div></div>
+
+    </div>
+  </div>
+</section>
+
+<section style="background:linear-gradient(135deg,rgba(0,168,133,.12),rgba(6,11,20,0) 60%);border-top:1px solid var(--brd);border-bottom:1px solid var(--brd)">
+  <div class="wrap">
+    <h2 class="sec">الأفضل على الإطلاق — كل شيء بضغطة واحدة</h2>
+    <p class="sub" style="margin-bottom:22px">برنامج صنع خصيصاً بدون تعقيدات — سهل الاستخدام لكافة المستخدمين</p>
+    <p class="statement">مناقصات، أوامر توريد ومرتجعات، توصيل وشحن، مدفوعات ومستحقات، إيصالات نقدية، منتجات ومخزن، تصنيع وأوامر تشغيل، العينات، المستندات والموظفين وغيرها — كلها بضغطة واحدة وبدون كثير من التعقيدات. لا يحتاج لموظفين؛ فتستطيع أنت إدارته وتنفيذ كافة العروض بضغطة واحدة — مع كثير من الإعدادات. وانتظر المزيد من الإضافات والتحديثات القادمة.</p>
   </div>
 </section>
 
@@ -149,36 +244,50 @@ footer{border-top:1px solid var(--brd);padding:26px 0;text-align:center;color:va
 </section>
 <script>
 var LANG="ar",CYC="m",RATE=50;/* USD→EGP */
-var LD={"نظام كامل لإدارة":"A complete system for managing","عروض الأسعار":"Quotations","والمستندات":"and documents","أكثر من 24 قسماً متكاملاً — عروض، توريد، تصنيع، مخزن، مناقصات، مدفوعات ومستحقات، عينات بشفرة QR، بوالص شحن، صلاحيات موظفين — يعمل أوفلاين بالكامل ويتزامن سحابياً":"Over 24 fully integrated modules — quotations, supply, manufacturing, inventory, tenders, payments & receivables, QR-coded samples, shipping waybills, employee permissions — works fully offline and syncs to the cloud","⬇ تحميل نسخة الكمبيوتر":"⬇ Download for Windows","خطط الاشتراك":"View Plans","🛡️ يعمل":"🛡️ Works","أوفلاين 100%":"100% offline","🎁 تجربة مجانية":"🎁 Free trial","30 يوماً":"30 days","🔄 مزامنة سحابية تلقائية":"🔄 Automatic cloud sync","🔐 ترخيص مرتبط بالجهاز":"🔐 Device-bound license","المزايا":"Features","التحميل":"Download","التفعيل":"Activation","تواصل":"Contact","الاشتراكات":"Pricing","🌐 عربي / English":"🌐 English / Arabic","كل ما تحتاجه شركتك في مكان واحد":"Everything your company needs in one place","من عرض السعر حتى التسليم والتحصيل":"From quotation to delivery and collection","عروض أسعار احترافية":"Professional Quotations","قوالب متعددة، ضريبة وخصم، أعمدة مخصصة، QR، PDF وطباعة":"Multiple templates, VAT & discounts, custom columns, QR, PDF & print","تصنيع وتوزيع مصانع":"Manufacturing & Factory Distribution","توزيع بنود أمر التوريد على مصانع متعددة بالمقاسات والألوان مع قفل الكميات":"Distribute supply order items across multiple factories by size & color with quantity locking","مخزن بذكاء":"Smart Inventory","مدخلات ومخرجات تراكمية، تقارير نواقص تلقائية، رول/توب، ملصقات باركود":"Cumulative in/out movements, automatic shortage reports, roll/bobbin tracking, barcode labels","عينات بتتبع كامل":"Fully Tracked Samples","خط 7 حالات، QR ومسح بالكاميرا أو الليزر، صور إثبات، تنبيهات بت واسترداد":"7-stage pipeline, QR camera/laser scanning, proof photos, deposit & retrieval alerts","شحن وبوالص":"Shipping & Waybills","مولد بوليصات شحن متعدد الأصناف محكوم بالمتاح من المخزن + مندوبون":"Multi-item waybill generator governed by available stock + couriers","مدفوعات ومستحقات":"Payments & Receivables","دفعات مجزأة بأكواد فريدة، إيصالات نقدية، كشوف مفلترة بالتفقيط العربي":"Split payments with unique codes, cash receipts, Arabic-styled filtered statements","إدارة وصلاحيات":"Management & Permissions","مستخدمون وأدوار (مسؤول/مشرف/موظف/مشاهدة) ومصفوفة أقسام لكل مستخدم":"Users & roles (admin/supervisor/employee/viewer) with a per-user section matrix","أوفلاين + سحابة":"Offline + Cloud","يعمل بدون إنترنت بالكامل، وعند الاتصال يرفع ويجلب تلقائياً (Supabase)":"Works fully offline; on connect it auto-pushes and pulls (Supabase)","الأكثر طلباً":"Most Popular","عروض الأسعار والعملاء والأصناف":"Quotations, clients & items","PDF والطباعة":"PDF & printing","المزامنة السحابية":"Cloud sync","دعم عبر تلجرام":"Telegram support","كل مزايا الفرد":"Everything in Individual","صلاحيات موظفين (3 مستخدمين)":"Employee permissions (3 users)","التوريد والتصنيع والمخزن":"Supply, manufacturing & inventory","المناقصات والشحن والعينات":"Tenders, shipping & samples","المدفوعات والمستحقات":"Payments & receivables","كل مزايا الشركات الصغيرة":"Everything in Small Businesses","حتى 8 مستخدمين بصلاحيات":"Up to 8 permissioned users","الفاتورة الإلكترونية":"E-invoice","أولوية الدعم":"Priority support","كل المزايا بلا حدود":"All features unlimited","عدد مستخدمين غير محدود":"Unlimited users","مركز المستندات المؤرشف":"Archived documents center","التحديث التلقائي وأعلى أولوية دعم":"Auto-updates & top-priority support","اختر نسختك — نفس الحساب والبيانات":"Pick your version — same account & data","نسخة الكمبيوتر":"Desktop Version","Windows — التثبيت الكامل مع النسخ الاحتياطي والطباعة الصامتة":"Windows — full install with backups & silent printing","⬇ تحميل المثبّت":"⬇ Download Installer","نسخة الهاتف":"Mobile Version","قريباً — Android وiOS بنفس البيانات والحساب":"Coming soon — Android & iOS with the same data & account","قريباً":"Coming soon","كيفية التفعيل":"How Activation Works","ثلاث خطوات فقط":"Just three steps","ثبّت البرنامج وافتحه":"Install & open the program","— من قسم الترخيص اضغط «طلب المفتاح» وسيُرسل لك":"— from the License section press \u201CRequest Key\u201D and your","معرف جهازك":"device ID","(8 أحرف) تلقائياً عبر تلجرام أو البريد.":"(8 characters) is sent automatically via Telegram or email.","اختر خطتك":"Choose your plan","— أرسل المعرف واسم الخطة، وسيصلك":"— send the ID and plan name, and you will receive a","مفتاح تفعيل فريد":"unique activation key","مرتبط بجهازك (لا يعمل على أي جهاز آخر).":"bound to your device (works on no other device).","ألصق المفتاح وفعّل":"Paste the key & activate","— يعمل البرنامج أوفلاين بالكامل بعد التفعيل، مدى الحياة للخطة المختارة.":"— the program works fully offline after activation, lifetime for the chosen plan.","🔐 محمي ضد التلاعب والاختراق — أي محاولة تزوير تُبطل الترخيص":"🔐 Tamper & crack protected — any forgery attempt voids the license","تواصل معنا":"Contact Us","للاشتراك أو الدعم الفني":"For subscriptions or technical support","✈️ تلجرام — اشترك الآن":"✈️ Telegram — Subscribe Now","📘 صفحتنا على فيسبوك":"📘 Our Facebook Page","البريد: amrnada@mail.ru — جميع الحقوق محفوظة © 2026 Amr Nada":"Email: amrnada@mail.ru — All rights reserved © 2026 Amr Nada","ProQuote — نظام إدارة عروض الأسعار والمستندات | صُنع بإتقان":"ProQuote — Quotation & Document Management | Crafted with care","تلجرام":"Telegram","⚠️ ظهرت رسالة «Windows cannot access the specified device, path, or file» عند فتح المثبّت؟":"⚠️ Getting “Windows cannot access the specified device, path, or file” when opening the installer?","هذا تحذير حماية من ويندوز للبرامج الجديدة — وليس عيباً في البرنامج. الحل في خطوتين:":"This is a Windows security notice for new programs — not a fault in the software. Fix it in two steps:","انقر بزر الفأرة الأيمن":"Right-click","على ملف المثبّت ← اختر":"on the installer file ← choose","Properties (خصائص)":"Properties","← من تبويب General ضع علامة ✓ على":"← in the General tab tick ✓ on","أسفل النافذة ← اضغط OK.":"at the bottom ← press OK.","شغّل المثبّت مجدداً":"Run the installer again","— سيعمل بشكل طبيعي. إن استمر التحذير: أغلق مضاد الفيروسات مؤقتاً أو نفّذ الملف بـ«Run as administrator».":"— it will work normally. If the warning persists: temporarily turn off your antivirus or run the file via “Run as administrator”.","💡 إن كان حجم الملف أقل من 75 ميجابايت فالتنزيل غير مكتمل — احذفه وحمّله من جديد. وللملاحظة: حجم النسخة الكاملة حوالي 76 ميجابايت.":"💡 If the file is smaller than 75 MB the download is incomplete — delete it and download again. For reference: the full installer is about 76 MB."};
+var LD={"نظام كامل لإدارة":"A complete system for managing","عروض الأسعار":"Quotations","والمستندات":"and documents","أكثر من 24 قسماً متكاملاً — عروض، توريد، تصنيع، مخزن، مناقصات، مدفوعات ومستحقات، عينات بشفرة QR، بوالص شحن، صلاحيات موظفين — يعمل أوفلاين بالكامل ويتزامن سحابياً":"Over 24 fully integrated modules — quotations, supply, manufacturing, inventory, tenders, payments & receivables, QR-coded samples, shipping waybills, employee permissions — works fully offline and syncs to the cloud","⬇ تحميل نسخة الكمبيوتر":"⬇ Download for Windows","خطط الاشتراك":"View Plans","🛡️ يعمل":"🛡️ Works","أوفلاين 100%":"100% offline","🎁 تجربة مجانية":"🎁 Free trial","30 يوماً":"30 days","🔄 مزامنة سحابية تلقائية":"🔄 Automatic cloud sync","🔐 ترخيص مرتبط بالجهاز":"🔐 Device-bound license","المزايا":"Features","التحميل":"Download","التفعيل":"Activation","تواصل":"Contact","الاشتراكات":"Pricing","🌐 عربي / English":"🌐 English / Arabic","البرنامج الأفضل على الإطلاق لتنفيذ عرض أسعار أو عروض فنية أو أذون استلام وتفويضات بكافة أنواعها بضغطة واحدة — بدون تعقيدات وبلا موظفين: أدره بنفسك ونفّذ كل العروض بضغطة واحدة":"The absolute best program for creating quotations, technical offers, receiving permits and every type of authorization in one click — no complications, no staff: run it yourself and produce every offer with a single click","🖥️ جولة داخل البرنامج":"🖥️ Take a tour inside","جولة":"Tour","مميزات ProQuote":"Why ProQuote?","سهل — سريع — بدون موظفين":"Easy — fast — no staff needed","سهل الاستخدام":"Easy to use","مناسب لكافة الأعمال وتستطيع استخدامه بدون موظفين":"Fits every business — you can run it without employees","مشاركة العميل بضغطة":"Share client details in one click","الاسم ورقم الهاتف والعنوان واللوكيشن — واتساب أو تيليجرام أو طباعة بضغطة واحدة":"Name, phone, address and location — via WhatsApp, Telegram or print with one click","إرسال وطباعة فورية":"Instant send & print","شارك أو أرسل كافة العروض أو اطبعها بضغطة واحدة":"Share, send or print any offer with a single click","أعمدة كما تحب":"Columns your way","أضف أعمدة اللون والمقاس والمواصفات وغيرها لكل عرض":"Add color, size, specs and any custom columns to every offer","منتجات بلا حدود + QR":"Unlimited products + QR","أضف منتجات لا حدود لها مع إنشاء كيو آر كود تلقائي لكل منتج":"Add unlimited products with an automatic QR code for each","صور المنتجات بالعروض":"Product images in offers","أضف صور المنتجات وتظهر في عروض الأسعار وغيرها من العروض":"Add product photos and they appear in quotations and every other offer","جولة داخل البرنامج — 25 قسماً متكاملاً":"A tour inside the program — 25 complete sections","لقطات حقيقية من داخل البرنامج — اضغط أي صورة لمشاهدتها بالحجم الكامل":"Real screenshots from inside the program — click any image to view it full size","الكل":"All","العروض والمستندات":"Offers & Documents","العمليات":"Operations","المالية":"Finance","الإدارة والمخزن":"Management & Inventory","النظام":"System","🔍 عرض مكبر":"🔍 View larger","لوحة التحكم":"Dashboard","نظرة فورية لكل ما يجري — إحصائيات العروض ومعدل التحويل وأحدث الحركات في مكان واحد.":"An instant view of everything — quote stats, conversion rate and latest activity in one place.","عروض احترافية بقوالب متعددة وضريبة وخصم وQR وPDF — جاهزة للإرسال خلال دقيقة.":"Professional quotations with multiple templates, VAT & discounts, QR and PDF — ready to send in a minute.","عرض فني":"Technical Offer","مستند فني كامل بالمواصفات والمقاسات لكل منتج — بضغطة واحدة من عرض السعر.":"A full technical document with specs and sizes for every product — one click from the quotation.","إذن استلام":"Receiving Permit","أذون استلام رسمية جاهزة للطباعة والمشاركة بضغطة واحدة.":"Official receiving permits ready to print or share in one click.","تفويض":"Authorization","تفويضات رسمية بكل الأنواع مرتبطة بالموظفين والمناقصات.":"Official authorizations of every type, linked to employees and tenders.","عرض مخصص":"Custom Letter","اعتذارات وتنويهات واستفسارات وقيد موردين — قوالب جاهزة تُحرر في ثوانٍ.":"Apologies, notices, inquiries and supplier registration — ready templates edited in seconds.","عرض متكامل":"Integrated Offer","من عرض سعر واحد تولّد العرض الفني وإذن الاستلام والتفويض تلقائياً.":"From one quotation, generate the technical offer, receiving permit and authorization automatically.","العينات":"Samples","خط 7 حالات للعينة من التحضير حتى البت — QR وصور إثبات وتنبيهات الاسترجاع.":"A 7-stage sample pipeline from preparation to decision — QR, proof photos and retrieval alerts.","أمر توريد":"Supply Order","أوامر توريد بحالة تشغيل ودفعات جزئية وبوالص شحن مرتبطة.":"Supply orders with working status, partial payments and linked waybills.","المرتجعات":"Returns","مرتجعات مرتبطة بأوامر التوريد بحالات فحص واستلام.":"Returns linked to supply orders with inspection and receipt statuses.","المناقصات":"Tenders","متابعة المناقصات والمواعيد النهائية وقيم المتعاقدات والضمانات.":"Track tenders, deadlines, contract values and guarantees.","التوصيل والشحن":"Delivery & Shipping","بوالص شحن متعددة الأصناف مع مندوبين وشركات وتكاليف وحالة كل شحنة.":"Multi-item waybills with couriers, companies, costs and per-shipment status.","مدفوعات":"Payments","كل مستحقاتك للموردين — دفعات مجزأة بطرق دفع متعددة وكشوف فورية.":"Everything you owe suppliers — split payments, multiple methods, instant statements.","مستحقات":"Receivables","ما عليك تحصيله من العملاء — دفعات جزئية ومتابعة حتى الخلاص.":"Everything clients owe you — partial payments tracked until settled.","إيصال نقدية":"Cash Receipt","إيصالات استلام نقدية رسمية مربوطة بأوامر التوريد.":"Official cash receipt vouchers linked to supply orders.","العملاء":"Clients","بطاقة عميل كاملة — هاتف وعنوان ولوكيشن وطرق دفع — تُشارك واتساب وتيليجرام بضغطة.":"A complete client card — phone, address, location and payment methods — shared via WhatsApp or Telegram in one click.","المنتجات":"Products","منتجات بلا حدود بصور ومتغيرات وQR تلقائي لكل منتج.":"Unlimited products with photos, variants and an automatic QR per product.","المخزن":"Inventory","مدخلات ومخرجات وعدة مستودعات وتنبيهات نواقص وملصقات باركود.":"In/out movements, multiple warehouses, shortage alerts and barcode labels.","التصنيع":"Manufacturing","توزيع أوامر التشغيل على مصانع متعددة واستلام الدفعات جزئياً أو كلياً.":"Distribute work orders across factories and receive batches partially or fully.","المستندات":"Documents","أرشيف مستندات بمجلدات — سجل تجاري وبطاقة ضريبية وعقود — مع طباعة ومشاركة الكل.":"A folder-based document archive — commercial register, tax card, contracts — print or share all.","الموظفين":"Employees","ملفات موظفين بالبطاقات والبيانات — مرتبطة بالتفويضات والصلاحيات.":"Employee files with IDs and details — linked to authorizations and permissions.","نوتة":"Notes","مهام يومية بأولويات ومواعيد استحقاق — لا ينسى فريقك شيئاً.":"Daily tasks with priorities and due dates — your team forgets nothing.","الفاتورة الإلكترونية":"E-invoice","فواتير ضريبية إلكترونية بالضرائب ونسبها — من المسودة حتى الإرسال.":"E-invoices with taxes and rates — from draft to submission.","الإدارة":"Administration","مستخدمون وأدوار وصلاحيات لكل قسم — أنت تتحكم فيمن يرى ومن يعدّل.":"Users, roles and per-section permissions — you control who views and who edits.","الإعدادات":"Settings","هوية الشركة والقوالب والشروط والضرائب — كل شيء يخرج باسم شركتك.":"Company identity, templates, terms and taxes — everything goes out under your company name.","الأفضل على الإطلاق — كل شيء بضغطة واحدة":"The absolute best — everything in one click","برنامج صنع خصيصاً بدون تعقيدات — سهل الاستخدام لكافة المستخدمين":"A program crafted on purpose with no complications — easy for every user","مناقصات، أوامر توريد ومرتجعات، توصيل وشحن، مدفوعات ومستحقات، إيصالات نقدية، منتجات ومخزن، تصنيع وأوامر تشغيل، العينات، المستندات والموظفين وغيرها — كلها بضغطة واحدة وبدون كثير من التعقيدات. لا يحتاج لموظفين؛ فتستطيع أنت إدارته وتنفيذ كافة العروض بضغطة واحدة — مع كثير من الإعدادات. وانتظر المزيد من الإضافات والتحديثات القادمة.":"Tenders, supply orders and returns, delivery and shipping, payments and receivables, cash receipts, products and inventory, manufacturing and work orders, samples, documents and employees and more — all in one click with no complications. It needs no staff; you can manage it yourself and produce every offer with a single click — with plenty of settings. And expect more features and updates to come.","كل ما تحتاجه شركتك في مكان واحد":"Everything your company needs in one place","من عرض السعر حتى التسليم والتحصيل":"From quotation to delivery and collection","عروض أسعار احترافية":"Professional Quotations","قوالب متعددة، ضريبة وخصم، أعمدة مخصصة، QR، PDF وطباعة":"Multiple templates, VAT & discounts, custom columns, QR, PDF & print","تصنيع وتوزيع مصانع":"Manufacturing & Factory Distribution","توزيع بنود أمر التوريد على مصانع متعددة بالمقاسات والألوان مع قفل الكميات":"Distribute supply order items across multiple factories by size & color with quantity locking","مخزن بذكاء":"Smart Inventory","مدخلات ومخرجات تراكمية، تقارير نواقص تلقائية، رول/توب، ملصقات باركود":"Cumulative in/out movements, automatic shortage reports, roll/bobbin tracking, barcode labels","عينات بتتبع كامل":"Fully Tracked Samples","خط 7 حالات، QR ومسح بالكاميرا أو الليزر، صور إثبات، تنبيهات بت واسترداد":"7-stage pipeline, QR camera/laser scanning, proof photos, deposit & retrieval alerts","شحن وبوالص":"Shipping & Waybills","مولد بوليصات شحن متعدد الأصناف محكوم بالمتاح من المخزن + مندوبون":"Multi-item waybill generator governed by available stock + couriers","مدفوعات ومستحقات":"Payments & Receivables","دفعات مجزأة بأكواد فريدة، إيصالات نقدية، كشوف مفلترة بالتفقيط العربي":"Split payments with unique codes, cash receipts, Arabic-styled filtered statements","إدارة وصلاحيات":"Management & Permissions","مستخدمون وأدوار (مسؤول/مشرف/موظف/مشاهدة) ومصفوفة أقسام لكل مستخدم":"Users & roles (admin/supervisor/employee/viewer) with a per-user section matrix","أوفلاين + سحابة":"Offline + Cloud","يعمل بدون إنترنت بالكامل، وعند الاتصال يرفع ويجلب تلقائياً (Supabase)":"Works fully offline; on connect it auto-pushes and pulls (Supabase)","الأكثر طلباً":"Most Popular","عروض الأسعار والعملاء والأصناف":"Quotations, clients & items","PDF والطباعة":"PDF & printing","المزامنة السحابية":"Cloud sync","دعم عبر تلجرام":"Telegram support","كل مزايا الفرد":"Everything in Individual","صلاحيات موظفين (3 مستخدمين)":"Employee permissions (3 users)","التوريد والتصنيع والمخزن":"Supply, manufacturing & inventory","المناقصات والشحن والعينات":"Tenders, shipping & samples","المدفوعات والمستحقات":"Payments & receivables","كل مزايا الشركات الصغيرة":"Everything in Small Businesses","حتى 8 مستخدمين بصلاحيات":"Up to 8 permissioned users","الفاتورة الإلكترونية":"E-invoice","أولوية الدعم":"Priority support","كل المزايا بلا حدود":"All features unlimited","عدد مستخدمين غير محدود":"Unlimited users","مركز المستندات المؤرشف":"Archived documents center","التحديث التلقائي وأعلى أولوية دعم":"Auto-updates & top-priority support","اختر نسختك — نفس الحساب والبيانات":"Pick your version — same account & data","نسخة الكمبيوتر":"Desktop Version","Windows — التثبيت الكامل مع النسخ الاحتياطي والطباعة الصامتة":"Windows — full install with backups & silent printing","⬇ تحميل المثبّت":"⬇ Download Installer","نسخة الهاتف":"Mobile Version","قريباً — Android وiOS بنفس البيانات والحساب":"Coming soon — Android & iOS with the same data & account","قريباً":"Coming soon","تواجه مشكلة في التثبيت أو تحذير أمان من ويندوز؟ راسلنا على تلجرام وسنحلها معك فوراً":"Trouble installing or a Windows security warning? Message us on Telegram and we will solve it with you right away","اشترك الآن واحصل على كافة المميزات، وأرسل لنا متطلباتك التي تريدها وسنعمل عليها لتصل مع الإضافات والتحديثات القادمة":"Subscribe now and get every feature — send us the requirements you want and we will build them into the coming updates","💳 اشترك الآن":"💳 Subscribe Now","✈️ أرسل متطلباتك":"✈️ Send Your Requirements","برنامج صُنع خصيصاً — بلا تعقيدات":"A program crafted on purpose — zero complications","سهل الاستخدام لكافة المستخدمين — وانتظر المزيد من الإضافات والتحديثات القادمة":"Easy for every user — and expect more features and updates to come","كيفية التفعيل":"How Activation Works","ثلاث خطوات فقط":"Just three steps","ثبّت البرنامج وافتحه":"Install & open the program","— من قسم الترخيص اضغط «طلب المفتاح» وسيُرسل لك":"— from the License section press \u201CRequest Key\u201D and your","معرف جهازك":"device ID","(8 أحرف) تلقائياً عبر تلجرام أو البريد.":"(8 characters) is sent automatically via Telegram or email.","اختر خطتك":"Choose your plan","— أرسل المعرف واسم الخطة، وسيصلك":"— send the ID and plan name, and you will receive a","مفتاح تفعيل فريد":"unique activation key","مرتبط بجهازك (لا يعمل على أي جهاز آخر).":"bound to your device (works on no other device).","ألصق المفتاح وفعّل":"Paste the key & activate","— يعمل البرنامج أوفلاين بالكامل بعد التفعيل، مدى الحياة للخطة المختارة.":"— the program works fully offline after activation, lifetime for the chosen plan.","🔐 محمي ضد التلاعب والاختراق — أي محاولة تزوير تُبطل الترخيص":"🔐 Tamper & crack protected — any forgery attempt voids the license","تواصل معنا":"Contact Us","للاشتراك أو الدعم الفني":"For subscriptions or technical support","✈️ تلجرام — اشترك الآن":"✈️ Telegram — Subscribe Now","📘 صفحتنا على فيسبوك":"📘 Our Facebook Page","البريد: amrnada@mail.ru — جميع الحقوق محفوظة © 2026 Amr Nada":"Email: amrnada@mail.ru — All rights reserved © 2026 Amr Nada","ProQuote — نظام إدارة عروض الأسعار والمستندات | صُنع بإتقان":"ProQuote — Quotation & Document Management | Crafted with care","تلجرام":"Telegram","✕ إغلاق":"✕ Close"};
 var LD_R={};Object.keys(LD).forEach(function(k){LD_R[LD[k]]=k});
 function renderPrices(){var usd=LANG==="en";document.querySelectorAll(".pv").forEach(function(e){var p=parseFloat(e.getAttribute("data-"+CYC));e.textContent=usd?(p%1?p.toFixed(2):String(p)):String(Math.round(p*RATE))});document.querySelectorAll(".pcu").forEach(function(e){e.textContent=usd?"$":"ج.م"});document.querySelectorAll(".pc").forEach(function(e){e.textContent=(CYC==="m"?(usd?"Monthly":"شهرياً"):(usd?"Yearly":"سنوياً"))});document.querySelectorAll(".btn-pp").forEach(function(a){a.href=a.getAttribute("data-"+CYC)})}
 function cyc(v){CYC=v;document.getElementById("cyM").className="cyc"+(v==="m"?" on":"");document.getElementById("cyY").className="cyc"+(v==="y"?" on":"");renderPrices()}
+function applyShots(){var en=LANG==="en";document.querySelectorAll("img.shot").forEach(function(im){var s=en?im.getAttribute("data-en"):im.getAttribute("data-ar");if(s)im.src=s})}
 function _ldApply(l){var d=l==="en"?LD:LD_R;var w=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT,{acceptNode:function(n){var p=n.parentElement;return !p||p.tagName==="SCRIPT"||p.tagName==="STYLE"||p.id==="lngT"?2:1}});var n;while((n=w.nextNode())){var v=n.nodeValue,t=v.trim();if(t&&d[t])n.nodeValue=v.replace(t,d[t])}document.querySelectorAll("[title]").forEach(function(el){var t=(el.getAttribute("title")||"").trim();if(t&&d[t])el.setAttribute("title",d[t])})}
-function setLang(l){LANG=l;document.documentElement.lang=l;document.documentElement.dir=l==="ar"?"rtl":"ltr";document.title=l==="en"?"ProQuote — Quotation & Document Management System":"ProQuote — نظام إدارة عروض الأسعار والمستندات";var t=document.getElementById("lngT");if(t)t.textContent=l==="ar"?"EN":"عربي";document.getElementById("cyM").textContent=l==="ar"?"شهري":"Monthly";document.getElementById("cyY").textContent=l==="ar"?"سنوي — وفّر أكثر":"Yearly — save more";document.querySelectorAll("[data-ar]").forEach(function(e){e.textContent=l==="ar"?e.getAttribute("data-ar"):e.getAttribute("data-en")});_ldApply(l);renderPrices()}
+function setLang(l){LANG=l;document.documentElement.lang=l;document.documentElement.dir=l==="ar"?"rtl":"ltr";document.title=l==="en"?"ProQuote — Quotation & Document Management System":"ProQuote — نظام إدارة عروض الأسعار والمستندات";var t=document.getElementById("lngT");if(t)t.textContent=l==="ar"?"EN":"عربي";document.getElementById("cyM").textContent=l==="ar"?"شهري":"Monthly";document.getElementById("cyY").textContent=l==="ar"?"سنوي — وفّر أكثر":"Yearly — save more";document.querySelectorAll("[data-ar]").forEach(function(e){e.textContent=l==="ar"?e.getAttribute("data-ar"):e.getAttribute("data-en")});_ldApply(l);applyShots();renderPrices()}
+function tFilter(g,btn){document.querySelectorAll(".fch button").forEach(function(b){b.classList.remove("on")});btn.classList.add("on");document.querySelectorAll(".scard").forEach(function(c){c.style.display=(g==="all"||c.getAttribute("data-g")===g)?"":"none"})};
+function shotClick(el){var im=el.querySelector("img.shot");var cap=el.querySelector("h3");lbOpen(im.currentSrc||im.src,cap?cap.textContent:"")}
+function lbOpen(src,cap){document.getElementById("lbxI").src=src;document.getElementById("lbxC").textContent=cap;document.getElementById("lbx").classList.add("on")}
+function lbClose(){document.getElementById("lbx").classList.remove("on")}
+document.addEventListener("keydown",function(e){if(e.key==="Escape")lbClose()});
 </script>
 
-<section id="download">
+<section id="features">
   <div class="wrap">
-    <h2 class="sec">التحميل</h2>
-    <p class="sub">اختر نسختك — نفس الحساب والبيانات</p>
-    <div class="dl">
-      <div class="card"><i class="ic">🖥️</i><h3>نسخة الكمبيوتر</h3><p>Windows — التثبيت الكامل مع النسخ الاحتياطي والطباعة الصامتة</p><br><a class="btn btn-p" href="https://github.com/javamicrosystem2-gif/proquote/releases/download/v9.7.0/ProQuote-Setup-9.7.0.exe" target="_blank">⬇ تحميل المثبّت</a></div>
-     
-      <div class="card"><i class="ic">📱</i><h3>نسخة الهاتف</h3><p>قريباً — Android وiOS بنفس البيانات والحساب</p><br><button class="btn btn-g" disabled>قريباً</button></div>
-    </div>
-    <div style="margin-top:26px;background:var(--card);border:1px solid var(--gold);border-radius:14px;padding:22px">
-      <h3 style="font-size:15.5px;margin-bottom:8px;color:var(--gold)">⚠️ ظهرت رسالة «Windows cannot access the specified device, path, or file» عند فتح المثبّت؟</h3>
-      <p style="font-size:13px;color:var(--t2);margin-bottom:6px">هذا تحذير حماية من ويندوز للبرامج الجديدة — وليس عيباً في البرنامج. الحل في خطوتين:</p>
-      <div class="steps">
-        <div class="step"><span class="n"></span><p><b>انقر بزر الفأرة الأيمن</b> على ملف المثبّت ← اختر <b>Properties (خصائص)</b> ← من تبويب General ضع علامة ✓ على <b>Unblock</b> أسفل النافذة ← اضغط OK.</p></div>
-        <div class="step"><span class="n"></span><p><b>شغّل المثبّت مجدداً</b> — سيعمل بشكل طبيعي. إن استمر التحذير: أغلق مضاد الفيروسات مؤقتاً أو نفّذ الملف بـ«Run as administrator».</p></div>
-      </div>
-      <p style="font-size:11.5px;color:var(--t3);margin-top:12px">💡 إن كان حجم الملف أقل من 75 ميجابايت فالتنزيل غير مكتمل — احذفه وحمّله من جديد. وللملاحظة: حجم النسخة الكاملة حوالي 76 ميجابايت.</p>
+    <h2 class="sec">كل ما تحتاجه شركتك في مكان واحد</h2>
+    <p class="sub">من عرض السعر حتى التسليم والتحصيل</p>
+    <div class="grid">
+      <div class="card"><i class="ic">💼</i><h3>عروض أسعار احترافية</h3><p>قوالب متعددة، ضريبة وخصم، أعمدة مخصصة، QR، PDF وطباعة</p></div>
+      <div class="card"><i class="ic">🏭</i><h3>تصنيع وتوزيع مصانع</h3><p>توزيع بنود أمر التوريد على مصانع متعددة بالمقاسات والألوان مع قفل الكميات</p></div>
+      <div class="card"><i class="ic">📦</i><h3>مخزن بذكاء</h3><p>مدخلات ومخرجات تراكمية، تقارير نواقص تلقائية، رول/توب، ملصقات باركود</p></div>
+      <div class="card"><i class="ic">🧪</i><h3>عينات بتتبع كامل</h3><p>خط 7 حالات، QR ومسح بالكاميرا أو الليزر، صور إثبات، تنبيهات بت واسترداد</p></div>
+      <div class="card"><i class="ic">🚚</i><h3>شحن وبوالص</h3><p>مولد بوليصات شحن متعدد الأصناف محكوم بالمتاح من المخزن + مندوبون</p></div>
+      <div class="card"><i class="ic">💰</i><h3>مدفوعات ومستحقات</h3><p>دفعات مجزأة بأكواد فريدة، إيصالات نقدية، كشوف مفلترة بالتفقيط العربي</p></div>
+      <div class="card"><i class="ic">🛡️</i><h3>إدارة وصلاحيات</h3><p>مستخدمون وأدوار (مسؤول/مشرف/موظف/مشاهدة) ومصفوفة أقسام لكل مستخدم</p></div>
+      <div class="card"><i class="ic">☁️</i><h3>أوفلاين + سحابة</h3><p>يعمل بدون إنترنت بالكامل، وعند الاتصال يرفع ويجلب تلقائياً (Supabase)</p></div>
     </div>
   </div>
 </section>
 
-<section id="activate" style="background:var(--bg2)">
+<section id="download" style="background:var(--bg2)">
+  <div class="wrap">
+    <h2 class="sec">التحميل</h2>
+    <p class="sub">اختر نسختك — نفس الحساب والبيانات</p>
+    <div class="dl">
+      <div class="card"><i class="ic">🖥️</i><h3>نسخة الكمبيوتر</h3><p>Windows — التثبيت الكامل مع النسخ الاحتياطي والطباعة الصامتة</p><br><a class="btn btn-p" href="https://github.com/javamicrosystem2-gif/proquote/releases/download/v9.7.0/ProQuote-Setup-9.7.0.exe" target="_blank">⬇ تحميل المثبّت</a><p style="margin-top:12px;font-size:11px;color:var(--t3)">تواجه مشكلة في التثبيت أو تحذير أمان من ويندوز؟ راسلنا على تلجرام وسنحلها معك فوراً</p></div>
+
+      <div class="card"><i class="ic">📱</i><h3>نسخة الهاتف</h3><p>قريباً — Android وiOS بنفس البيانات والحساب</p><br><button class="btn btn-g" disabled>قريباً</button></div>
+    </div>
+  </div>
+</section>
+
+<section id="activate">
   <div class="wrap">
     <h2 class="sec">كيفية التفعيل</h2>
     <p class="sub">ثلاث خطوات فقط</p>
@@ -188,6 +297,18 @@ function setLang(l){LANG=l;document.documentElement.lang=l;document.documentElem
       <div class="step"><span class="n"></span><p><b>ألصق المفتاح وفعّل</b> — يعمل البرنامج أوفلاين بالكامل بعد التفعيل، مدى الحياة للخطة المختارة.</p></div>
     </div>
     <p style="text-align:center;color:var(--t3);font-size:12px;margin-top:18px">🔐 محمي ضد التلاعب والاختراق — أي محاولة تزوير تُبطل الترخيص</p>
+  </div>
+</section>
+
+<section id="cta" style="background:radial-gradient(60% 80% at 50% 100%,rgba(0,168,133,.16),transparent);border-top:1px solid var(--brd)">
+  <div class="wrap" style="text-align:center">
+    <h2 class="sec">برنامج صُنع خصيصاً — بلا تعقيدات</h2>
+    <p class="sub">سهل الاستخدام لكافة المستخدمين — وانتظر المزيد من الإضافات والتحديثات القادمة</p>
+    <p class="statement" style="margin-bottom:26px">اشترك الآن واحصل على كافة المميزات، وأرسل لنا متطلباتك التي تريدها وسنعمل عليها لتصل مع الإضافات والتحديثات القادمة</p>
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+      <a class="btn btn-p" href="#plans">💳 اشترك الآن</a>
+      <a class="btn btn-o" href="https://t.me/javamicro" target="_blank">✈️ أرسل متطلباتك</a>
+    </div>
   </div>
 </section>
 
@@ -203,6 +324,12 @@ function setLang(l){LANG=l;document.documentElement.lang=l;document.documentElem
 
 <footer>ProQuote — نظام إدارة عروض الأسعار والمستندات | صُنع بإتقان</footer>
 <a class="wa" style="background:#229ED9;box-shadow:0 6px 20px rgba(34,158,217,.45)" href="https://t.me/javamicro" target="_blank" title="تلجرام">✈️</a>
+
+<div id="lbx" onclick="lbClose()">
+  <img id="lbxI" onclick="event.stopPropagation()" alt="">
+  <div id="lbxC" onclick="event.stopPropagation()"></div>
+  <button class="btn btn-o" onclick="lbClose()">✕ إغلاق</button>
+</div>
 
 </body>
 </html>

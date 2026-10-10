@@ -9,6 +9,12 @@ const fs = require('fs');
 
 // ضمان اسم موحّد لمجلد بيانات المستخدم (ProQuote بحرف كبير)
 app.setName('ProQuote');
+
+// وضع حاصاد لقطات التسويق (--shoot): بيانات تجرية معزولة في TEMP — لا يلمس بيانات المستخدم
+const SHOOT_MODE = process.argv.includes('--shoot');
+if (SHOOT_MODE) {
+  try { require('./shoot').isolateUserData(); } catch (e) { console.error('[shoot] isolation failed:', e.message); }
+}
 // لغة التسطيب المختارة (يكتبها NSIS في lang.txt بجذر التثبيت)
 // ===== جسر الفاتورة الإلكترونية (شبكة + توقيع خارجي) =====
 const https = require('https');
@@ -251,6 +257,12 @@ function buildMenu() {
 
 // ---------- دورة حياة التطبيق ----------
 app.whenReady().then(() => {
+  // وضع الالتقاط: نافذة مستقلة + جولتان (عربي/إنجليزي) ثم خروج — بلا أي أثر جانبي
+  if (SHOOT_MODE) {
+    require('./shoot').run();
+    return;
+  }
+
   createMainWindow();
   buildMenu();
 
