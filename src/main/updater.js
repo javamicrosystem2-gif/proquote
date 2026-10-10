@@ -14,20 +14,20 @@ let autoUpdater = null;
 let mainWindowRef = null;
 let updateAvailable = null;
 
+// الخادم الافتراضي: GitHub Releases (يعمل لكل المستخدمين بلا إعدادات)
+const DEFAULT_GITHUB_FEED = { provider: 'github', owner: 'javamicrosystem2-gif', repo: 'proquote' };
+
 // تفعيل التحديث التلقائي
-// feedUrl: عنوان خادم التحديثات (يُحدَّد لاحقاً)
+// feedUrl (اختياري): خادم مخصص من إعدادات المستخدم — وإلا GitHub الافتراضي
 function init(mainWindow, feedUrl) {
   mainWindowRef = mainWindow;
   try {
     autoUpdater = require('electron-updater').autoUpdater;
-    if (!feedUrl) {
-      // بدون خادم: وضع خامد (لا تحقق تلقائي)
-      console.log('[updater] وضع خامد — لم يُحدَّد خادم تحديثات');
-      return false;
-    }
     autoUpdater.autoDownload = false;        // عدم التنزيل التلقائي (المستخدم يقرر)
     autoUpdater.autoInstallOnAppQuit = true;  // تثبيت عند الإغلاق إن نُزّل
-    autoUpdater.setFeedURL(feedUrl);
+    // في وضع التطوير: اسمح بالفحص عبر dev-app-update.yml (اختبار التحديثات محلياً)
+    try { if (!app.isPackaged) autoUpdater.forceDevUpdateConfig = true; } catch (_) {}
+    autoUpdater.setFeedURL(feedUrl || DEFAULT_GITHUB_FEED);
 
     // ربط الأحداث
     autoUpdater.on('checking-for-update', () => {
@@ -101,8 +101,9 @@ async function downloadUpdate() {
 // تثبيت التحديث المنزّل (يُعيد التشغيل)
 function quitAndInstall() {
   if (!autoUpdater) return false;
-  // حفظ نهائي قبل التثبيت
+  // حفظ نهائي قبل التثبيت + تجاوز حوار الخروج (إعادة التشغيل مقصودة)
   try { db.forceFlush(); } catch {}
+  try { if (mainWindowRef && !mainWindowRef.isDestroyed()) mainWindowRef.__forceClose = true; } catch (_) {}
   autoUpdater.quitAndInstall(true, true);
   return true;
 }

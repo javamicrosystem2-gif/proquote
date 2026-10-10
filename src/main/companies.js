@@ -114,7 +114,8 @@ function activeStore() {
   _activeStore = createKvStore({
     dbFile: companyDbFile(id),
     backupDir: companyBackupDir(id),
-    jsonLegacy: legacyJsonPath()
+    // ملف JSON التراثي ملك الشركة الأولى فقط — لا ترثه الشركات الجديدة (عزل تام)
+    jsonLegacy: (Number(id) === 1) ? legacyJsonPath() : null
   });
   return _activeStore;
 }
@@ -167,7 +168,7 @@ function setDefault(id) {
     _activeStore = createKvStore({
       dbFile: companyDbFile(id),
       backupDir: companyBackupDir(id),
-      jsonLegacy: legacyJsonPath()
+      jsonLegacy: (Number(id) === 1) ? legacyJsonPath() : null
     });
     _activeStore.open();
     console.log('[companies] ↪ الاتصال الآن بشركة: ' + row.name + ' (c' + id + '.db)');

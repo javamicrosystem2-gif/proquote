@@ -1,6 +1,6 @@
 {
   "name": "proquote",
-  "version": "9.9.0",
+  "version": "9.9.1",
   "description": "ProQuote — نظام إدارة عروض الأسعار والمستندات",
   "main": "src/main/main.js",
   "author": {
@@ -39,7 +39,13 @@
       "src/**/*",
       "package.json"
     ],
-    "publish": null,
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "javamicrosystem2-gif",
+        "repo": "proquote"
+      }
+    ],
     "win": {
       "target": [
         {

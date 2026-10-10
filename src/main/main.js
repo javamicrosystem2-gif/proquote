@@ -185,21 +185,26 @@ function createMainWindow() {
     callback(permission === 'media');
   });
 
-  // تحذير الخروج بالبيانات غير المحفوظة: نسأل الواجهة إن كانت هناك تعديلات
+  // رسالة الخروج: أنت الآن على وشك إغلاق البرنامج — الحفظ والخروج أو إلغاء الخروج
   mainWindow.on('close', (e) => {
     if (mainWindow.__forceClose) return;
     e.preventDefault();
     Promise.resolve()
-      .then(() => mainWindow.webContents.executeJavaScript('window.pqDirtyCheck ? window.pqDirtyCheck() : false', true))
-      .then(async (dirty) => {
-        if (!dirty) { mainWindow.__forceClose = true; mainWindow.close(); return; }
+      .then(async () => {
         const r = await dialog.showMessageBox(mainWindow, {
-          type: 'question', title: 'حفظ قبل الإغلاق',
-          message: 'لديك تعديلات غير محفوظة. ماذا تريد أن تفعل؟',
-          detail: 'اختر «البقاء والحفظ» للعودة للبرنامج وحفظ عملك يدوياً، أو «الخروج دون حفظ» لإغلاق البرنامج فوراً مع فقدان التعديلات غير المحفوظة.',
-          buttons: ['البقاء والحفظ', 'الخروج دون حفظ'], defaultId: 1, cancelId: 1, noLink: true
+          type: 'question', title: 'إغلاق البرنامج',
+          message: 'أنت الآن على وشك إغلاق البرنامج',
+          detail: 'هل تود الحفظ والخروج أم إلغاء الخروج؟',
+          buttons: ['الحفظ والخروج', 'إلغاء الخروج'], defaultId: 0, cancelId: 1, noLink: true
         });
-        if (r.response === 1) { mainWindow.__forceClose = true; mainWindow.close(); }
+        if (r.response !== 0) return; // إلغاء الخروج — البقاء في البرنامج
+        // الحفظ والخروج: دفع كل بيانات الواجهة إلى قاعدة البيانات ثم حفظ نهائي وإغلاق
+        try {
+          await mainWindow.webContents.executeJavaScript(`(function(){var PQ=window.proquote;if(!PQ||!PQ.storage)return Promise.resolve(0);var ps=[];for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);var v=localStorage.getItem(k);if(v!==null)ps.push(PQ.storage.setItem(k,v))}return Promise.all(ps).then(function(){return ps.length})})()`, true);
+        } catch (_) {}
+        try { db.forceFlush(); } catch (_) {}
+        mainWindow.__forceClose = true;
+        mainWindow.close();
       })
       .catch(() => { mainWindow.__forceClose = true; mainWindow.close(); });
   });
@@ -308,11 +313,20 @@ app.whenReady().then(() => {
   // تهيئة التحديث التلقائي (خامل حتى يُحدَّد خادم التحديثات)
   // ضع رابط خادمك هنا عند التوفر، مثلاً:
   // updater.init(mainWindow, { provider: 'generic', url: 'https://yourserver.com/proquote/updates/' });
-  // رابط التحديثات من إعدادات المستخدم (تبويب المزامنة)
+  // رابط التحديثات من إعدادات المستخدم (تبويب المزامنة) — اختياري
+  // أي رابط github.com يُتجاهل: مزوّد GitHub المدمج يتولى الأمر بالصيغة الصحيحة
   let _updFeed = null;
-  try { const _s = JSON.parse(db.getItem('pq5_s') || 'null'); if (_s && _s.updateFeed) _updFeed = { provider: 'generic', url: _s.updateFeed }; } catch (_) {}
+  try {
+    const _s = JSON.parse(db.getItem('pq5_s') || 'null');
+    const _uf = _s && _s.updateFeed;
+    if (_uf && /^https?:\/\//.test(_uf) && _uf.indexOf('github.com') === -1) _updFeed = { provider: 'generic', url: _uf };
+  } catch (_) {}
   updater.init(mainWindow, _updFeed);
   updater.registerIpc();
+  // فحص تلقائي للتحديثات: بعد 10 ثوانٍ من الإقلاع ثم كل 6 ساعات
+  // (يظهر تنبيه «تحديث جديد متاح» لكل المستخدمين عند رفع إصدار جديد على GitHub)
+  setTimeout(() => { updater.checkForUpdates().catch(() => {}); }, 10000);
+  setInterval(() => { updater.checkForUpdates().catch(() => {}); }, 6 * 60 * 60 * 1000);
   productImport.registerIpc();
   filestore.init();
   try { const _dm = dataMigrations.init(); console.log('[startup] data migrations:', JSON.stringify(_dm.health)); } catch (e) { console.error('[startup] data migrations error:', e.message); }

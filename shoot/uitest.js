@@ -119,6 +119,19 @@ async function run() {
   t = await js(`(function(){try{go('shipping');const rows=Array.from(document.querySelectorAll('#shpTb tr'));const hit=rows.some(function(r){return r.textContent.includes('صنف توريد اختبار')});if(hit)return true;const s=ld('pq5_shp');return 'DBG docs='+JSON.stringify(s.map(function(d){return {n:d.number,items:(d.items||[]).map(function(i){return i.name+'#'+i.qty}),c:d.contents}}))}catch(e){return 'ERR:'+e.message}})()`);
   R('قائمة الشحنات تعرض ملخص الأصناف بدل الوصف الفارغ', t === true, typeof t === 'string' ? t : '');
 
+  // ===== التحديث 2: روابط الاشتراك وأدوات التواصل =====
+  // 17) مودال الترخيص: زر PayPal صحيح الاقتباس + أزرار تيليجرام/بريد + شريط تواصل
+  t = await js(`(function(){try{go('dash');openLicenseModal();const html=document.getElementById('subPlans').innerHTML;const quoted=html.includes("subPay('solo')")||html.includes('subPay(\\'solo\\')');const tg=html.includes('subTelegram');const em=html.includes('subEmail');const strip=html.includes('t.me/javamicro')&&html.includes('facebook.com/proquoteamrnada');const linkOk=!!((_plans().payLinks||{}).solo_m);return {quoted:quoted,tg:tg,em:em,strip:strip,linkOk:linkOk,all:quoted&&tg&&em&&strip&&linkOk}}catch(e){return 'ERR:'+e.message}})()`);
+  R('مودال الترخيص: PayPal مقتبس + تيليجرام/بريد + شريط التواصل + الروابط موجودة', t && t.all === true, typeof t === 'string' ? t : JSON.stringify(t));
+
+  // 18) رسالة الاشتراك تحمل الخطة ومعرف الجهاز
+  t = await js(`(function(){try{_subCycle='m';return _subMsg('small').then(function(m){return m.includes('Small')&&m.includes('معرف جهازي')})}catch(e){return 'ERR:'+e.message}})()`);
+  R('رسالة الاشتراك تُبنى بالخطة ومعرف الجهاز', t === true, typeof t === 'string' ? t : '');
+
+  // 19) أدوات التواصل في الشريط الجانبي
+  t = await js(`(function(){try{const sb=document.querySelector('.sidebar').innerHTML;return sb.includes('https://t.me/javamicro')&&sb.includes('https://www.facebook.com/proquoteamrnada')&&sb.includes('mailto:amrnada@mail.ru')}catch(e){return 'ERR:'+e.message}})()`);
+  R('الشريط الجانبي: أزرار تيليجرام وفيسبوك والبريد', t === true, typeof t === 'string' ? t : '');
+
   const passed = out.filter((l) => l.startsWith('✅')).length;
   log('=== ' + passed + '/' + (out.length) + ' ===');
   const report = path.join(app.getPath('userData'), '..', 'pq-uitest-report.txt');
