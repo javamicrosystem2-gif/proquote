@@ -36,7 +36,8 @@ contextBridge.exposeInMainWorld('proquote', {
     create: (name) => ipcRenderer.invoke('companies:create', name),
     setDefault: (id) => ipcRenderer.invoke('companies:set-default', id),
     current: () => ipcRenderer.invoke('companies:current'),
-    remove: (id) => ipcRenderer.invoke('companies:delete', id)
+    remove: (id) => ipcRenderer.invoke('companies:delete', id),
+    rename: (id, name) => ipcRenderer.invoke('companies:rename', id, name)
   },
 
   // ---------- النسخ الاحتياطي والاستعادة ----------
@@ -75,7 +76,9 @@ contextBridge.exposeInMainWorld('proquote', {
     deviceId: () => ipcRenderer.invoke('license:deviceId'),
     hasFeature: (feature) => ipcRenderer.invoke('license:hasFeature', feature),
     getTier: () => ipcRenderer.invoke('license:getTier'),
-    features: () => ipcRenderer.invoke('license:features')
+    features: () => ipcRenderer.invoke('license:features'),
+    sections: () => ipcRenderer.invoke('license:sections'),
+    sectionAllowed: (sec) => ipcRenderer.invoke('license:sectionAllowed', sec)
   },
 
   // ---------- التخزين الآمن للملفات (FileStore) ----------

@@ -121,12 +121,12 @@ async function run() {
 
   // ===== التحديث 2: روابط الاشتراك وأدوات التواصل =====
   // 17) مودال الترخيص: زر PayPal صحيح الاقتباس + أزرار تيليجرام/بريد + شريط تواصل
-  t = await js(`(function(){try{go('dash');openLicenseModal();const html=document.getElementById('subPlans').innerHTML;const quoted=html.includes("subPay('solo')")||html.includes('subPay(\\'solo\\')');const tg=html.includes('subTelegram');const em=html.includes('subEmail');const strip=html.includes('t.me/javamicro')&&html.includes('facebook.com/proquoteamrnada');const linkOk=!!((_plans().payLinks||{}).solo_m);return {quoted:quoted,tg:tg,em:em,strip:strip,linkOk:linkOk,all:quoted&&tg&&em&&strip&&linkOk}}catch(e){return 'ERR:'+e.message}})()`);
+  t = await js(`(function(){try{go('dash');openLicenseModal();const html=document.getElementById('subPlans').innerHTML;const quoted=html.includes("subPay('full')")||html.includes('subPay(\\'full\\')');const tg=html.includes('subTelegram');const em=html.includes('subEmail');const strip=html.includes('t.me/javamicro')&&html.includes('facebook.com/proquoteamrnada');const linkOk=!!((_plans().payLinks||{}).full_m);return {quoted:quoted,tg:tg,em:em,strip:strip,linkOk:linkOk,all:quoted&&tg&&em&&strip&&linkOk}}catch(e){return 'ERR:'+e.message}})()`);
   R('مودال الترخيص: PayPal مقتبس + تيليجرام/بريد + شريط التواصل + الروابط موجودة', t && t.all === true, typeof t === 'string' ? t : JSON.stringify(t));
 
   // 18) رسالة الاشتراك تحمل الخطة ومعرف الجهاز
-  t = await js(`(function(){try{_subCycle='m';return _subMsg('small').then(function(m){return m.includes('Small')&&m.includes('معرف جهازي')})}catch(e){return 'ERR:'+e.message}})()`);
-  R('رسالة الاشتراك تُبنى بالخطة ومعرف الجهاز', t === true, typeof t === 'string' ? t : '');
+  t = await js(`(function(){try{_subCycle='m';return _subMsg('mgmt').then(function(m){return m.includes('Management')&&m.includes('معرف جهازي')})}catch(e){return 'ERR:'+e.message}})()`);
+  R('رسالة الاشتراك تُبنى بالباقة ومعرف الجهاز', t === true, typeof t === 'string' ? t : '');
 
   // 19) أدوات التواصل في الشريط الجانبي
   t = await js(`(function(){try{const sb=document.querySelector('.sidebar').innerHTML;return sb.includes('https://t.me/javamicro')&&sb.includes('https://www.facebook.com/proquoteamrnada')&&sb.includes('mailto:amrnada@mail.ru')}catch(e){return 'ERR:'+e.message}})()`);
@@ -267,6 +267,49 @@ edIo(d.id);
 const restoredHidden=document.querySelectorAll('#ioib tr .io-size').length===0&&ioShowSize===false;
 return {savedHidden:!!savedHidden,restoredHidden:restoredHidden,ok:!!savedHidden&&restoredHidden}}catch(e){return 'ERR:'+e.message}})()`);
   R('حفظ القيم المخفية داخل المستند واستعادتها عند التحرير', t && t.ok === true, typeof t === 'string' ? t : JSON.stringify(t));
+
+  // ===== نظام الباقات: البوابة والبطاقات =====
+  // 35) هجرة _plans إلى v4: خمس باقات بأسعار وروابطها العشرة
+  t = await js(`(function(){try{localStorage.setItem('pq5_s', JSON.stringify({_v:9, plans:{_v:3, solo:{m:19.99,y:199}}, payLinks:{_v:3, solo_m:'x'}}));const s=_plans();return {v:s.plans._v, fullPrice:s.plans.full&&s.plans.full.y, links:Object.keys(s.payLinks).filter(function(k){return k!=='_v'}).length, fullLink:(s.payLinks.full_y||'').indexOf('P-9KM50536NN239142UNLJPMYI')>=0}}catch(e){return 'ERR:'+e.message}})()`);
+  R('هجرة v3→v4: خمس باقات و10 روابط جديدة', t && t.v === 4 && t.fullPrice === 940 && t.links === 10 && t.fullLink === true, typeof t === 'string' ? t : JSON.stringify(t));
+
+  // 36) نافذة الترخيص: خمس بطاقات بوصف أقسامها
+  t = await js(`(function(){try{openLicenseModal();const html=document.getElementById('subPlans').innerHTML;const cards=(html.match(/subPay\\('/g)||[]).length;return {cards:cards, hasFull:html.includes('الأفضل قيمة'), hasDesc:html.includes('المناقصات')&&html.includes('إيصالات النقدية'), ok:cards===5&&html.includes('الأفضل قيمة')}}catch(e){return 'ERR:'+e.message}})()`);
+  R('نافذة الاشتراك: 5 بطاقات بوصف الأقسام', t && t.ok === true, typeof t === 'string' ? t : JSON.stringify(t));
+
+  // 37) بوابة الأقسام: محاكاة باقة مالية (أقسام مالية+dash+settings فقط)
+  t = await js(`(function(){try{_licSections=new Set(['dash','settings','payments','receivables','rcpt']);_licPkgName='باقة الأمور المالية';licApplySections2();function licApplySections2(){};applySidebarVisibility();
+const hiddenQuotes=(function(){var el=Array.from(document.querySelectorAll('.sb-it')).find(function(i){return (i.getAttribute('onclick')||'').includes(\"go('quotes')\")});return el&&el.style.display==='none'})();
+const visPay=(function(){var el=Array.from(document.querySelectorAll('.sb-it')).find(function(i){return (i.getAttribute('onclick')||'').includes(\"go('payments')\")});return el&&el.style.display===''})();
+window._secGate=undefined;licApplySections();
+return {hiddenQuotes:hiddenQuotes, visPay:visPay, ok:hiddenQuotes&&visPay}}catch(e){return 'ERR:'+e.message}})()`);
+  R('البوابة: إخفاء خارج الباقة وإظهار داخلها بالشريط الجانبي', t && t.ok === true, typeof t === 'string' ? t : JSON.stringify(t));
+
+  // ===== الإصلاح G+H: إعادة تسمية المستندات والشركة =====
+  // 38) إعادة تسمية مجلد مستندات + مستند داخل مجلد (كانتا معطلتين بسبب prompt)
+  t = await js(`(function(){try{localStorage.setItem('pq5_dc', JSON.stringify([{id:'dcf1',name:'ملف قديم',folder:true,parentId:null,files:[{id:'df1',title:'مستند قديم.pdf',name:'مستند قديم.pdf',data:'demo'}],at:1}]));
+go('documents');
+window.__pqPromptSim=true;
+var _origPqPrompt=window.pqPrompt;window.pqPrompt=function(title,label,def,hint,cb){cb('ملف جديد تماماً')};
+dcRenameFolderDlg('dcf1');
+const folderRenamed=(ld('pq5_dc')[0].name==='ملف جديد تماماً');
+window.pqPrompt=function(title,label,def,hint,cb){cb('مستند جديد.pdf')};
+dcRenameFileDlg('dcf1','df1');
+const fileRenamed=((ld('pq5_dc')[0].files||[])[0]||{}).title==='مستند جديد.pdf';
+window.pqPrompt=_origPqPrompt;
+return {folder:folderRenamed,file:fileRenamed,ok:folderRenamed&&fileRenamed}}catch(e){return 'ERR:'+e.message}})()`);
+  R('إعادة تسمية مجلد ومستند بالمستندات تعملان (مودال موحد بدل prompt)', t && t.ok === true, typeof t === 'string' ? t : JSON.stringify(t));
+
+  // 39) تعديل اسم شركة عبر IPC
+  t = await js(`(async function(){try{const PQ=window.proquote;var cr=await PQ.companies.create('__شركة_تسمية__');if(!cr||!cr.ok)return 'create: '+(cr&&cr.error);
+var rn=await PQ.companies.rename(cr.id,'__الاسم_الجديد__');
+var lst=await PQ.companies.list();var found=lst.find(function(x){return x.id===cr.id});
+var ok=rn&&rn.ok&&found&&found.name==='__الاسم_الجديد__';
+var dup=await PQ.companies.rename(cr.id,'شركتي');
+var dupBlocked=!(dup&&dup.ok);
+await PQ.companies.remove(cr.id);
+return {ok:ok,dupBlocked:dupBlocked,all:ok&&dupBlocked}}catch(e){return 'ERR:'+e.message}})()`);
+  R('تعديل اسم شركة: يعمل + يرفض الاسم المكرر', t && t.all === true, typeof t === 'string' ? t : JSON.stringify(t));
 
   const passed = out.filter((l) => l.startsWith('✅')).length;
   log('=== ' + passed + '/' + (out.length) + ' ===');

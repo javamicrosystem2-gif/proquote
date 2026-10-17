@@ -147,8 +147,8 @@ function getState() {
       deviceId: getShortDeviceId(),
       activatedAt: license.issued || null,
       expiry: license.expiry || null,
-      message: 'مُفعّل (' + (license.tier || 'professional') + ')',
-      maxUsers: maxUsersForTier(license.tier || 'professional')
+      message: 'مُفعّل — ' + tierDisplayName(license.tier || 'professional'),
+        maxUsers: maxUsersForTier(license.tier || 'professional')
     };
   }
 
@@ -201,8 +201,68 @@ const TIER_FEATURES = {
   enterprise: ['quotes', 'clients', 'products', 'tech', 'receipt', 'custom', 'full', 'documents', 'templates', 'pdf', 'print', 'export', 'import', 'autoupdate', 'plugins', 'eta_invoice']
 };
 
+// ---------- نظام الباقات: الأقسام المفتوحة لكل باقة ----------
+// الأقسام الستة والعشرون كما في الشريط الجانبي. لوحة التحكم والإعدادات مفتوحان دائماً.
+const ALWAYS_OPEN_SECTIONS = ['dash', 'settings'];
+const _PKG_QUOTES = ['quotes', 'tech', 'receipt', 'auth', 'custom', 'full', 'samples', 'supply', 'returns', 'tenders', 'shipping'];
+const _PKG_FINANCE = ['payments', 'receivables', 'rcpt'];
+const _PKG_MGMT = ['company', 'clients', 'products', 'warehouse', 'mfg', 'documents', 'emp', 'notes'];
+const _PKG_SYSTEM = ['ei', 'adm'];
+const _ALL_SECTIONS = ALWAYS_OPEN_SECTIONS.concat(_PKG_QUOTES, _PKG_FINANCE, _PKG_MGMT, _PKG_SYSTEM);
+
+const TIER_SECTIONS = {
+  // الباقات الخمس الجديدة (نظام الاشتراكات بالأقسام)
+  quotes: ALWAYS_OPEN_SECTIONS.concat(_PKG_QUOTES),
+  finance: ALWAYS_OPEN_SECTIONS.concat(_PKG_FINANCE),
+  mgmt: ALWAYS_OPEN_SECTIONS.concat(_PKG_MGMT),
+  system: ALWAYS_OPEN_SECTIONS.concat(_PKG_SYSTEM),
+  full: _ALL_SECTIONS.slice(),
+  // التجربة: كل الأقسام 30 يوماً ثم قفل كامل (licEnforce)
+  trial: _ALL_SECTIONS.slice(),
+  // الباقات القديمة (solo/small/med/ulim/basic/professional/enterprise) وغير المعروفة:
+  // كل الأقسام — لا ننزع من مشترك قديم شيئاً اشتراه
+  solo: _ALL_SECTIONS.slice(),
+  small: _ALL_SECTIONS.slice(),
+  med: _ALL_SECTIONS.slice(),
+  ulim: _ALL_SECTIONS.slice(),
+  basic: _ALL_SECTIONS.slice(),
+  professional: _ALL_SECTIONS.slice(),
+  enterprise: _ALL_SECTIONS.slice()
+};
+
+// أسماء الباقات للعرض
+const TIER_NAMES = {
+  quotes: 'باقة عروض الأسعار', finance: 'باقة الأمور المالية', mgmt: 'باقة الإدارة',
+  system: 'باقة النظام', full: 'الباقة الشاملة', trial: 'نسخة تجريبية',
+  solo: 'الباقة الفردية (كاملة)', small: 'باقة الشركات الصغيرة (كاملة)', med: 'باقة الشركات المتوسطة (كاملة)', ulim: 'الباقة الكبرى (كاملة)'
+};
+
+// ذاكرة تخزين مؤقت للأقسام المسموحة (تفادي قراءة الملف الموقّع مع كل تنقل)
+let _sectionsCache = { tier: null, status: null, sections: null };
+
+function getAllowedSections() {
+  const s = getState();
+  if (_sectionsCache.tier === s.tier && _sectionsCache.status === s.status && _sectionsCache.sections) {
+    return _sectionsCache.sections;
+  }
+  let sections;
+  if (s.status === 'trial') sections = TIER_SECTIONS.trial;
+  else if (s.status === 'activated' && s.tier && TIER_SECTIONS[s.tier]) sections = TIER_SECTIONS[s.tier];
+  else sections = ALWAYS_OPEN_SECTIONS.slice(); // منتهي/غير معروف: الأساسيات فقط (الواجهة تمنع الباقي عبر licEnforce عموماً)
+  _sectionsCache = { tier: s.tier, status: s.status, sections: sections.slice() };
+  return _sectionsCache.sections;
+}
+
+function sectionAllowed(sectionKey) {
+  return getAllowedSections().includes(sectionKey);
+}
+
+function tierDisplayName(tier) {
+  return TIER_NAMES[tier] || (tier ? ('مُفعّل (' + tier + ')') : '—');
+}
+
 // ---------- حد المستخدمين لكل باقة (0 = بلا حدود) ----------
-const TIER_MAX_USERS = { trial: 0, solo: 1, small: 3, med: 8, ulim: 0, basic: 1, professional: 8, enterprise: 0 };
+const TIER_MAX_USERS = { trial: 0, quotes: 1, finance: 1, mgmt: 1, system: 1, full: 0, solo: 1, small: 3, med: 8, ulim: 0, basic: 1, professional: 8, enterprise: 0 };
 function maxUsersForTier(tier) { return (tier && TIER_MAX_USERS[tier] !== undefined) ? TIER_MAX_USERS[tier] : 0; }
 
 function getTier() {
@@ -274,6 +334,7 @@ module.exports = {
   getMachineId, getShortDeviceId,
   getState, isLicensed,
   getTier, hasFeature, getAvailableFeatures,
+  getAllowedSections, sectionAllowed, tierDisplayName,
   activate,
-  TRIAL_DAYS, TIER_FEATURES, TIER_MAX_USERS
+  TRIAL_DAYS, TIER_FEATURES, TIER_MAX_USERS, TIER_SECTIONS, ALWAYS_OPEN_SECTIONS
 };

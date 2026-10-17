@@ -201,10 +201,30 @@ function remove(id) {
   }
 }
 
+// تعديل اسم شركة (اسم فريد — بلا تغيير لبياناتها أو افتراضيتها)
+function rename(id, newName) {
+  init();
+  const reg = registry();
+  const clean = String(newName || '').trim();
+  if (!clean) return { ok: false, error: 'أدخل الاسم الجديد' };
+  if (clean.length > 60) return { ok: false, error: 'الاسم طويل جداً (60 حرفاً كحد أقصى)' };
+  const row = reg.prepare('SELECT * FROM companies WHERE id = ?').get(id);
+  if (!row) return { ok: false, error: 'الشركة غير موجودة' };
+  try {
+    const info = reg.prepare('UPDATE companies SET name = ? WHERE id = ?').run(clean, id);
+    if (!info.changes) return { ok: false, error: 'تعذر التعديل' };
+    console.log('[companies] أُعيدت تسمية الشركة id=' + id + ' إلى: ' + clean);
+    return { ok: true, id: Number(id), name: clean };
+  } catch (e) {
+    if (String(e.message).includes('UNIQUE')) return { ok: false, error: 'يوجد شركة أخرى بهذا الاسم' };
+    return { ok: false, error: e.message };
+  }
+}
+
 function setSwitchingDone() { _switching = false; }
 
 module.exports = {
-  init, list, create, setDefault, remove,
+  init, list, create, setDefault, remove, rename,
   active, activeStore, isSwitching, setSwitchingDone,
   companiesDir, companyDbFile, companyBackupDir
 };

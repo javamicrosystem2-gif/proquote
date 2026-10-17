@@ -452,6 +452,7 @@ ipcMain.handle('companies:create', (_evt, name) => companies.create(name));
 ipcMain.handle('companies:set-default', (_evt, id) => companies.setDefault(id));
 ipcMain.handle('companies:current', () => companies.active());
 ipcMain.handle('companies:delete', (_evt, id) => companies.remove(id));
+ipcMain.handle('companies:rename', (_evt, id, name) => companies.rename(id, name));
 
 // ---------- تصدير ملف سيرفر المزامنة للعميل (sync-server.js) ----------
 // الملف مرفق مع البرنامج (extraResources) — الزر في نافذة مساعدة المزامنة
@@ -546,6 +547,8 @@ ipcMain.handle('license:deviceId', () => license.getShortDeviceId());
 ipcMain.handle('license:hasFeature', (_evt, feature) => license.hasFeature(feature));
 ipcMain.handle('license:getTier', () => license.getTier());
 ipcMain.handle('license:features', () => license.getAvailableFeatures());
+ipcMain.handle('license:sections', () => license.getAllowedSections());
+ipcMain.handle('license:sectionAllowed', (_evt, sec) => license.sectionAllowed(sec));
 
 
 // منع إنشاء نوافذ عرض إضافية غير مرغوبة تلقائياً

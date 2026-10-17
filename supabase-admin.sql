@@ -67,3 +67,15 @@ insert into pq_plans (plan_key, name, price_m, price_y) values
 on conflict (plan_key) do update set
   price_m = excluded.price_m,
   price_y = excluded.price_y;
+
+
+-- ===== الباقات الخمس الجديدة (نظام الأقسام) — أسعار وروابط PayPal =====
+insert into pq_plans (plan_key, name, price_m, price_y, paypal_m, paypal_y) values
+  ('quotes_full',  'باقة عروض الأسعار', 19.99, 199, 'https://www.paypal.com/webapps/billing/plans/subscribe?plan_id=P-79Y10184HV8984701NK6QOHA', 'https://www.paypal.com/webapps/billing/plans/subscribe?plan_id=P-32969311AW310952HNLJPREQ'),
+  ('finance_full', 'باقة الأمور المالية', 19.99, 199, 'https://www.paypal.com/webapps/billing/plans/subscribe?plan_id=P-8BF09849DB984670MNK6QTLY', 'https://www.paypal.com/webapps/billing/plans/subscribe?plan_id=P-7JV77932AD445503FNLJPR6Q'),
+  ('mgmt_full',    'باقة الإدارة', 19.99, 199, 'https://www.paypal.com/webapps/billing/plans/subscribe?plan_id=P-3AM723754L7800622NK6QVGA', 'https://www.paypal.com/webapps/billing/plans/subscribe?plan_id=P-75J71479S1623490KNLJPSTQ'),
+  ('system_full',  'باقة النظام', 19.99, 199, 'https://www.paypal.com/webapps/billing/plans/subscribe?plan_id=P-00T60558V0503131NNK6QWJQ', 'https://www.paypal.com/webapps/billing/plans/subscribe?plan_id=P-9AM029235T7376710NLJPTJQ'),
+  ('full_full',    'الباقة الشاملة', 79, 940, 'https://www.paypal.com/webapps/billing/plans/subscribe?plan_id=P-91R69971UP3609026NLJPLFA', 'https://www.paypal.com/webapps/billing/plans/subscribe?plan_id=P-9KM50536NN239142UNLJPMYI')
+on conflict (plan_key) do update set name=excluded.name, price_m=excluded.price_m, price_y=excluded.price_y, paypal_m=excluded.paypal_m, paypal_y=excluded.paypal_y, updated_at=now();
+-- إزالة صفوف الباقات القديمة (سولو/سمول/مد/أوليم)
+delete from pq_plans where plan_key in ('solo_full','small_full','med_full','ulim_full');

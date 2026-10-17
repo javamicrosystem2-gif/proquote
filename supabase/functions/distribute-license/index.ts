@@ -25,16 +25,23 @@ const SB_URL = Deno.env.get('SUPABASE_URL')!;
 const SB_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 
 const PLAN_MAP: Record<string, { tier: string; days: number }> = {
-  // الشهرية
-  'P-79Y10184HV8984701NK6QOHA': { tier: 'solo', days: 31 },
-  'P-8BF09849DB984670MNK6QTLY': { tier: 'small', days: 31 },
-  'P-3AM723754L7800622NK6QVGA': { tier: 'med', days: 31 },
-  'P-00T60558V0503131NNK6QWJQ': { tier: 'ulim', days: 31 },
-  // السنوية
-  'P-6F9852959W923042YNK6QXOY': { tier: 'solo', days: 366 },
-  'P-1YR373559E473603LNK6QZIQ': { tier: 'small', days: 366 },
-  // (med السنوية = نفس معرف small السنوية كما أكدها المطوّر — تعامل small)
-  'P-67859581MF821035CNK6QZ7A': { tier: 'ulim', days: 366 }
+  // ===== الباقات الخمس الجديدة (نظام الأقسام) — الشهرية =====
+  'P-79Y10184HV8984701NK6QOHA': { tier: 'quotes', days: 31 },   // باقة عروض الأسعار — شهري
+  'P-8BF09849DB984670MNK6QTLY': { tier: 'finance', days: 31 },  // باقة الأمور المالية — شهري
+  'P-3AM723754L7800622NK6QVGA': { tier: 'mgmt', days: 31 },     // باقة الإدارة — شهري
+  'P-00T60558V0503131NNK6QWJQ': { tier: 'system', days: 31 },   // باقة النظام — شهري
+  'P-91R69971UP3609026NLJPLFA': { tier: 'full', days: 31 },     // الباقة الشاملة — شهري
+  // ===== الباقات الخمس الجديدة — السنوية =====
+  'P-32969311AW310952HNLJPREQ': { tier: 'quotes', days: 366 },
+  'P-7JV77932AD445503FNLJPR6Q': { tier: 'finance', days: 366 },
+  'P-75J71479S1623490KNLJPSTQ': { tier: 'mgmt', days: 366 },
+  'P-9AM029235T7376710NLJPTJQ': { tier: 'system', days: 366 },
+  'P-9KM50536NN239142UNLJPMYI': { tier: 'full', days: 366 },
+  // ===== المعرفات القديمة (solo/small/med/ulim) → الشاملة =====
+  // المشتركون القدامى لا ينزع منهم شيء: التجديدات عبر الروابط القديمة تُصدر «full»
+  'P-6F9852959W923042YNK6QXOY': { tier: 'full', days: 366 },
+  'P-1YR373559E473603LNK6QZIQ': { tier: 'full', days: 366 },
+  'P-67859581MF821035CNK6QZ7A': { tier: 'full', days: 366 }
 };
 
 // ---------- أدوات ----------
