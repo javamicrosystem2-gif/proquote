@@ -36,10 +36,13 @@ function run() {
     log('— الترحيل من JSON: ' + (migrated ? 'نُفّذ الآن' : 'غير مطلوب (سبق أو أول تشغيل)'));
 
     // ---------- 3) التكافؤ الحرفي ----------
+    // JSON التراثي يخص الشركة الأولى فقط — لا يُقارن بمخزن شركة أخرى (عصر تعدد الشركات)
+    const meta0 = db.getMeta();
+    const legacyApplies = meta0.companyId === 1 && original;
     const now = db.getAll();
     const keyCount = Object.keys(now).length;
     log('— عدد المفاتيح في القاعدة: ' + keyCount);
-    if (original) {
+    if (legacyApplies) {
       const oKeys = Object.keys(original);
       let same = oKeys.length === keyCount;
       const diffs = [];
@@ -48,21 +51,24 @@ function run() {
           if (String(original[k]) !== String(now[k])) { diffs.push(k); same = false; if (diffs.length > 3) break; }
         }
       }
-      log('— التكافؤ مع JSON الأصلي: ' + (same ? '✅ متطابق 100%' : '✗ اختلاف! ' + diffs.join(', ')));
+      log('— التكافؤ مع JSON الأصلي (الشركة الأولى): ' + (same ? '✅ متطابق 100%' : '✗ اختلاف! ' + diffs.join(', ')));
       const hO = sha(original), hN = sha(now);
       log('— بصمة SHA-256 الأصل : ' + hO.slice(0, 16) + '…');
       log('— بصمة SHA-256 القاعدة: ' + hN.slice(0, 16) + '…');
       log('— البصمتان متطابقتان: ' + (hO === hN ? '✅ نعم' : '✗ لا'));
+    } else {
+      log('— التكافؤ مع JSON التراثي: غير منطبق (الشركة النشطة «' + (meta0.company || '—') + '» ليست الشركة الأولى) ✓');
     }
 
-    // ---------- 4) النسخ الاحتياطي ذهاباً وإياباً ----------
+    // ---------- 4) النسخ الاحتياطي ذهاباً وإياباً (الأساس: لقطة المخزن النشط نفسه) ----------
+    const snap = db.getAll();
     const bakPath = path.join(app.getPath('userData'), 'dbtest-roundtrip.pqbak');
     db.createBackup(bakPath, false);
     db.replaceAll({ __dbtest_wiped__: '1' }); // مسح كامل
     const afterWipe = Object.keys(db.getAll()).length;
     db.restoreBackup(bakPath);
     const afterRestore = db.getAll();
-    const roundTripOk = sha(afterRestore) === (original ? sha(original) : sha(now)) && afterWipe === 1;
+    const roundTripOk = sha(afterRestore) === sha(snap) && afterWipe === 1;
     log('— نسخ احتياطي → مسح → استعادة: ' + (roundTripOk ? '✅ مطابقة كاملة' : '✗ خلل!'));
     try { fs.unlinkSync(bakPath); } catch (_) {}
 

@@ -169,6 +169,33 @@ function createMainWindow() {
     try { companies.setSwitchingDone(); } catch (_) {}
   });
 
+  // قائمة الزر الأيمن: نسخ / لصق / قص / تحديد الكل (تعمل بالفأرة في كل البرنامج)
+  // داخل الحقول: القائمة الكاملة — وعلى نص محدد بالقوائم: نسخ وتحديد الكل
+  mainWindow.webContents.on('context-menu', (_e, params) => {
+    try {
+      let _lang = 'ar';
+      try { _lang = JSON.parse(db.getItem('pq5_s') || '{}').lang || 'ar'; } catch (_) {}
+      const T = (ar, en) => (_lang === 'en' ? en : ar);
+      const ef = params.editFlags || {};
+      const tpl = [];
+      if (params.isEditable && (ef.canUndo || ef.canRedo)) {
+        tpl.push({ role: 'undo', label: T('تراجع', 'Undo'), enabled: !!ef.canUndo });
+        tpl.push({ role: 'redo', label: T('إعادة', 'Redo'), enabled: !!ef.canRedo });
+        tpl.push({ type: 'separator' });
+      }
+      const canCut = params.isEditable && !!ef.canCut;
+      const canCopy = !!ef.canCopy;
+      const canPaste = params.isEditable && !!ef.canPaste;
+      if (canCut) tpl.push({ role: 'cut', label: T('قص', 'Cut') });
+      if (canCopy) tpl.push({ role: 'copy', label: T('نسخ', 'Copy') });
+      if (canPaste) tpl.push({ role: 'paste', label: T('لصق', 'Paste') });
+      if ((canCut || canCopy || canPaste) && ef.canSelectAll) tpl.push({ type: 'separator' });
+      if (ef.canSelectAll) tpl.push({ role: 'selectAll', label: T('تحديد الكل', 'Select All'), enabled: params.isEditable || canCopy });
+      if (!tpl.length) return; // زر يمين بلا نص محدد ولا حقل — لا قائمة
+      Menu.buildFromTemplate(tpl).popup({ window: mainWindow });
+    } catch (err) { console.error('[context-menu]', err.message); }
+  });
+
   // فتح الروابط الخارجية في المتصفح الافتراضي بدل نافذة Electron
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {
     if (url.startsWith('whatsapp://')) { shell.openExternal(url).catch(() => {}); return { action: 'deny' }; }
@@ -382,6 +409,15 @@ ipcMain.handle('app:get-version', () => app.getVersion());
 
 // مسار بيانات المستخدم (للاستخدام المستقبلي في قاعدة البيانات والنسخ الاحتياطي)
 ipcMain.handle('app:get-user-data-path', () => app.getPath('userData'));
+
+// إعادة تشغيل البرنامج بالكامل (تُستخدم بعد تبديل الشركة الافتراضية)
+// app.exit يتجاوز حوار الخروج — وrelaunch يعيد الفتح تلقائياً
+ipcMain.handle('app:relaunch', () => {
+  try { db.forceFlush(); } catch (_) {}
+  app.relaunch();
+  app.exit(0);
+  return true;
+});
 
 // إظهار حوار حفظ ملف (للاستخدام في النسخ الاحتياطي/تصدير PDF لاحقاً)
 ipcMain.handle('dialog:show-save', async (_evt, opts) => {

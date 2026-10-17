@@ -132,6 +132,142 @@ async function run() {
   t = await js(`(function(){try{const sb=document.querySelector('.sidebar').innerHTML;return sb.includes('https://t.me/javamicro')&&sb.includes('https://www.facebook.com/proquoteamrnada')&&sb.includes('mailto:amrnada@mail.ru')}catch(e){return 'ERR:'+e.message}})()`);
   R('الشريط الجانبي: أزرار تيليجرام وفيسبوك والبريد', t === true, typeof t === 'string' ? t : '');
 
+  // ===== البند 2: أكواد المنتجات التلقائية =====
+  // 20) منتج جديد: الكود معبأ مسبقاً بفريد + حفظ بكود فارغ يولّد تلقائياً
+  t = await js(`(function(){try{localStorage.setItem('pq5_p', JSON.stringify([{id:'p1',code:'P-1001',name:'قديم 1',price:1,unit:'قطعة',at:1},{id:'p2',code:'',name:'قديم بلا كود',price:1,unit:'قطعة',at:2}]));go('products');openPM();const pre=document.getElementById('pcd').value;
+document.getElementById('pn').value='منتج جديد تجريبي';document.getElementById('pcd').value='';saveP();
+const ps=ld('pq5_p');const saved=ps.find(function(x){return x.name==='منتج جديد تجريبي'});
+return {pre:pre,savedCode:saved?saved.code:null,ok:!!pre&&!!saved&&!!(saved&&saved.code)}}catch(e){return 'ERR:'+e.message}})()`);
+  R('منتج جديد: كود مقترح مسبقاً + الحفظ بلا كود يولّد فريداً', t && t.ok === true && !!t.savedCode, typeof t === 'string' ? t : JSON.stringify(t));
+
+  // 21) رفض الكود المكرر
+  t = await js(`(function(){try{openPM();document.getElementById('pn').value='مكرر تجريبي';document.getElementById('pcd').value='P-1001';saveP();return !ld('pq5_p').some(function(x){return x.name==='مكرر تجريبي'})}catch(e){return 'ERR:'+e.message}})()`);
+  R('رفض حفظ منتج بكود مستخدم لمنتج آخر', t === true, typeof t === 'string' ? t : '');
+
+  // 22) توليد الأكواد الناقصة: يملأ الفارغ ولا يغيّر الموجود + كلها فريدة
+  t = await js(`(function(){try{genMissingProdCodes();const ps=ld('pq5_p');const noCode=ps.filter(function(p){return !(p.code||'').trim()}).length;const codes=ps.map(function(p){return (p.code||'').trim().toUpperCase()});const uniq=new Set(codes).size===codes.length;const kept=ps.find(function(x){return x.id==='p1'}).code==='P-1001';return noCode===0&&uniq&&kept}catch(e){return 'ERR:'+e.message}})()`);
+  R('توليد الناقص: يملأ الفارغ بفريد + يحترم الموجود', t === true, typeof t === 'string' ? t : '');
+
+  // ===== البند 3: إعادة التشغيل عند تعيين الشركة + الاسم بالعنوان =====
+  // 23) عنوان القسم يعرض اسم الشركة الافتراضية
+  t = await js(`(function(){try{go('company');return new Promise(function(res){setTimeout(function(){res(document.getElementById('compTitleName').textContent.length>0)},400)})}catch(e){return 'ERR:'+e.message}})()`);
+  R('عنوان قسم الشركة يعرض اسم الشركة الافتراضية', t === true, typeof t === 'string' ? t : '');
+
+  // 24) التبديل: حفظ كامل ← مسح ← تبديل ← أمر إعادة التشغيل (بمحاكاة الريستارت)
+  t = await js(`(async function(){try{
+const PQ=window.proquote;
+// تنظيف أي بقايا من تشغيلة سابقة (حتى لو كانت قد صارت الافتراضية)
+var _pre=await PQ.companies.list();var _old=_pre.find(function(c){return c.name==='__شركة_ريستارت__'});
+if(_old){if(_old.isDefault){var _first=_pre.find(function(c){return c.id!==_old.id});if(_first)await PQ.companies.setDefault(_first.id)}await PQ.companies.remove(_old.id)}
+var cr=await PQ.companies.create('__شركة_ريستارت__');
+if(!cr||!cr.ok)return 'create failed: '+(cr&&cr.error);
+var relaunchCalled=false;window.__PQ_RELAUNCH_HOOK=function(){relaunchCalled=true};
+window.confirm=function(){return true};
+localStorage.setItem('__sw_test__','1');
+await setDefComp(cr.id);
+await new Promise(function(res){setTimeout(res,900)});
+window.__PQ_RELAUNCH_HOOK=null;
+var switched=await PQ.companies.current();
+var restored=(switched&&switched.name==='__شركة_ريستارت__');
+var cleared=localStorage.length===0;
+await PQ.companies.setDefault(1);
+await PQ.companies.remove(cr.id);
+return {restored:restored,cleared:cleared,relaunch:relaunchCalled,ok:restored&&relaunchCalled}}catch(e){return 'ERR:'+e.message}})()`);
+  R('التبديل: مسح الذاكرة ← تبديل فعلي ← أمر إعادة التشغيل', t && t.ok === true, typeof t === 'string' ? t : JSON.stringify(t));
+
+  // ===== البند 4: المظهر والألوان =====
+  // 25) ثيم فاتح يغيّر ألوان البرنامج فعلياً ويحفظ
+  t = await js(`(function(){try{go('settings');stab('theme');thPreset('light');const cs=getComputedStyle(document.documentElement).getPropertyValue('--bg0').trim();const saved=(ls().theme&&ls().theme.key)==='light';const scheme=getComputedStyle(document.documentElement).colorScheme||document.documentElement.style.colorScheme;return {bg0:cs,saved:saved,scheme:String(scheme),ok:cs==='#eef2f8'&&saved}}catch(e){return 'ERR:'+e.message}})()`);
+  R('ثيم «فاتح نظيف»: الألوان تتغير فورياً وتُحفظ', t && t.ok === true, typeof t === 'string' ? t : JSON.stringify(t));
+
+  // 26) تحكم يدوي في اللون المميز + اشتقاق التدرجات تلقائياً
+  t = await js(`(function(){try{thSetVar('--acc','#123456');const acc=getComputedStyle(document.documentElement).getPropertyValue('--acc').trim();const acc2=getComputedStyle(document.documentElement).getPropertyValue('--acc2').trim();return {acc:acc,acc2:acc2,ok:acc==='#123456'&&acc2.indexOf('18,52,86')>=0}}catch(e){return 'ERR:'+e.message}})()`);
+  R('لون مميز مخصص + اشتقاق خلفياته الشفافة تلقائياً', t && t.ok === true, typeof t === 'string' ? t : JSON.stringify(t));
+
+  // 27) الثيم يبقى بعد إعادة التحميل + التكبير يعمل
+  await load();
+  await sleep(3500);
+  t = await js(`(function(){try{const acc=getComputedStyle(document.documentElement).getPropertyValue('--acc').trim();thZoom(1.2);const z=document.body.style.zoom;return {acc:acc,zoom:z,ok:acc==='#123456'&&String(z)==='1.2'}}catch(e){return 'ERR:'+e.message}})()`);
+  R('الثيم يبقى بعد إعادة التشغيل + حجم العرض يعمل', t && t.ok === true, typeof t === 'string' ? t : JSON.stringify(t));
+
+  // 28) إعادة الافتراضي
+  t = await js(`(function(){try{window.confirm=function(){return true};thReset();const acc=getComputedStyle(document.documentElement).getPropertyValue('--acc').trim();const t2=(ls().theme);return {acc:acc,cleared:!t2,ok:acc==='#00d4aa'&&!t2}}catch(e){return 'ERR:'+e.message}})()`);
+  R('إعادة المظهر الافتراضي تعيد كل شيء', t && t.ok === true, typeof t === 'string' ? t : JSON.stringify(t));
+
+  // ===== بند إصلاح 1: عنوان QUOTATION وكلمة الشحن =====
+  // 29) الحفظ الصحيح: العنوان لا يُستبدل بكلمة الشحن + الحقول تُستعاد
+  t = await js(`(function(){try{go('settings');stab('company');
+document.getElementById('sqtx').value='عرض سعر خاص';
+document.getElementById('sqshpLbl').value='التوصيل';
+saveS();
+var s1=ls();
+var okSave=s1.quotationText==='عرض سعر خاص'&&s1.shippingLabel==='التوصيل';
+document.getElementById('sqtx').value='x';document.getElementById('sqshpLbl').value='y';
+ldSF();
+var okLoad=document.getElementById('sqtx').value==='عرض سعر خاص'&&document.getElementById('sqshpLbl').value==='التوصيل';
+// حالة كلمة شحن فارغة: العنوان يظل محفوظاً
+document.getElementById('sqshpLbl').value='';saveS();
+var okEmpty=ls().quotationText==='عرض سعر خاص'&&ls().shippingLabel==='';
+ldSF();
+return {okSave:okSave,okLoad:okLoad,okEmpty:okEmpty,ok:okSave&&okLoad&&okEmpty}}catch(e){return 'ERR:'+e.message}})()`);
+  R('عنوان QUOTATION: يحفظ نصه ولا يتأثر بكلمة الشحن (ممتلئة أو فارغة) ويُستعاد', t && t.ok === true, typeof t === 'string' ? t : JSON.stringify(t));
+
+  // ===== إصلاح 2: ملصق الباركود =====
+  // 30) صنف بلا كود: يولّد كوداً تلقائياً + المودال يفتح بمعاينة باركود حقيقية
+  t = await js(`(function(){try{localStorage.setItem('pq5_wi', JSON.stringify([{id:'wb1',code:'',name:'صنف بلا كود',unit:'قطعة',minQty:0,at:1}]));go('warehouse');whLabel('wb1');
+const it=ld('pq5_wi').find(function(x){return x.id==='wb1'});
+const prev=document.getElementById('wbcPrev');
+const hasSvg=prev&&prev.querySelector('svg');
+return {code:it?it.code:null,hasSvg:!!hasSvg,ok:!!(it&&it.code&&it.code.indexOf('P-')===0)&&!!hasSvg}}catch(e){return 'ERR:'+e.message}})()`);
+  R('باركود لصنف بلا كود: توليد كود تلقائي + معاينة SVG فورية', t && t.ok === true, typeof t === 'string' ? t : JSON.stringify(t));
+
+  // 31) المقاسات المخصصة + التفضيلات تُحفظ
+  t = await js(`(function(){try{document.getElementById('wbcSize').value='custom';wbcOnSize();document.getElementById('wbcW').value='45';document.getElementById('wbcH').value='25';document.getElementById('wbcBcH').value='15';document.getElementById('wbcCopies').value='3';wbcPrev();
+const prefCheck=_wbcSet();
+return {dims:_wbcDims(),copies:prefCheck.copies,bch:prefCheck.bch,ok:_wbcDims()[0]===45&&_wbcDims()[1]===25&&prefCheck.copies==='3'&&prefCheck.bch==='15'}}catch(e){return 'ERR:'+e.message}})()`);
+  R('مقاس مخصص 45×25 + تفضيلات القراءة سليمة', t && t.ok === true, typeof t === 'string' ? t : JSON.stringify(t));
+
+  // ===== إصلاح 3: منتقي المنتجات يظهر فوق المودال =====
+  // 32) فتح منتقي شحنة جديدة: fixed + داخل الشاشة + z-index عالٍ + مرئي
+  t = await js(`(function(){try{go('shipping');openShp();document.getElementById('shpnm').value='عميل';
+const btn=document.querySelector('#mShp .am button');
+tglShpPP(btn);
+const pp=document.getElementById('shppp');
+const st=getComputedStyle(pp);
+const r=pp.getBoundingClientRect();
+const vis=st.display==='block'&&st.position==='fixed'&&parseInt(st.zIndex)>=200&&r.top>=0&&r.bottom<=window.innerHeight&&r.left>=0&&r.right<=window.innerWidth&&pp.querySelector('.pp-item, .pp-l div, div')!==null;
+return {display:st.display,position:st.position,z:st.zIndex,top:Math.round(r.top),bottom:Math.round(r.bottom),vis:vis}}catch(e){return 'ERR:'+e.message}})()`);
+  R('منتقي المنتجات في «شحنة جديدة» يظهر فوق كل شيء وداخل الشاشة', t && t.vis === true, typeof t === 'string' ? t : JSON.stringify(t));
+
+  // ===== إصلاح 4: تهيئة أعمدة مدخل/مخرج جديد =====
+  // 33) إخفاء المقاس واللون بالشيكبوكسات: جدول بسيط (صنف ثم كمية) مع حفظ القيم المخفية
+  t = await js(`(function(){try{localStorage.setItem('pq5_p', JSON.stringify([{id:'p1',code:'P-1001',name:'صنف اختبار io',price:1,unit:'قطعة',at:1}]));localStorage.setItem('pq5_c', JSON.stringify([{id:'cl1',name:'عميل الفحص',phone:'0100',at:1}]));go('warehouse');whTab('io');openIo('in');
+document.getElementById('iocl').value='cl1';
+addProdToIo('p1');
+const rows0=document.querySelectorAll('#ioib tr');const last0=rows0[rows0.length-1];
+const sz0=last0.querySelector('.io-size');if(sz0)sz0.value='100';
+const cl0=last0.querySelector('.io-color');if(cl0)cl0.value='أحمر';
+last0.querySelector('.io-qty').value='5';
+const preRows=document.querySelectorAll('#ioib tr').length;const preNamed=Array.from(document.querySelectorAll('#ioib .io-name')).filter(function(x){return x.value.trim()}).length;
+document.getElementById('ioTSize').checked=false;ioTglSize();
+document.getElementById('ioTColor').checked=false;ioTglColor();
+const headers=Array.from(document.querySelectorAll('#mIo thead th')).map(function(th){return th.textContent.trim()});
+const szGone=!document.querySelector('#ioib tr .io-size');
+const rowAfter=document.querySelectorAll('#ioib tr');const prod=rowAfter[rowAfter.length-1];
+const nameKept=prod&&prod.querySelector('.io-name').value.trim().length>0;
+const qtyKept=prod&&prod.querySelector('.io-qty').value==='5';
+const dbg='preRows='+preRows+' preNamed='+preNamed+' rows='+rowAfter.length+' names='+JSON.stringify(Array.from(rowAfter).map(function(r){return (r.querySelector('.io-name')||{}).value||''}));
+return {headers:headers,szGone:szGone,nameKept:nameKept,qtyKept:qtyKept,dbg:dbg,ok:szGone&&nameKept&&qtyKept&&!headers.includes('المقاس')&&!headers.includes('اللون')}}catch(e){return 'ERR:'+e.message}})()`);
+  R('مدخل جديد: إخفاء المقاس/اللون ← جدول صنف+كمية والقيم محفوظة', t && t.ok === true, typeof t === 'string' ? t : JSON.stringify(t));
+
+  // 34) القيم المخفية تُحفظ في المستند وتُستعاد عند التحرير
+  t = await js(`(function(){try{saveIo();const ios=ld('pq5_io');const d=ios[ios.length-1];
+const savedHidden=d&&d.items.length&&d.items[0].size==='100'&&d.items[0].color==='أحمر'&&d.showSize===false&&d.showColor===false;
+edIo(d.id);
+const restoredHidden=document.querySelectorAll('#ioib tr .io-size').length===0&&ioShowSize===false;
+return {savedHidden:!!savedHidden,restoredHidden:restoredHidden,ok:!!savedHidden&&restoredHidden}}catch(e){return 'ERR:'+e.message}})()`);
+  R('حفظ القيم المخفية داخل المستند واستعادتها عند التحرير', t && t.ok === true, typeof t === 'string' ? t : JSON.stringify(t));
+
   const passed = out.filter((l) => l.startsWith('✅')).length;
   log('=== ' + passed + '/' + (out.length) + ' ===');
   const report = path.join(app.getPath('userData'), '..', 'pq-uitest-report.txt');

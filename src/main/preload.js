@@ -11,6 +11,7 @@ contextBridge.exposeInMainWorld('proquote', {
   getVersion: () => ipcRenderer.invoke('app:get-version'),
   installLang: () => ipcRenderer.invoke('app:install-lang'),
   getUserDataPath: () => ipcRenderer.invoke('app:get-user-data-path'),
+  relaunchApp: () => ipcRenderer.invoke('app:relaunch'),
 
   // ---------- حوارات الملفات ----------
   showSaveDialog: (options) => ipcRenderer.invoke('dialog:show-save', options),
