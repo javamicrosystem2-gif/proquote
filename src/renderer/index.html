@@ -207,7 +207,9 @@ body[data-share-size="lg"] .btn-w.btn-sm i,body[data-share-size="lg"] .md-h .btn
 .bg-orb{position:fixed;border-radius:50%;filter:blur(80px);pointer-events:none;z-index:0}
 @keyframes f1{0%,100%{transform:translate(0,0)}50%{transform:translate(35px,-25px)}}
 @keyframes f2{0%,100%{transform:translate(0,0)}50%{transform:translate(-25px,35px)}}
-.pp{position:absolute;left:0;top:100%;background:var(--bg1);border:1px solid var(--brd);border-radius:10px;padding:0;min-width:320px;max-height:350px;z-index:35;display:none;box-shadow:0 12px 44px rgba(0,0,0,.5);overflow:hidden}
+.pp{position:fixed;background:var(--bg1);border:1px solid var(--brd);border-radius:10px;padding:0;min-width:320px;max-width:92vw;max-height:70vh;z-index:300;display:none;box-shadow:0 18px 60px rgba(0,0,0,.6);overflow:hidden}
+.pp.show{display:flex;flex-direction:column}
+.pp-l{overflow-y:auto}
 .pp.show{display:block}
 .pp-s{padding:8px;border-bottom:1px solid var(--brd);position:sticky;top:0;background:var(--bg1);z-index:1}
 .pp-l{max-height:290px;overflow-y:auto}
@@ -1391,7 +1393,7 @@ body[data-share-size="lg"] .btn-w.btn-sm i,body[data-share-size="lg"] .md-h .btn
 </div>
 <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:10px">
 <label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:11.5px;color:var(--t2)"><input type="checkbox" id="wbpShowQr" checked style="accent-color:var(--acc)">QR</label>
-<label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:11.5px;color:var(--t2)"><input type="checkbox" id="wbpCompactHdr" checked style="accent-color:var(--acc)">هيدر مضغوط (سطر واحد)</label>
+<label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:11.5px;color:var(--t2)"><input type="checkbox" id="wbpCompactHdr" checked style="accent-color:var(--acc)">هيدر مضغوط (سطر واحد)</label><label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:11.5px;color:var(--t2)"><input type="checkbox" id="wbpFullHdr" style="accent-color:var(--acc)" onchange="wbpPrev()">الهيدر الافتراضي الكامل</label><label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:11.5px;color:var(--t2)"><input type="checkbox" id="wbpMeta" checked style="accent-color:var(--acc)" onchange="wbpPrev()">عنوان البوليصة والرقم والتاريخ</label>
 <label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:11.5px;color:var(--t2)"><input type="checkbox" id="wbpShowSign" checked style="accent-color:var(--acc)">التواقيع</label>
 <label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:11.5px;color:var(--t2)"><input type="checkbox" id="wbpShowTot" checked style="accent-color:var(--acc)">إجمالي الكمية</label>
 <span style="font-size:10.5px;color:var(--t3)">تُحفظ إعداداتك تلقائياً</span>
@@ -1913,12 +1915,13 @@ function thCustomFromInputs(){THEME_VARS.forEach(function(p){var inp=document.ge
 function _ppShow(ppId,btn){
 const pp=document.getElementById(ppId);if(!pp)return;
 if(pp.classList.contains('show')){pp.classList.remove('show');return}
-pp.classList.add('show');_ppJustOpened=Date.now()+150;pp.style.position='fixed';pp.style.left='-9999px';pp.style.top='0';
-const r=btn?btn.getBoundingClientRect():{left:innerWidth/2-160,right:innerWidth/2+160,bottom:100,top:0};
-const w=pp.offsetWidth||320,hh=Math.min(pp.offsetHeight||300,350);
-let l=Math.min(Math.max(8,r.left),window.innerWidth-w-8);
-let t=r.bottom+6;if(t+hh>window.innerHeight-10)t=Math.max(8,r.top-hh-6);
-pp.style.left=l+'px';pp.style.top=t+'px';pp.style.zIndex=300;
+pp.classList.add('show');_ppJustOpened=Date.now()+150;
+pp.style.position='fixed';
+pp.style.left='50%';pp.style.top='50%';
+pp.style.transform='translate(-50%,-50%)';
+pp.style.right='auto';
+pp.style.zIndex=300;
+pp.style.maxHeight='70vh';pp.style.overflowY='auto';
 if(btn)btn.setAttribute('data-pp-open','1')}
 
 function tglSoPP(btn){_ppShow('sopp',btn);if(document.getElementById('sopp').classList.contains('show'))filterSoPP()}
@@ -1960,28 +1963,33 @@ pqPrompt('إعادة تسمية الفرع','الاسم الجديد:',w.name,''
 
 // ===== طابعة بوليصة الشحن الاحترافية (حراري/A4 — ورقة واحدة) =====
 function wbpOnSize(){const v=document.getElementById('wbpSize').value;const cust=(v==='custom');document.getElementById('wbpCW').style.display=cust?'':'none';document.getElementById('wbpCH').style.display=cust?'':'none';wbpPrev()}
-function _wbpSet(){return {size:document.getElementById('wbpSize').value,w:document.getElementById('wbpW').value,h:document.getElementById('wbpH').value,hdr:document.getElementById('wbpHdr').value,tbl:document.getElementById('wbpTbl').value,fs:document.getElementById('wbpFs').value,margin:document.getElementById('wbpMargin').value,qr:document.getElementById('wbpShowQr').checked,compact:document.getElementById('wbpCompactHdr').checked,sign:document.getElementById('wbpShowSign').checked,tot:document.getElementById('wbpShowTot').checked}}
+function _wbpSet(){return {size:document.getElementById('wbpSize').value,w:document.getElementById('wbpW').value,h:document.getElementById('wbpH').value,hdr:document.getElementById('wbpHdr').value,tbl:document.getElementById('wbpTbl').value,fs:document.getElementById('wbpFs').value,margin:document.getElementById('wbpMargin').value,qr:document.getElementById('wbpShowQr').checked,compact:document.getElementById('wbpCompactHdr').checked,fullHdr:document.getElementById('wbpFullHdr').checked,meta:document.getElementById('wbpMeta').checked,sign:document.getElementById('wbpShowSign').checked,tot:document.getElementById('wbpShowTot').checked}}
 function _wbpDims(p){if(p.size==='custom')return [Math.max(30,parseInt(p.w)||80),Math.max(0,parseInt(p.h)||0)];if(p.size==='a4')return [210,297];const pr=p.size.split('x');return [parseInt(pr[0]),(pr[1]==='auto'||pr[1]===undefined)?0:parseInt(pr[1])]}
 function _wbpBuild(p){
 const d=ld(K.wb).find(function(x){return x.id===((_pvCurDoc||{}).id)})||ld(K.wb)[ld(K.wb).length-1];if(!d)return '';
 const s=ls();const W=_wbpDims(p)[0];
 const scale=p.fs/100,hdrS=p.hdr/100,tblS=p.tbl/100;
+var _fullHdrHtml='';
+if(p.fullHdr){const t=TP[s.template||'classic'];const hf=s.headingFont||'Tajawal',bf2=s.bodyFont||'Tajawal';const dk=!!t.dk;const txC=dk?'#ffffff':t.txC,txL=dk?'rgba(255,255,255,.7)':t.txL,txM=dk?'rgba(255,255,255,.5)':t.txM;
+_fullHdrHtml=buildCompanyHeader(t,s,hf,bf2,(s.headingSize||22)*hdrS,(s.bodySize||13)*scale,txC,txL,txM);}
+const fullHdrBlock=(p.fullHdr&&_fullHdrHtml)?_fullHdrHtml:'';
 const base=10*scale; // حجم خط أساسي متكيف
 const qr=(p.qr&&d.number)?mkQR(d.number,3):'';
 const logo=s.logo?('<img src="'+s.logo+'" style="max-height:'+(22*hdrS*scale)+'px;max-width:'+(44*hdrS*scale)+'px;object-fit:contain">'):'';
 const info=p.compact
 ?('<div style="font-size:'+(base*0.9)+'px;font-weight:800">'+(s.companyName||'الشركة')+(s.phone?' · '+s.phone:'')+'</div>')
-:('<div style="font-size:'+(base*1.15*hdrS)+'px;font-weight:900">'+(s.companyName||الشركة)+'</div>'+(s.address?'<div style="font-size:'+(base*0.75*hdrS)+'px">'+s.address+'</div>':'')+(s.phone?'<div style="font-size:'+(base*0.75*hdrS)+'px">'+s.phone+(s.email?' · '+s.email:'')+'</div>':''));
-const head='<div style="display:flex;align-items:center;justify-content:space-between;gap:4px;border-bottom:1.5px solid #000;padding-bottom:3px;margin-bottom:4px">'+logo+info+(qr?('<img src="'+qr+'" style="width:'+(26*scale)+'px;height:'+(26*scale)+'px">'):'')+'</div>';
-const meta='<div style="display:flex;justify-content:space-between;flex-wrap:wrap;font-size:'+(base*0.85)+'px;margin-bottom:3px"><b>'+d.number+'</b><span>'+fmtD(d.date)+'</span></div><div style="font-size:'+(base*0.8)+'px;margin-bottom:4px;padding-bottom:3px;border-bottom:1px dashed #999"><b>العميل:</b> '+(d.clientName||'—')+(d.address?' · '+d.address:'')+(d.phone?' · '+d.phone:'')+(d.supplyNumber?' · أمر توريد: '+d.supplyNumber:'')+'</div>';
+:('<div style="font-size:'+(base*1.15*hdrS)+'px;font-weight:900">'+(s.companyName||'الشركة')+'</div>'+(s.address?'<div style="font-size:'+(base*0.75*hdrS)+'px">'+s.address+'</div>':'')+(s.phone?'<div style="font-size:'+(base*0.75*hdrS)+'px">'+s.phone+(s.email?' · '+s.email:'')+'</div>':''));
+const head=(fullHdrBlock&&fullHdrBlock.length)?fullHdrBlock:('<div style="display:flex;align-items:center;justify-content:space-between;gap:4px;border-bottom:1.5px solid #000;padding-bottom:3px;margin-bottom:4px">'+logo+info+(qr?('<img src="'+qr+'" style="width:'+(26*scale)+'px;height:'+(26*scale)+'px">'):'')+'</div>');
+const meta=(p.meta!==false)?('<div style="font-size:'+(base*0.95)+'px;font-weight:800;margin-bottom:3px">بوليصة شحن صادرة</div><div style="display:flex;justify-content:space-between;flex-wrap:wrap;font-size:'+(base*0.85)+'px;margin-bottom:3px"><span>رقم البوليصة: <b>'+d.number+'</b></span><span>بتاريخ '+fmtD(d.date)+'</span></div>'):'';
+const cliBlock='<div style="font-size:'+(base*0.8)+'px;margin-bottom:4px;padding-bottom:3px;border-bottom:1px dashed #999"><b>العميل:</b> '+(d.clientName||'—')+(d.address?' · '+d.address:'')+(d.phone?' · '+d.phone:'')+(d.supplyNumber?' · أمر توريد: '+d.supplyNumber:'')+'</div>';
 let rows='';
 (d.items||[]).forEach(function(it,i){rows+='<tr><td style="text-align:center">'+(i+1)+'</td><td>'+it.name+(it.size?' — مقاس '+it.size:'')+(it.color?' — '+it.color:'')+'</td><td style="text-align:center;font-weight:800">'+fmtN(it.qty||0)+'</td></tr>'});
 const tbl='<table style="width:100%;border-collapse:collapse;font-size:'+(base*tblS)+'px"><thead><tr style="border-bottom:1px solid #000"><th style="padding:2px 3px;width:18px">#</th><th style="padding:2px 3px;text-align:right">الصنف</th><th style="padding:2px 3px;width:34px">كمية</th></tr></thead><tbody>'+rows+'</tbody></table>';
 const tot=(p.tot&&d.items)?('<div style="text-align:left;font-size:'+(base*0.85)+'px;font-weight:900;margin-top:3px">الإجمالي: '+fmtN((d.items||[]).reduce(function(a,b){return a+(b.qty||0)},0))+' قطعة</div>'):'';
 const sign=p.sign?('<div style="display:flex;justify-content:space-between;margin-top:'+(8*scale)+'px;font-size:'+(base*0.8)+'px"><div style="border-top:1px solid #000;padding-top:2px;width:'+(W*0.35)+'px;text-align:center">توقيع المستلم</div><div style="border-top:1px solid #000;padding-top:2px;width:'+(W*0.35)+'px;text-align:center">توقيع الشركة</div></div>'):'';
-return '<div style="direction:rtl;font-family:Tajawal,Arial,sans-serif;color:#000;background:#fff;padding:'+(p.margin)+'mm;width:'+(W)+'mm'+((_wbpDims(p)[1])?(';height:'+_wbpDims(p)[1]+'mm;overflow:hidden'):'')+';box-sizing:border-box">'+head+meta+tbl+tot+sign+'</div>'}
+return '<div style="direction:rtl;font-family:Tajawal,Arial,sans-serif;color:#000;background:#fff;padding:'+(p.margin)+'mm;width:'+(W)+'mm'+((_wbpDims(p)[1])?(';height:'+_wbpDims(p)[1]+'mm;overflow:hidden'):'')+';box-sizing:border-box">'+head+meta+cliBlock+tbl+tot+sign+'</div>'}
 function wbpPrev(){const p=_wbpSet();const box=document.getElementById('wbpPrev');if(box)box.innerHTML=_wbpBuild(p)}
-function wbpOpenPrint(){try{const p=(ls().wbpPrefs)||{};if(p.size)document.getElementById('wbpSize').value=p.size;if(p.w)document.getElementById('wbpW').value=p.w;if(p.h)document.getElementById('wbpH').value=p.h;if(p.hdr)document.getElementById('wbpHdr').value=p.hdr;if(p.tbl)document.getElementById('wbpTbl').value=p.tbl;if(p.fs)document.getElementById('wbpFs').value=p.fs;if(p.margin!==undefined)document.getElementById('wbpMargin').value=p.margin;if(p.qr!==undefined)document.getElementById('wbpShowQr').checked=p.qr;if(p.compact!==undefined)document.getElementById('wbpCompactHdr').checked=p.compact;if(p.sign!==undefined)document.getElementById('wbpShowSign').checked=p.sign;if(p.tot!==undefined)document.getElementById('wbpShowTot').checked=p.tot}catch(e){}
+function wbpOpenPrint(){try{const p=(ls().wbpPrefs)||{};if(p.size)document.getElementById('wbpSize').value=p.size;if(p.w)document.getElementById('wbpW').value=p.w;if(p.h)document.getElementById('wbpH').value=p.h;if(p.hdr)document.getElementById('wbpHdr').value=p.hdr;if(p.tbl)document.getElementById('wbpTbl').value=p.tbl;if(p.fs)document.getElementById('wbpFs').value=p.fs;if(p.margin!==undefined)document.getElementById('wbpMargin').value=p.margin;if(p.qr!==undefined)document.getElementById('wbpShowQr').checked=p.qr;if(p.compact!==undefined)document.getElementById('wbpCompactHdr').checked=p.compact;if(p.fullHdr!==undefined)document.getElementById('wbpFullHdr').checked=p.fullHdr;if(p.meta!==undefined)document.getElementById('wbpMeta').checked=p.meta;if(p.sign!==undefined)document.getElementById('wbpShowSign').checked=p.sign;if(p.tot!==undefined)document.getElementById('wbpShowTot').checked=p.tot}catch(e){}
 wbpOnSize();om('mWbPrint');setTimeout(wbpPrev,150)}
 function wbpPrintNow(){
 const p=_wbpSet();try{const s=ls();s.wbpPrefs=p;sv(K.s,s)}catch(e){}

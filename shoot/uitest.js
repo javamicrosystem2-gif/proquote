@@ -330,7 +330,7 @@ pp.dispatchEvent(new MouseEvent('click',{bubbles:true}));
 const stillOpen=pp.classList.contains('show');
 await new Promise(function(res){setTimeout(res,250)});
 const closedOutside=(function(){var probe=document.createElement('div');document.body.appendChild(probe);probe.dispatchEvent(new MouseEvent('click',{bubbles:true}));var closed=!pp.classList.contains('show');probe.remove();return closed})();
-return {open1:open1,stillOpen:stillOpen,closedOutside:closedOutside,ok:open1&&stillOpen&&closedOutside}}catch(e){return 'ERR:'+e.message}})()`);
+return {open1:open1,stillOpen:stillOpen,closedOutside:closedOutside,fixed:(getComputedStyle(pp).position==='fixed'),ok:open1&&stillOpen&&closedOutside&&getComputedStyle(pp).position==='fixed'}}catch(e){return 'ERR:'+e.message}})()`);
   R('منتقي «إضافة منتج»: يفتح ويبقى مفتوحاً ويغلق فقط من خارج', t && t.ok === true, typeof t === 'string' ? t : JSON.stringify(t));
 
   // 42) باركود: إخفاء الباركود يخفيه والاسم/الكود بالأسود
