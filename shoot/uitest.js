@@ -311,6 +311,40 @@ await PQ.companies.remove(cr.id);
 return {ok:ok,dupBlocked:dupBlocked,all:ok&&dupBlocked}}catch(e){return 'ERR:'+e.message}})()`);
   R('تعديل اسم شركة: يعمل + يرفض الاسم المكرر', t && t.all === true, typeof t === 'string' ? t : JSON.stringify(t));
 
+  // ===== الموسم الجديد: طابعة البوليصة + منتقي + باركود =====
+  // 40) طابعة البوليصة: بناء مقاس حراري 80مم + هيدر مضغوط + تفضيلات تُقرأ سليمة
+  t = await js(`(function(){try{localStorage.setItem('pq5_wb', JSON.stringify([{id:'wbT1',number:'WB-777',date:'2026-01-01',clientName:'عميل طباعة',phone:'0100',address:'القاهرة',items:[{name:'صنف طباعة',size:'100',color:'أحمر',qty:5}],supplyNumber:'PO-1',at:1}]));
+_pvCurDoc={kind:'waybill',id:'wbT1'};
+document.getElementById('wbpSize').value='80xauto';document.getElementById('wbpHdr').value='50';document.getElementById('wbpTbl').value='70';document.getElementById('wbpCompactHdr').checked=true;document.getElementById('wbpShowSign').checked=false;
+const p=_wbpSet();const html=_wbpBuild(p);
+const dims=_wbpDims(p);
+return {w:dims[0],hasNum:html.includes('WB-777'),hasItem:html.includes('صنف طباعة'),noSign:!html.includes('توقيع المستلم'),hasHdr:html.includes('font-weight:800'),ok:dims[0]===80&&html.includes('WB-777')&&html.includes('صنف طباعة')&&!html.includes('توقيع المستلم')}}catch(e){return 'ERR:'+e.message}})()`);
+  R('طابعة البوليصة: بناء حراري 80مم بمقاسات مضغوطة بلا تواقيع', t && t.ok === true, typeof t === 'string' ? t : JSON.stringify(t));
+
+  // 41) المنتقي يبقى مفتوحاً بعد نقرة الفتح (إصلاح الإغلاق الفوري)
+  t = await js(`(async function(){try{go('dash');try{newQ()}catch(e){};const btn=document.querySelector('#mQ .am button');
+tglPP(btn);
+const pp=document.getElementById('pp');
+const open1=pp.classList.contains('show');
+pp.dispatchEvent(new MouseEvent('click',{bubbles:true}));
+const stillOpen=pp.classList.contains('show');
+await new Promise(function(res){setTimeout(res,250)});
+const closedOutside=(function(){var probe=document.createElement('div');document.body.appendChild(probe);probe.dispatchEvent(new MouseEvent('click',{bubbles:true}));var closed=!pp.classList.contains('show');probe.remove();return closed})();
+return {open1:open1,stillOpen:stillOpen,closedOutside:closedOutside,ok:open1&&stillOpen&&closedOutside}}catch(e){return 'ERR:'+e.message}})()`);
+  R('منتقي «إضافة منتج»: يفتح ويبقى مفتوحاً ويغلق فقط من خارج', t && t.ok === true, typeof t === 'string' ? t : JSON.stringify(t));
+
+  // 42) باركود: إخفاء الباركود يخفيه والاسم/الكود بالأسود
+  t = await js(`(function(){try{localStorage.setItem('pq5_wi', JSON.stringify([{id:'wbB1',code:'P-9',name:'صنف أسود',unit:'قطعة',minQty:0,at:1}]));whLabel('wbB1');
+const prevFull=document.getElementById('wbcPrev');
+document.getElementById('wbcShowBc').checked=false;wbcPrev();
+const html=prevFull.innerHTML;
+const noSvg=!html.includes('<svg');
+const black=html.includes('color:#000');
+document.getElementById('wbcShowBc').checked=true;wbcPrev();
+const withSvg=prevFull.innerHTML.includes('<svg');
+return {noSvg:noSvg,black:black,withSvg:withSvg,ok:noSvg&&black&&withSvg}}catch(e){return 'ERR:'+e.message}})()`);
+  R('ملصق الباركود: إخفاء الباركود يعمل + كل النصوص بالأسود', t && t.ok === true, typeof t === 'string' ? t : JSON.stringify(t));
+
   const passed = out.filter((l) => l.startsWith('✅')).length;
   log('=== ' + passed + '/' + (out.length) + ' ===');
   const report = path.join(app.getPath('userData'), '..', 'pq-uitest-report.txt');
