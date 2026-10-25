@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>دليل المزامنة السحابية — ProQuote</title>
+<link href="../../src/renderer/assets/fonts/google-fonts.css" rel="stylesheet">
+<style>
+@page{size:A4;margin:0}
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--acc:#00a885;--acc2:#e6f9f3;--bg:#ffffff;--soft:#f4f8fb;--tx:#182333;--t2:#4a5c72;--t3:#7b8ca3;--brd:#d8e2ec}
+body{font-family:'Tajawal','Segoe UI',Tahoma,sans-serif;background:var(--bg);color:var(--tx);line-height:1.9;font-size:13px}
+.page{width:210mm;min-height:296mm;padding:16mm 15mm;background:var(--bg);page-break-after:always;position:relative}
+.page:last-child{page-break-after:auto}
+.cover{background:linear-gradient(160deg,#04121c 0%,#0a2333 55%,#0e3a4d 100%);color:#fff;display:flex;flex-direction:column;justify-content:center}
+.cover .brand{display:flex;align-items:center;gap:12px;position:absolute;top:18mm;right:15mm}
+.cover .brand .bicon{width:46px;height:46px;border-radius:12px;background:var(--acc);display:flex;align-items:center;justify-content:center;font-size:22px}
+.cover .brand h1{font-size:24px;font-weight:900}
+.cover .brand span{font-size:11px;color:#9fc7d8;display:block}
+.cover .mid{text-align:center;padding:0 12mm}
+.cover .kick{font-size:12px;letter-spacing:3px;color:#5fd6b8;font-weight:700;margin-bottom:8mm}
+.cover h2{font-size:34px;font-weight:900;line-height:1.5;margin-bottom:8mm}
+.cover .desc{font-size:13.5px;color:#c3d9e4;max-width:130mm;margin:0 auto 10mm;line-height:2.1}
+.cover .chips{display:flex;gap:6mm;justify-content:center;flex-wrap:wrap}
+.cover .chip{border:1px solid rgba(95,214,184,.4);border-radius:20px;padding:6px 18px;font-size:11px;color:#8fe3cc}
+.cover .foot{position:absolute;bottom:16mm;left:0;right:0;text-align:center;font-size:10px;color:#6d8ba0}
+h2.sec{font-size:19px;font-weight:900;color:var(--acc);margin:0 0 4mm;padding-bottom:2.5mm;border-bottom:2.5px solid var(--acc);display:flex;align-items:center;gap:8px}
+h2.sec .n{background:var(--acc);color:#fff;width:26px;height:26px;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;font-size:13px;flex:none}
+h3.sub{font-size:14.5px;font-weight:800;color:var(--tx);margin:6mm 0 3mm}
+p{color:var(--t2);margin-bottom:3mm}
+.step{display:flex;gap:10px;margin-bottom:4.5mm;background:var(--soft);border:1px solid var(--brd);border-radius:10px;padding:10px 12px;page-break-inside:avoid}
+.step .sn{flex:none;width:24px;height:24px;border-radius:50%;background:var(--acc);color:#fff;font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center;margin-top:2px}
+.step .st b{color:var(--tx)} .step .st{font-size:12.5px;color:var(--t2)}
+.step .st code{background:#fff;border:1px solid var(--brd);border-radius:5px;padding:1px 7px;font-size:11px;direction:ltr;display:inline-block;font-family:Consolas,monospace;color:#0b6e58}
+.cmd{background:#0d1b2a;border-radius:10px;padding:10px 14px;direction:ltr;text-align:left;font-family:Consolas,monospace;font-size:10.5px;color:#9fe8d2;line-height:2;margin:3mm 0;page-break-inside:avoid}
+.cmd .c{color:#5a7a92}
+.note{border-right:3.5px solid var(--acc);background:var(--acc2);border-radius:8px;padding:9px 12px;font-size:12px;color:#0b5c49;margin:4mm 0;page-break-inside:avoid}
+.warn{border-right:3.5px solid #f59e0b;background:#fef6e7;border-radius:8px;padding:9px 12px;font-size:12px;color:#8a5a10;margin:4mm 0;page-break-inside:avoid}
+table.tb{width:100%;border-collapse:collapse;margin:3mm 0;font-size:11.5px}
+table.tb th{background:var(--acc);color:#fff;padding:7px 9px;font-weight:700;text-align:right}
+table.tb td{border:1px solid var(--brd);padding:6px 9px;color:var(--t2)}
+table.tb tr:nth-child(even) td{background:var(--soft)}
+.flow{display:flex;align-items:center;justify-content:center;gap:4mm;margin:5mm 0;flex-wrap:wrap}
+.flow .fbox{background:var(--soft);border:1.5px solid var(--acc);border-radius:10px;padding:8px 14px;font-size:11.5px;font-weight:700;color:var(--tx);text-align:center}
+.flow .arr{color:var(--acc);font-weight:900;font-size:16px}
+.foot{position:absolute;bottom:8mm;left:15mm;right:15mm;display:flex;justify-content:space-between;font-size:9.5px;color:var(--t3);border-top:1px solid var(--brd);padding-top:3mm}
+.toc{background:var(--soft);border:1px solid var(--brd);border-radius:12px;padding:14px 18px;margin-top:6mm}
+.toc .ti{display:flex;justify-content:space-between;padding:7px 4px;border-bottom:1px dashed var(--brd);font-size:13px;font-weight:700;color:var(--tx)}
+.toc .ti:last-child{border-bottom:none}
+.toc .ti span{color:var(--acc)}
+</style>
+</head>
+<body>
+
+<!-- ===== الغلاف ===== -->
+<div class="page cover">
+  <div class="brand"><div class="bicon">📄</div><div><h1>ProQuote</h1><span>نظام إدارة عروض الأسعار والمستندات</span></div></div>
+  <div class="mid">
+    <div class="kick">دليل تشغيل شامل</div>
+    <h2>المزامنة السحابية<br>خطوة بخطوة</h2>
+    <div class="desc">من تفعيل المزامنة على جهاز المسؤول، إلى ربط الموظفين ورمز الإقران السريع، إلى رفع الخادم الخاص — كل ما تحتاجه لتعمل بياناتك على كل الأجهزة وتصل تحديثاتك للجميع خلال ٣٠ ثانية</div>
+    <div class="chips">
+      <div class="chip">☁️ Supabase مجاناً</div>
+      <div class="chip">🖥️ خادم شركتك الخاص</div>
+      <div class="chip">👥 ربط الموظفين</div>
+      <div class="chip">🔄 مزامنة كل 30 ثانية</div>
+    </div>
+  </div>
+  <div class="foot">ProQuote — جميع الحقوق محفوظة © 2026 Amr Nada · t.me/javamicro</div>
+</div>
+
+<!-- ===== الصفحة 2: نظرة عامة + الطريق الأول ===== -->
+<div class="page">
+  <h2 class="sec"><span class="n">١</span> نظرة عامة: طريقان للمزامنة</h2>
+  <p>المزامنة في ProQuote تعمل بطريقين، وكلاهما مضمن في البرنامج بالفعل — لا تحتاج تثبيت أي شيء إضافي على أجهزة الموظفين:</p>
+  <table class="tb">
+    <tr><th style="width:22%">الطريق</th><th>الوصف</th><th style="width:28%">الأنسب لـ</th></tr>
+    <tr><td><b>Supabase</b></td><td>سحابة مجانية — إعداد في دقيقتين بلا أي خادم</td><td>الشركات الصغيرة والمتوسطة (الأسرع والأسهل)</td></tr>
+    <tr><td><b>خادم sync-server</b></td><td>خادم خاص بك — ملف واحد بدون أي مكتبات</td><td>من يريد الخصوصية الكاملة أو سيرفر الشركة</td></tr>
+  </table>
+  <div class="flow">
+    <div class="fbox">تعديل على أي جهاز</div><div class="arr">←</div>
+    <div class="fbox">رفع للسحابة</div><div class="arr">←</div>
+    <div class="fbox">مزامنة تلقائية</div><div class="arr">←</div>
+    <div class="fbox">وصول للجميع<br>خلال 30 ثانية</div>
+  </div>
+  <div class="note">💡 البرنامج يعمل أوفلاين 100% بدون أي سيرفر — المزامنة ميزة إضافية اختيارية تشتغل عند توفر الإنترنت وتكمل تلقائياً عند عودته.</div>
+
+  <h2 class="sec" style="margin-top:8mm"><span class="n">٢</span> الطريق الأول: Supabase (الأسهل)</h2>
+  <h3 class="sub">أ) عند المسؤول — جهاز الكمبيوتر الرئيسي</h3>
+  <div class="step"><div class="sn">1</div><div class="st">افتح البرنامج ← <b>الإعدادات</b> ← تبويب <b>«المزامنة السحابية»</b></div></div>
+  <div class="step"><div class="sn">2</div><div class="st">في <b>«رابط الخادم»</b> ضع رابط مشروع Supabase الخاص بك، مثال: <code>https://xxxx.supabase.co</code></div></div>
+  <div class="step"><div class="sn">3</div><div class="st">في <b>«المفتاح»</b> ضع المفتاح العام (Anon Key) من لوحة supabase.com ← Settings ← API Keys</div></div>
+  <div class="step"><div class="sn">4</div><div class="st">اكتب <b>اسم الجهاز</b> (مثل: «جهاز المسؤول») وفعّل شيكبوكس <b>«التشغيل»</b> ← اضغط <b>«حفظ»</b></div></div>
+  <div class="step"><div class="sn">5</div><div class="st">خلال ثوانٍ تظهر حالة الاتصال — ومن هذه اللحظة يرفع البرنامج بياناتك ويجلبها <b>كل 30 ثانية تلقائياً</b></div></div>
+  <div class="note">📌 أول مرة فقط: نفّذ ملف <code>supabase.sql</code> المرفق من SQL Editor بلوحة Supabase لإنشاء جدول المزامنة (خطوة تُنفَّذ مرة واحدة).</div>
+  <div class="foot"><span>ProQuote — دليل المزامنة السحابية</span><span>صفحة 2 من 6</span></div>
+</div>
+
+<!-- ===== الصفحة 3: ربط الموظفين ===== -->
+<div class="page">
+  <h2 class="sec"><span class="n">٣</span> ربط الموظفين — رمز الإقران السريع</h2>
+  <p>الطريقة الأسهل لربط أي عدد من الأجهزة خلال ثوانٍ — بلا كتابة روابط ولا مفاتيح:</p>
+  <h3 class="sub">عند المسؤول (توليد الرمز)</h3>
+  <div class="step"><div class="sn">1</div><div class="st">من جهازك: <b>الإعدادات ← المزامنة السحابية ← زر «رمز إقران الموظفين»</b></div></div>
+  <div class="step"><div class="sn">2</div><div class="st">سيولّد رمزاً يبدأ بـ <code>PQP1:</code> — يحتوي الرابط والمفتاح داخله (منسوخ تلقائياً)</div></div>
+  <div class="step"><div class="sn">3</div><div class="st">أرسل الرمز للموظف عبر واتساب / تيليجرام / أي وسيلة</div></div>
+  <h3 class="sub">عند الموظف (الربط)</h3>
+  <div class="step"><div class="sn">1</div><div class="st">افتح البرنامج على جهازه ← <b>من شاشة الدخول</b> اضغط <b>«إقران سريع مع جهاز المسئول»</b></div></div>
+  <div class="step"><div class="sn">2</div><div class="st">الصق الرمز ← اضغط <b>«تفعيل الإقران»</b></div></div>
+  <div class="step"><div class="sn">3</div><div class="st">يحدث تلقائياً: تُجلب حسابات المستخدمين والصلاحيات ← يدخل الموظف <b>باسمه ورمزه</b> ويبدأ العمل على نفس البيانات</div></div>
+  <div class="note">🔑 الطريقة اليدوية البديلة: يدخل الموظف نفس الرابط ونفس المفتاح في إعدادات المزامنة على جهازه — لكن رمز الإقرار أسرع وأسهل.</div>
+
+  <h2 class="sec" style="margin-top:7mm"><span class="n">٤</span> كيف يشاهد الموظفون البيانات؟</h2>
+  <div class="step"><div class="sn">1</div><div class="st"><b>مزامنة تلقائية</b>: كل جهاز يسحب آخر نسخة كل 30 ثانية — أي تعديل عندك يصلهم خلال نصف دقيقة وأي تعديل منهم يصلك</div></div>
+  <div class="step"><div class="sn">2</div><div class="st"><b>ما يراه كل موظف تتحكم فيه أنت</b>: من قسم «الإدارة» تحدد لكل مستخدم صلاحية كل قسم (مشاهدة / تعديل / إخفاء تماماً)</div></div>
+  <div class="step"><div class="sn">3</div><div class="st"><b>الصلاحيات تصل تلقائياً</b>: أي تعديل تفعله في الصلاحيات يصل لجهاز الموظف دون أي تدخل منه</div></div>
+  <div class="warn">⚠️ قاعدة التعارض: «الأحدث يفوز» — آخر تعديل على أي جهاز هو المعتمد. لا يُنصح بتعديل نفس العنصر في جهازين في نفس اللحظة.</div>
+  <div class="foot"><span>ProQuote — دليل المزامنة السحابية</span><span>صفحة 3 من 6</span></div>
+</div>
+
+<!-- ===== الصفحة 4: الطريق الثاني ===== -->
+<div class="page">
+  <h2 class="sec"><span class="n">٥</span> الطريق الثاني: رفع خادم sync-server الخاص</h2>
+  <p>بديل Supabase لمن يريد سيرفر الشركة أو خصوصية أعلى. الملف <b>بلا أي مكتبات نهائياً</b> — يكفي وجود Node.js على السيرفر (لا يوجد npm install).</p>
+
+  <h3 class="sub">الخطوة 1 — احصل على الملف</h3>
+  <p>من البرنامج نفسه: <b>الإعدادات ← المزامنة ← زر المساعدة (?) ← زر «⬇ تحميل ملف السيرفر (sync-server.js)»</b> — أو من مجلد تثبيت البرنامج: <code>resources\sync-server.js</code></p>
+
+  <h3 class="sub">الخطوة 2 — ارفعه وشغّله حسب نوع السيرفر</h3>
+  <p><b>أ) سيرفر VPS / سيرفر الشركة (عليه Node.js):</b></p>
+  <div class="cmd"><span class="c"># 1. ارفع الملف إلى السيرفر</span><br>scp sync-server.js root@سيرفرك:/www/sync/<br><br><span class="c"># 2. شغّله بمفتاحك واختر المنفذ</span><br>cd /www/sync<br>API_KEY=كلمة-سر-قوية PORT=3000 node sync-server.js<br><br><span class="c"># 3. اجعله دائماً يعمل (بلا توقف عند غلق الطرفية)</span><br>npx pm2 start sync-server.js --name proquote-sync</div>
+  <p><b>ب) Railway أو Render (استضافة بلا سيرفر مُدار):</b></p>
+  <div class="step"><div class="sn">1</div><div class="st">أنشئ مشروعاً جديداً ← <b>Web Service</b> من مستودع يحتوي الملف فقط</div></div>
+  <div class="step"><div class="sn">2</div><div class="st">أضف متغيري البيئة: <code>API_KEY</code> = كلمة سر قوية، و<code>PORT</code> = 3000</div></div>
+  <div class="step"><div class="sn">3</div><div class="st">Deploy — ستحصل على رابط مثل: <code>https://proquote-sync.up.railway.app</code></div></div>
+
+  <h3 class="sub">الخطوة 3 — اربطه بالبرنامج (عندك وعند كل موظف)</h3>
+  <div class="step"><div class="sn">1</div><div class="st"><b>رابط الخادم</b> = <code>http://سيرفرك:3000</code> (أو رابط Railway/Render)</div></div>
+  <div class="step"><div class="sn">2</div><div class="st"><b>المفتاح</b> = نفس <code>API_KEY</code> التي اخترتها</div></div>
+  <div class="step"><div class="sn">3</div><div class="st">ثم وزّعه على الموظفين بنفس <b>رمز الإقران</b> (القسم ٣)</div></div>
+  <div class="foot"><span>ProQuote — دليل المزامنة السحابية</span><span>صفحة 4 من 6</span></div>
+</div>
+
+<!-- ===== الصفحة 5: ملاحظات تشغيلية ===== -->
+<div class="page">
+  <h2 class="sec"><span class="n">٦</span> ما يجب معرفته عن sync-server</h2>
+  <table class="tb">
+    <tr><th style="width:30%">الخاصية</th><th>التفاصيل</th></tr>
+    <tr><td><b>الاعتماديات</b></td><td>صفر — Node.js فقط (لا يوجد npm install)</td></tr>
+    <tr><td><b>التخزين</b></td><td>ملف <code>sync-data.json</code> بجانب السكربت — انسخه دورياً كنسخة احتياطية</td></tr>
+    <tr><td><b>الحفظ التلقائي</b></td><td>مع كل كتابة + كل 30 ثانية + عند الإيقاف بأمان (SIGINT/SIGTERM)</td></tr>
+    <tr><td><b>التوافق</b></td><td>يفهم نفس لغة Supabase — البرنامج لا يفرّق بين الطريقين</td></tr>
+    <tr><td><b>حجم الطلب الأقصى</b></td><td>50 ميجابايت</td></tr>
+    <tr><td><b>الأمان</b></td><td>مفتاح API_KEY إلزامي (Bearer / apikey / x-api-key) + CORS مفتوح للبرنامج</td></tr>
+  </table>
+
+  <h2 class="sec" style="margin-top:8mm"><span class="n">٧</span> ملاحظات تشغيلية عامة</h2>
+  <table class="tb">
+    <tr><th style="width:26%">النقطة</th><th>التفاصيل</th></tr>
+    <tr><td><b>سرعة المزامنة</b></td><td>دورة كل 30 ثانية + فوراً عند عودة الاتصال بالإنترنت</td></tr>
+    <tr><td><b>حل التعارض</b></td><td>«الأحدث يفوز» — آخر تعديل على أي جهاز هو المعتمد</td></tr>
+    <tr><td><b>العمل أوفلاين</b></td><td>البرنامج يعمل 100% بدون إنترنت — المزامنة اختيارية وتكمل تلقائياً</td></tr>
+    <tr><td><b>مشروع Supabase المجاني</b></td><td>يتوقف مؤقتاً بعد أسبوع بلا استخدام — فتحه بضغطة من لوحة supabase.com يعيده فوراً</td></tr>
+    <tr><td><b>للعملاء المستقبليين</b></td><td>نفس الدليلين: مشروع Supabase مجاني خاص بالعميل أو sync-server على سيرفره</td></tr>
+  </table>
+
+  <h2 class="sec" style="margin-top:8mm"><span class="n">٨</span> الأسئلة الشائعة</h2>
+  <p><b>س: هل فقدت الإنترنت أثناء العمل؟</b><br>ج: لا مشكلة — تعمل طبيعياً، وعند عودة الإنترنت يرفع ويجلب كل شيء تلقائياً.</p>
+  <p><b>س: هل يمكن لجهازين تعديل نفس العرض؟</b><br>ج: نعم، لكن الأحدث يفوز. الأفضل تقسيم العمل بين الأجهزة أو الاعتماد على الصلاحيات.</p>
+  <p><b>س: هل بياناتي آمنة على Supabase؟</b><br>ج: نعم — البيانات مشفرة أثناء النقل وال存储، والمفتاح العام يقرأ جدول المزامنة فقط.</p>
+  <p><b>س: أضفت موظفاً جديداً — هل يعيد الإقران؟</b><br>ج: لا — الموظف الجديد يستخدم نفس رمز الإقران أو الإعدادات اليدوية، وحسابه تُنشئه من قسم الإدارة.</p>
+  <div class="foot"><span>ProQuote — دليل المزامنة السحابية</span><span>صفحة 5 من 6</span></div>
+</div>
+
+<!-- ===== الصفحة 6: الختام والدعم ===== -->
+<div class="page">
+  <div style="height:30mm"></div>
+  <h2 class="sec"><span class="n">✆</span> الدعم والتواصل</h2>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:6mm;margin-top:5mm">
+    <div style="background:var(--soft);border:1.5px solid var(--acc);border-radius:12px;padding:16px;text-align:center">
+      <div style="font-size:26px;margin-bottom:6px">✈️</div>
+      <div style="font-weight:800;font-size:14px">تيليجرام — الدعم والاشتراك</div>
+      <div style="font-size:12px;color:var(--t3);margin-top:4px;direction:ltr">t.me/javamicro</div>
+    </div>
+    <div style="background:var(--soft);border:1.5px solid #1877f2;border-radius:12px;padding:16px;text-align:center">
+      <div style="font-size:26px;margin-bottom:6px">📘</div>
+      <div style="font-weight:800;font-size:14px">صفحتنا على فيسبوك</div>
+      <div style="font-size:12px;color:var(--t3);margin-top:4px;direction:ltr">facebook.com/proquoteamrnada</div>
+    </div>
+    <div style="background:var(--soft);border:1.5px solid var(--t3);border-radius:12px;padding:16px;text-align:center">
+      <div style="font-size:26px;margin-bottom:6px">✉️</div>
+      <div style="font-weight:800;font-size:14px">البريد الإلكتروني</div>
+      <div style="font-size:12px;color:var(--t3);margin-top:4px;direction:ltr">amrnada@mail.ru</div>
+    </div>
+    <div style="background:var(--soft);border:1.5px solid var(--t3);border-radius:12px;padding:16px;text-align:center">
+      <div style="font-size:26px;margin-bottom:6px">🌐</div>
+      <div style="font-weight:800;font-size:14px">الموقع الرسمي</div>
+      <div style="font-size:12px;color:var(--t3);margin-top:4px;direction:ltr">proquote-2px.pages.dev</div>
+    </div>
+  </div>
+
+  <div style="margin-top:14mm;background:linear-gradient(135deg,#04121c,#0e3a4d);border-radius:14px;padding:22px 24px;color:#fff;text-align:center">
+    <div style="font-size:17px;font-weight:900;margin-bottom:8px">جاهز للبدء؟</div>
+    <div style="font-size:12.5px;color:#c3d9e4;line-height:2.1">فعّل المزامنة الآن في دقيقتين من الإعدادات ← المزامنة السحابية<br>وأرسل رمز الإقران لفريقك — وستعمل بياناتكم كأنها جهاز واحد</div>
+  </div>
+
+  <div style="margin-top:10mm;text-align:center;font-size:10.5px;color:var(--t3)">
+    ProQuote — نظام إدارة عروض الأسعار والمستندات · جميع الحقوق محفوظة © 2026 Amr Nada<br>
+    هذا الدليل مطابق للإصدار 9.10 من البرنامج
+  </div>
+  <div class="foot"><span>ProQuote — دليل المزامنة السحابية</span><span>صفحة 6 من 6</span></div>
+</div>
+
+</body>
+</html>
