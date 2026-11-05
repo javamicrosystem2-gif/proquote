@@ -444,7 +444,7 @@ body[data-share-size="lg"] .btn-w.btn-sm i,body[data-share-size="lg"] .md-h .btn
 <div class="pg" id="p-documents">
 <div class="topbar"><div><h2 data-i18n="page.documents.title">المستندات</h2><p id="docsCrumb">إدارة الملفات والمستندات (السجل التجاري، البطاقة الضريبية...)</p></div><div style="display:flex;gap:7px;flex-wrap:wrap"><div class="sbx"><i class="fas fa-search"></i><input class="fi" style="width:190px" placeholder="بحث في الملفات..." id="sDc" oninput="rDcL()"></div><button class="btn btn-s btn-sm" onclick="openDcFolderDlg()"><i class="fas fa-folder-plus"></i>ملف جديد</button><button class="btn btn-p" onclick="dcUploadDlg()"><i class="fas fa-upload"></i>رفع مستند</button></div></div>
 <div style="padding:20px 24px" class="fi-in">
-<div style="background:var(--yel2);border:1px solid var(--yel);border-radius:10px;padding:12px 16px;margin-bottom:14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap"><i class="fas fa-triangle-exclamation" style="color:var(--yel);font-size:16px"></i><div style="font-size:11.5px;color:var(--t2);flex:1;min-width:220px">لحذف أي ملف أو مستند يجب إدخال كلمة المرور: <b style="color:var(--yel);letter-spacing:2px">0000</b> — تنويه احذري لحماية بياناتك.</div></div>
+
 <div id="dcView"></div>
 </div></div>
 
@@ -1319,11 +1319,11 @@ body[data-share-size="lg"] .btn-w.btn-sm i,body[data-share-size="lg"] .md-h .btn
 <span style="flex:1"></span>
 <button class="btn btn-p btn-xs" onclick="dcvPrint()" title="طباعة"><i class="fas fa-print"></i></button>
 <button class="btn btn-s btn-xs" onclick="dcvDownload()" title="تحميل"><i class="fas fa-download"></i></button>
-<button class="btn btn-w btn-xs" onclick="dcvShareWA()" title="واتساب"><i class="fab fa-whatsapp"></i></button>
+<button class="btn btn-w btn-xs" onclick="dcvShareWA()" title="واتساب"><i class="fab fa-whatsapp"></i></button><button class="btn btn-w btn-xs" style="padding:2px 6px;background:rgba(245,185,66,.15);color:var(--gold)" title="تحميل PDF" onclick="dcvToPDF()"><i class="fas fa-file-pdf" style="font-size:9px"></i></button>
 <button class="btn btn-s btn-xs" onclick="dcvShareEM()" title="بريد"><i class="fas fa-envelope"></i></button>
 </div>
 <div class="md-b" style="padding:0;background:var(--bg1);overflow:auto;max-height:65vh;min-height:300px;display:flex;align-items:center;justify-content:center" id="dcvCanvas">
-<img id="dcvImg" src="" style="max-width:100%;max-height:60vh;transition:transform .2s;transform-origin:center;user-select:none" alt="">
+<img id="dcvImg" src="" style="max-width:100%;max-height:70vh;transition:transform .2s;transform-origin:center;user-select:none;cursor:grab" alt="">
 <iframe id="dcvPdf" src="" style="width:100%;height:60vh;border:none;display:none"></iframe>
 <div id="dcvOther" style="text-align:center;padding:40px;display:none"><i class="fas fa-file" style="font-size:48px;color:var(--t3);display:block;margin-bottom:12px"></i><div style="font-size:14px;font-weight:700" id="dcvOtherName"></div><div style="font-size:11px;color:var(--t3);margin-top:4px" id="dcvOtherInfo"></div><div style="font-size:11px;color:var(--yel);margin-top:8px">استخدم زر التحميل لفتح الملف بالبرنامج المناسب</div></div>
 </div>
@@ -1331,7 +1331,7 @@ body[data-share-size="lg"] .btn-w.btn-sm i,body[data-share-size="lg"] .md-h .btn
 </div></div>
 
 <!-- مودال رفع مستند -->
-<div class="mo" id="mDcUpload"><div class="md md-m"><div class="md-h"><h3><i class="fas fa-upload" style="color:var(--acc);margin-left:5px"></i>رفع مستند</h3><button class="md-x" onclick="cm('mDcUpload')"><i class="fas fa-times"></i></button></div><div class="md-b"><input type="hidden" id="dcUploadFolder"><div class="fg"><label class="fl">اسم المستند (اختياري)</label><input class="fi" id="dcUploadTitle" placeholder="مثال: السجل التجاري، البطاقة الضريبية..."></div><div class="fg"><label class="fl">الملف (PDF, صورة, Word... حتى 10MB)</label><div class="logo-zone" id="dcDrop" onclick="document.getElementById('dcFile').click()"><input type="file" id="dcFile" onchange="dcFilePicked(event)"><div id="dcDropPh"><i class="fas fa-cloud-arrow-up" style="font-size:26px;color:var(--t3);margin-bottom:5px;display:block"></i><div style="font-size:12px;font-weight:600;color:var(--t2)">اضغط لاختيار ملف</div><div style="font-size:10px;color:var(--t3)" id="dcFilePh2">PDF, PNG, JPG, DOCX...</div></div></div></div><div class="fg"><label class="fl">ملاحظات (اختياري)</label><textarea class="fi" id="dcUploadNote" rows="2" placeholder="ملاحظات حول المستند..."></textarea></div><div style="background:var(--bg0);border:1px solid var(--brd);border-radius:8px;padding:9px;font-size:10.5px;color:var(--t3);display:flex;align-items:center;gap:6px"><i class="fas fa-circle-info" style="color:var(--blu)"></i><span>يُحفظ الملف محلياً داخل متصفحك (Base64) ويمكن تصديره ضمن النسخة الاحتياطية.</span></div></div><div class="md-f"><button class="btn btn-p" onclick="cfDcUpload()"><i class="fas fa-save"></i>حفظ المستند</button><button class="btn btn-s" onclick="cm('mDcUpload')">إلغاء</button></div></div></div>
+<div class="mo" id="mDcUpload"><div class="md md-m"><div class="md-h"><h3><i class="fas fa-upload" style="color:var(--acc);margin-left:5px"></i>رفع مستند</h3><button class="md-x" onclick="cm('mDcUpload')"><i class="fas fa-times"></i></button></div><div class="md-b"><input type="hidden" id="dcUploadFolder"><div class="fg"><label class="fl">اسم المستند (اختياري)</label><input class="fi" id="dcUploadTitle" placeholder="مثال: السجل التجاري، البطاقة الضريبية..."></div><div class="fg"><label class="fl">الملف (PDF, صورة, Word... حتى 10MB)</label><div class="logo-zone" id="dcDrop" onclick="document.getElementById('dcFile').click()" ondragover="event.preventDefault();this.style.borderColor='var(--acc)'" ondragleave="this.style.borderColor='var(--brd)'" ondrop="event.preventDefault();event.stopPropagation();this.style.borderColor='var(--brd)';_dcPendFiles=_dcPendFiles.concat(Array.from(event.dataTransfer.files||[]));_dcRdrPickList()"><input type="file" id="dcFile" multiple onchange="dcFilePicked(event)"><div id="dcPickList" style="width:100%"></div><div id="dcDropPh"><i class="fas fa-cloud-arrow-up" style="font-size:26px;color:var(--t3);margin-bottom:5px;display:block"></i><div style="font-size:12px;font-weight:600;color:var(--t2)">اضغط لاختيار ملف</div><div style="font-size:10px;color:var(--t3)" id="dcFilePh2">PDF, PNG, JPG, DOCX...</div></div></div></div><div class="fg"><label class="fl">ملاحظات (اختياري)</label><textarea class="fi" id="dcUploadNote" rows="2" placeholder="ملاحظات حول المستند..."></textarea></div><div style="background:var(--bg0);border:1px solid var(--brd);border-radius:8px;padding:9px;font-size:10.5px;color:var(--t3);display:flex;align-items:center;gap:6px"><i class="fas fa-circle-info" style="color:var(--blu)"></i><span>يُحفظ الملف محلياً داخل متصفحك (Base64) ويمكن تصديره ضمن النسخة الاحتياطية.</span></div></div><div class="md-f"><button class="btn btn-p" onclick="cfDcUpload()"><i class="fas fa-save"></i>حفظ المستند</button><button class="btn btn-s" onclick="cm('mDcUpload')">إلغاء</button></div></div></div>
 
 <!-- مودال مشاركة مستند -->
 <div class="mo" id="mDcShare"><div class="md md-s"><div class="md-h"><h3><i class="fas fa-share-nodes" style="color:var(--acc);margin-left:5px"></i>مشاركة المستند</h3><button class="md-x" onclick="cm('mDcShare')"><i class="fas fa-times"></i></button></div><div class="md-b"><input type="hidden" id="dcShareId"><div class="fg"><label class="fl">اختر العميل (اختياري — لتعبئة الرقم تلقائياً)</label><select class="fi" id="dcShareClient" onchange="onDcShareClient()"><option value="">-- بدون --</option></select></div><div class="fg"><label class="fl">رقم واتساب (مع رمز الدولة)</label><input class="fi" id="dcSharePhone" placeholder="+201XXXXXXXXX" style="direction:ltr;text-align:left"></div><div class="fg"><label class="fl">البريد الإلكتروني</label><input class="fi" id="dcShareEmail" placeholder="email@example.com" style="direction:ltr;text-align:left"></div><div class="fg"><label class="fl">رسالة مرفقة</label><textarea class="fi" id="dcShareMsg" rows="3" placeholder="نص الرسالة..."></textarea></div><div style="background:var(--bg0);border:1px solid var(--brd);border-radius:8px;padding:9px;font-size:10.5px;color:var(--t3);display:flex;align-items:center;gap:6px"><i class="fas fa-triangle-exclamation" style="color:var(--yel)"></i><span>سيتم تنزيل المستند على جهازك أولاً ثم فتح واتساب/البريد لإرفاقه يدوياً.</span></div></div><div class="md-f"><button class="btn btn-w" onclick="dcShareWA()"><i class="fab fa-whatsapp"></i>واتساب</button><button class="btn btn-s" onclick="dcShareEmail()"><i class="fas fa-envelope"></i>بريد</button><button class="btn btn-s" onclick="cm('mDcShare')">إغلاق</button></div></div></div>
@@ -1955,11 +1955,11 @@ function pqPromptOk(){var v=document.getElementById('pqPromptInput').value;var c
 function dcRenameFolderDlg(id){const docs=ld(K.dc)||[];const f=docs.find(d=>d.id===id);if(!f)return;
 pqPrompt('إعادة تسمية الملف','الاسم الجديد:',f.name,'',function(nm){if(nm&&nm.trim()){const d2=ld(K.dc)||[];const f2=d2.find(d=>d.id===id);if(!f2)return;f2.name=nm.trim();sv(K.dc,d2);rDcL();toast('تم التعديل','in')}})}
 // إعادة تسمية مستند (جديدة — داخل مجلد أو بالجذر)
-function dcRenameFileDlg(folderId,fileId){let docs=ld(K.dc)||[];let fl=null;if(folderId){const f=docs.find(d=>d.id===folderId);if(!f)return;fl=(f.files||[]).find(x=>x.id===fileId)}else{fl=docs.find(d=>d.id===fileId)}if(!fl)return;const cur=fl.title||fl.name||'';
-pqPrompt('إعادة تسمية المستند','الاسم الجديد:',cur,'',function(nm){if(nm&&nm.trim()){const d2=ld(K.dc)||[];let f2=null;if(folderId){f2=d2.find(d=>d.id===folderId);if(!f2)return;const t2=(f2.files||[]).find(x=>x.id===fileId);if(!t2)return;if(t2.title!==undefined)t2.title=nm.trim();else t2.name=nm.trim()}else{const t3=d2.find(d=>d.id===fileId);if(!t3)return;if(t3.title!==undefined)t3.title=nm.trim();else t3.name=nm.trim()}sv(K.dc,d2);rDcL();toast('تم التعديل','in')}})}
+function dcRenameFileDlg(folderId,fileId){let docs=ld(K.dc)||[];let fl=null;if(folderId){const f=docs.find(function(d){return d.id===folderId});if(!f)return;fl=(f.files||[]).find(x=>x.id===fileId)}else{fl=docs.find(d=>d.id===fileId)}if(!fl)return;const cur=fl.title||fl.name||'';
+pqPrompt('إعادة تسمية المستند','الاسم الجديد:',cur,'',function(nm){if(nm&&nm.trim()){const d2=ld(K.dc)||[];let f2=null;if(folderId){f2=d2.find(function(d){return d.id===folderId});if(!f2)return;const t2=(f2.files||[]).find(x=>x.id===fileId);if(!t2)return;if(t2.title!==undefined)t2.title=nm.trim();else t2.name=nm.trim()}else{const t3=d2.find(d=>d.id===fileId);if(!t3)return;if(t3.title!==undefined)t3.title=nm.trim();else t3.name=nm.trim()}sv(K.dc,d2);rDcL();toast('تم التعديل','in')}})}
 // إعادة تسمية مستودع/فرع (كانت معطلة بسبب prompt)
 function whRename(id){const whs=ld(K.wh),w=whs.find(x=>x.id===id);if(!w)return;
-pqPrompt('إعادة تسمية الفرع','الاسم الجديد:',w.name,'',function(nm){if(nm&&nm.trim()){const w2=ld(K.wh).find(x=>x.id===id);if(!w2)return;w2.name=nm.trim();sv(K.wh,ld(K.wh));rWhL();toast('تم التعديل','in')}})}
+pqPrompt('إعادة تسمية الفرع','الاسم الجديد:',w.name,'',function(nm){if(nm&&nm.trim()){const w2=ld(K.wh).find(x=>x.id===id);if(!w2)return;w2.name=nm.trim();sv(K.wh,ld(K.wh));rWhL();try{renderWhList()}catch(e){};toast('تم التعديل','in')}})}
 
 // ===== طابعة بوليصة الشحن الاحترافية (حراري/A4 — ورقة واحدة) =====
 function wbpOnSize(){const v=document.getElementById('wbpSize').value;const cust=(v==='custom');document.getElementById('wbpCW').style.display=cust?'':'none';document.getElementById('wbpCH').style.display=cust?'':'none';wbpPrev()}
@@ -1998,6 +1998,73 @@ const css='@page{size:'+W+'mm'+(H?(' '+H+'mm'):'')+';margin:0}';
 const html='<!DOCTYPE html><html dir="rtl" lang="ar"><head><meta charset="UTF-8"><title>بوليصة شحن</title><link href="fonts/google-fonts.css" rel="stylesheet"><style>'+css+'*{margin:0;padding:0;box-sizing:border-box}body{margin:0;background:#fff}@media screen{body{padding:8mm;background:#555;display:flex;justify-content:center}}</style></head><body>'+_wbpBuild(p)+'</body></html>';
 const w=window.open('','_blank');
 w.document.write(html);w.document.close();setTimeout(function(){try{w.print()}catch(e){}},450)}
+
+// ===== محرك PDF للمستندات (html2pdf API — الحزمة المضمونة) =====
+function _dcPdfReady(){try{return typeof html2pdf==='function'}catch(e){return false}}
+function _dcIsImg(fl){return (fl.type||'').indexOf('image/')===0||/\.(png|jpe?g|gif|bmp|webp|svg)$/i.test(fl.name||fl.title||'')}
+function _dcIsPdf(fl){return (fl.type||'').indexOf('pdf')>=0||/\.pdf$/i.test(fl.name||fl.title||'')}
+function _dcFindFile(folderId,fileId){var docs=ld(K.dc)||[];if(folderId){var f=docs.find(function(d){return d.id===folderId});return f?(f.files||[]).find(function(x){return x.id===fileId}):null}return docs.find(function(d){return d.id===fileId&&!d.folder})}
+function _dcSaveBlob(blob,fname){var url=URL.createObjectURL(blob);var a=document.createElement('a');a.href=url;a.download=fname||'documents.pdf';document.body.appendChild(a);a.click();setTimeout(function(){a.remove();URL.revokeObjectURL(url)},800)}
+function _dcBuildPagesEl(files,folderName){
+var el=document.createElement('div');el.style.cssText='position:absolute;left:-9999px;top:0;width:210mm';
+var cover=document.createElement('div');
+cover.style.cssText='height:297mm;display:flex;flex-direction:column;align-items:center;justify-content:center;page-break-after:always;font-family:Tajawal,Arial,sans-serif;background:#fff;padding:20mm;box-sizing:border-box';
+var idxHtml='<div style="margin-top:10mm;font-size:10px;color:#4a5c72;text-align:right;width:160mm;line-height:2.4">'+
+files.map(function(x,i){var icon=_dcIsImg(x)?'🖼️':'📄';return '<div style="border-bottom:1px dashed #d8e2ec;padding:3px 6px">'+icon+' '+(i+1)+'. '+(x.title||x.name||'')+(_dcIsImg(x)?'':' <span style="color:#7b8ca3;font-size:8px">('+(x.type||'ملف')+')</span>')+'</div>'}).join('')+'</div>';
+cover.innerHTML='<div style="width:56px;height:56px;border-radius:14px;background:#00a885;color:#fff;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:900;font-family:Arial">Q</div>'+
+'<div style="font-size:26px;font-weight:900;color:#182333;margin-top:8mm">'+(folderName||'Documents')+'</div>'+
+'<div style="font-size:12px;color:#7b8ca3;margin-top:3mm">'+files.length+' files · '+new Date().toLocaleDateString('en-GB')+'</div>'+idxHtml;
+el.appendChild(cover);
+files.forEach(function(x){
+if(!_dcIsImg(x))return;
+var pg=document.createElement('div');
+pg.style.cssText='height:297mm;display:flex;flex-direction:column;align-items:center;justify-content:center;page-break-after:always;background:#fff;font-family:Tajawal,Arial,sans-serif;padding:10mm;box-sizing:border-box';
+pg.innerHTML='<img src="'+x.data+'" style="max-width:190mm;max-height:265mm;object-fit:contain">'+
+'<div style="font-size:10px;color:#7b8ca3;margin-top:3mm">'+(x.title||x.name||'')+'</div>';
+el.appendChild(pg)});
+document.body.appendChild(el);
+return el}
+function _dcMakePdf(files,folderName,fname){
+if(!_dcPdfReady()){toast('محرك PDF غير متاح','er');return Promise.resolve(null)}
+toast('جارٍ إنشاء PDF…','in');
+var el=_dcBuildPagesEl(files,folderName);
+return html2pdf().set({margin:0,filename:fname||'documents.pdf',image:{type:'jpeg',quality:.92},html2canvas:{scale:2,useCORS:true},jsPDF:{unit:'mm',format:'a4',orientation:'portrait'},pagebreak:{mode:['css','legacy']}}).from(el).toPdf().output('blob').then(function(blob){el.remove();return blob}).catch(function(e){try{el.remove()}catch(_){ };return null})}
+// زر PDF لكل مستند
+function dcFileToPDF(folderId,fileId){
+var fl=_dcFindFile(folderId,fileId);if(!fl)return;
+if(_dcIsPdf(fl)){_dcAnchorDl(fl);toast('ملف PDF أصلاً — تم تحميله بصيغته الأصلية','in');return}
+if(!_dcIsImg(fl)){toast('هذه الصيغة (غير الصور) تُحمّل بأصلها — استخدم زر التحميل','er');return}
+var name=(fl.title||fl.name||'document').replace(/\.[^.]+$/,'');
+_dcMakePdf([fl],fl.title||'',name+'.pdf').then(function(blob){if(blob){_dcSaveBlob(blob,name+'.pdf');toast('تم تحميل PDF ✓','ok')}})}
+// تحميل الكل = PDF واحد
+function dcDownloadAll(folderId){
+var f=(ld(K.dc)||[]).find(function(d){return d.id===folderId});if(!f)return;
+var files=(f.files||[]).filter(function(x){return x.data});if(!files.length){toast('هذا الملف فارغ','er');return}
+var imgs=files.filter(_dcIsImg);
+if(!imgs.length){toast('لا توجد صور قابلة للدمج — استخدم التحميل الفردي','er');return}
+var nonImgs=files.filter(function(x){return !_dcIsImg(x)});
+toast('جارٍ دمج '+imgs.length+' صورة في PDF واحد'+(nonImgs.length?(' + '+nonImgs.length+' ملفًا غير صوري في الفهرس'):'')+'…','in');
+_dcMakePdf(files,f.name,(f.name||'documents').replace(/[^a-zA-Z0-9_-]/g,'_')+'.pdf').then(function(blob){
+if(!blob)return;
+_dcSaveBlob(blob,(f.name||'documents').replace(/[^a-zA-Z0-9_-]/g,'_')+'.pdf');
+toast('تم تحميل PDF واحد يجمع '+imgs.length+' صورة'+(nonImgs.length?(' + فهرس '+nonImgs.length+' ملفًا آخر'):'')+' ✓','ok')})}
+// مشاركة الكل = PDF واحد + واتساب
+function dcShareFolderWA(folderId){
+var f=(ld(K.dc)||[]).find(function(d){return d.id===folderId});if(!f)return;
+var files=(f.files||[]).filter(function(x){return x.data});if(!files.length){toast('هذا الملف فارغ','er');return}
+var imgs=files.filter(_dcIsImg);if(!imgs.length){toast('لا توجد صور قابلة للدمج','er');return}
+_dcMakePdf(imgs,f.name,'share.pdf').then(function(blob){
+if(blob){_dcSaveBlob(blob,(f.name||'documents').replace(/[^a-zA-Z0-9_-]/g,'_')+'.pdf');
+var msg='السلام عليكم,\nيرفق ملف PDF واحد يجمع '+imgs.length+' مستندًا من ملف: '+(f.name||'')+'\n'+files.map(function(x){return '- '+(x.title||x.name||'')}).join('\n');
+setTimeout(function(){window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank')},800);
+toast('تم تحميل PDF واحد — أرفقه في واتساب','ok')}})}
+
+function dcvToPDF(){
+if(!_dcvFile)return;
+if(_dcIsPdf(_dcvFile)){dcvDownload();return}
+if(!_dcIsImg(_dcvFile)){toast('هذه الصيغة تُحمّل بأصلها','er');return}
+var name=(_dcvFile.title||_dcvFile.name||'document').replace(/\.[^.]+$/,'');
+_dcMakePdf([_dcvFile],_dcvFile.title||'',name+'.pdf').then(function(blob){if(blob){_dcSaveBlob(blob,name+'.pdf');toast('تم تحميل PDF ✓','ok')}})}
 
 function rql(){const qs=ld(K.q),s=ls(),se=(document.getElementById('sq')?.value||'').toLowerCase(),fs=document.getElementById('fs')?.value||'';let fl=sfFilter('quotes',qs).filter(q=>!fs||q.status===fs);fl.sort((a,b)=>b.at-a.at);const tb=document.getElementById('qtb');if(!fl.length){tb.innerHTML=`<tr><td colspan="6" style="text-align:center;padding:28px;color:var(--t3)"><i class="fas fa-inbox" style="font-size:28px;opacity:.3;display:block;margin-bottom:6px"></i>${!qs.length?'لا توجد عروض':'لا توجد نتائج'}</td></tr>`;return}tb.innerHTML=fl.map(q=>{const st=SM[q.status]||SM.draft;const cu=CU[q.currency||s.currency]?.s||'ر.س';return`<tr><td style="font-weight:600;color:var(--acc)">${q.number}</td><td>${q.clientName}</td><td style="font-size:11px;color:var(--t3)">${cu}</td><td style="font-weight:700">${fmtN(q.total)} ${cu}</td><td><span class="stb ${st.c}"><span class="st-dot"></span>${st.l}</span></td><td style="text-align:center"><div class="am"><button class="btn btn-s btn-xs" style="padding:3px 5px" onclick="tglA(this)"><i class="fas fa-ellipsis-v"></i></button><div class="add"><button onclick="vQ('${q.id}')"><i class="fas fa-eye"></i>معاينة</button><button onclick="edQ('${q.id}')"><i class="fas fa-pen"></i>تعديل</button><button onclick="dupQ('${q.id}')"><i class="fas fa-copy"></i>نسخ</button><button class="dg" onclick="delQ('${q.id}')"><i class="fas fa-trash"></i>حذف</button></div></div></td></tr>`}).join('')}
 function tglA(b){document.querySelectorAll('.add.show').forEach(d=>d.classList.remove('show'));const d=b.nextElementSibling;d.classList.toggle('show');setTimeout(()=>{const h=e=>{if(!d.contains(e.target)&&e.target!==b){d.classList.remove('show');document.removeEventListener('click',h)}};document.addEventListener('click',h)},10)}
@@ -4340,7 +4407,36 @@ else{html+=`<div style="display:grid;grid-template-columns:repeat(auto-fill,minm
 view.innerHTML=html
 }
 function dcFolderCard(f){const cnt=(f.files||[]).length;return`<div class="sc" style="cursor:pointer;padding:14px" ondblclick="dcOpenFolder('${f.id}')" onclick="event.stopPropagation()"><div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:6px"><div style="width:40px;height:40px;border-radius:9px;background:var(--yel2);display:flex;align-items:center;justify-content:center"><i class="fas fa-folder" style="color:var(--yel);font-size:17px"></i></div><div style="display:flex;gap:3px"><button class="btn btn-s btn-xs" style="padding:2px 5px" title="فتح" onclick="dcOpenFolder('${f.id}')"><i class="fas fa-folder-open" style="font-size:9px"></i></button><button class="btn btn-s btn-xs" style="padding:2px 5px" title="رفع بداخله" onclick="dcUploadDlg('${f.id}')"><i class="fas fa-upload" style="font-size:9px"></i></button><button class="btn btn-s btn-xs" style="padding:2px 5px" title="إعادة تسمية" onclick="dcRenameFolderDlg('${f.id}')"><i class="fas fa-pen" style="font-size:9px"></i></button><button class="btn btn-d btn-xs" style="padding:2px 5px" title="حذف" onclick="dcDelFolder('${f.id}')"><i class="fas fa-trash" style="font-size:9px"></i></button></div></div><div style="font-size:13px;font-weight:700;margin-bottom:2px;cursor:pointer" onclick="dcOpenFolder('${f.id}')">${f.name}</div><div style="font-size:10.5px;color:var(--t3)"><i class="fas fa-file" style="margin-left:3px;font-size:8px"></i>${cnt} مستند</div></div>`}
-function dcFileCard(fl,folderId){const ext=(fl.name||'').split('.').pop().toUpperCase();const isImg=(fl.type||'').startsWith('image/');const icon=dcFileIcon(fl.type||fl.name);const sz=dcFmtSize(fl.size||0);return`<div class="sc" style="padding:14px"><div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:6px"><div style="width:40px;height:40px;border-radius:9px;background:var(--blu2);display:flex;align-items:center;justify-content:center;overflow:hidden">${isImg&&fl.data?`<img src="${fl.data}" style="width:100%;height:100%;object-fit:cover">`:`<i class="fas ${icon}" style="color:var(--blu);font-size:16px"></i>`}</div><div style="display:flex;gap:3px"><button class="btn btn-s btn-xs" style="padding:2px 5px;background:rgba(0,212,170,.12);color:var(--acc)" title="طباعة" onclick="dcPrintFile('${folderId||''}','${fl.id}')"><i class="fas fa-print" style="font-size:9px"></i></button><button class="btn btn-xs" style="padding:2px 5px;background:rgba(37,211,102,.12);color:#25d366" title="مشاهدة" onclick="dcvOpen('${folderId||''}','${fl.id}')"><i class="fas fa-eye" style="font-size:9px"></i></button><button class="btn btn-p btn-xs" style="padding:2px 5px" title="تحميل/فتح" onclick="dcDownloadFile('${folderId||''}','${fl.id}')"><i class="fas fa-download" style="font-size:9px"></i></button><button class="btn btn-w btn-xs" style="padding:2px 5px" title="مشاركة" onclick="dcShareDlg('${folderId||''}','${fl.id}')"><i class="fas fa-share-nodes" style="font-size:9px"></i></button><button class="btn btn-s btn-xs" style="padding:2px 5px" title="إعادة تسمية" onclick="dcRenameFileDlg('${folderId||''}','${fl.id}')"><i class="fas fa-pen" style="font-size:9px"></i></button><button class="btn btn-d btn-xs" style="padding:2px 5px" title="حذف" onclick="dcDelFile('${folderId||''}','${fl.id}')"><i class="fas fa-trash" style="font-size:9px"></i></button></div></div><div style="font-size:12.5px;font-weight:700;margin-bottom:2px">${fl.title||fl.name||'مستند'}</div><div style="font-size:10px;color:var(--t3)">${ext} · ${sz}${fl.note?` · <i class="fas fa-align-right" style="font-size:8px"></i> ${fl.note.length>30?fl.note.slice(0,30)+'…':fl.note}`:''}</div></div>`}
+function dcFileCard(fl,folderId){
+  const ext=(fl.name||'').split('.').pop().toUpperCase();
+  const isImg=(fl.type||'').startsWith('image/');
+  const icon=dcFileIcon(fl.type||fl.name);
+  const sz=dcFmtSize(fl.size||0);
+  const fid=folderId||'';
+  const did=fl.id;
+  const oc="dcvOpen('"+fid+"','"+did+"')";
+  const imgHtml=isImg&&fl.data?'<img src="'+fl.data+'" style="width:100%;height:100%;object-fit:contain;background:#fff">':'<i class="fas '+icon+'" style="color:var(--blu);font-size:32px"></i>';
+  const btns=[
+    ['eye','\u0645\u0634\u0627\u0647\u062f\u0629','rgba(37,211,102,.12)','#25d366',"dcvOpen('"+fid+"','"+did+"')"],
+    ['print','\u0637\u0628\u0627\u0639\u0629','rgba(0,212,170,.12)','var(--acc)',"dcPrintFile('"+fid+"','"+did+"')"],
+    ['download','\u062a\u062d\u0645\u064a\u0644','var(--acc)','#fff',"dcDownloadFile('"+fid+"','"+did+"')","btn-p"],
+    ['file-pdf','\u062a\u062d\u0645\u064a\u0644 PDF','rgba(245,185,66,.15)','var(--gold)',"dcFileToPDF('"+fid+"','"+did+"')"],
+    ['share-nodes','\u0645\u0634\u0627\u0631\u0643\u0629','','',"dcShareDlg('"+fid+"','"+did+"')","btn-w"],
+    ['pen','\u0625\u0639\u0627\u062f\u0629 \u062a\u0633\u0645\u064a\u0629','','',"dcRenameFileDlg('"+fid+"','"+did+"')"],
+    ['trash','\u062d\u0630\u0641','','',"dcDelFile('"+fid+"','"+did+"')","btn-d"]
+  ];
+  const btnHtml=btns.map(function(b){
+    const cls=b[5]||'btn-xs';
+    const bg=b[5]==='btn-p'||b[5]==='btn-w'||b[5]==='btn-d'?'':'background:'+b[2]+';color:'+b[3];
+    return '<button class="btn '+cls+'" style="padding:4px 8px;'+bg+'" title="'+b[1]+'" onclick="'+b[4]+'"><i class="fas fa-'+b[0]+'" style="font-size:10px"></i></button>';
+  }).join('');
+  return '<div class="sc" style="padding:10px;display:flex;flex-direction:column">'
+    +'<div style="width:100%;height:150px;border-radius:10px;background:var(--blu2);display:flex;align-items:center;justify-content:center;overflow:hidden;margin-bottom:8px;cursor:pointer" onclick="'+oc+'">'+imgHtml+'</div>'
+    +'<div style="font-size:12.5px;font-weight:700;margin-bottom:2px;word-break:break-word;min-height:18px">'+(fl.title||fl.name||'\u0645\u0633\u062a\u0646\u062f')+'</div>'
+    +'<div style="font-size:10px;color:var(--t3);margin-bottom:8px">'+ext+' \u00b7 '+sz+'</div>'
+    +'<div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:auto">'+btnHtml+'</div>'
+  +'</div>';
+}
 function dcFileIcon(t){t=(t||'').toLowerCase();if(t.startsWith('image/'))return'fa-image';if(t.includes('pdf'))return'fa-file-pdf';if(t.includes('word')||t.endsWith('docx')||t.endsWith('doc'))return'fa-file-word';if(t.endsWith('xls')||t.endsWith('xlsx')||t.includes('sheet'))return'fa-file-excel';if(t.endsWith('zip')||t.endsWith('rar'))return'fa-file-zipper';if(t.endsWith('txt'))return'fa-file-lines';return'fa-file'}
 function dcFmtSize(b){if(!b)return'—';if(b<1024)return b+' B';if(b<1048576)return(b/1024).toFixed(1)+' KB';return(b/1048576).toFixed(2)+' MB'}
 function dcGoRoot(){dcCurFolder=null;rDcL()}
@@ -4352,9 +4448,9 @@ function cfCreateDcFolder(){const nm=document.getElementById('dcFolderName').val
 // حذف مجلد (محمي بكلمة مرور)
 function dcDelFolder(id){const docs=ld(K.dc)||[];const f=docs.find(d=>d.id===id);if(!f)return;const cnt=(f.files||[]).length;_dcPendingDelete={type:'folder',folderId:id};document.getElementById('pwdMsg').innerHTML=`حذف الملف <b style="color:var(--red)">${f.name}</b>${cnt?` (${cnt} مستند)`:''}؟`;askPwd(()=>{const d2=ld(K.dc)||[];sv(K.dc,d2.filter(x=>x.id!==id));if(dcCurFolder===id)dcCurFolder=null;_dcPendingDelete=null;cntBadge();rDcL();toast('تم حذف الملف ومحتوياته','in')})}
 // حذف ملف (محمي بكلمة مرور)
-function dcDelFile(folderId,fileId){let docs=ld(K.dc)||[];let fl=null;if(folderId){const f=docs.find(d=>d.id===folderId);if(!f)return;fl=(f.files||[]).find(x=>x.id===fileId)}else{fl=docs.find(d=>d.id===fileId)}if(!fl)return;_dcPendingDelete={type:'file',folderId,fileId};document.getElementById('pwdMsg').innerHTML=`حذف المستند <b style="color:var(--red)">${fl.title||fl.name||'مستند'}</b>؟`;askPwd(()=>{const d2=ld(K.dc)||[];if(folderId){const f=d2.find(d=>d.id===folderId);if(f)f.files=(f.files||[]).filter(x=>x.id!==fileId)}else{sv(K.dc,d2.filter(x=>x.id!==fileId));_dcPendingDelete=null;cntBadge();rDcL();toast('تم الحذف','in');return}sv(K.dc,d2);_dcPendingDelete=null;cntBadge();rDcL();toast('تم الحذف','in')})}
+function dcDelFile(folderId,fileId){let docs=ld(K.dc)||[];let fl=null;if(folderId){const f=docs.find(function(d){return d.id===folderId});if(!f)return;fl=(f.files||[]).find(x=>x.id===fileId)}else{fl=docs.find(d=>d.id===fileId)}if(!fl)return;_dcPendingDelete={type:'file',folderId,fileId};document.getElementById('pwdMsg').innerHTML=`حذف المستند <b style="color:var(--red)">${fl.title||fl.name||'مستند'}</b>؟`;askPwd(()=>{const d2=ld(K.dc)||[];if(folderId){const f=d2.find(function(d){return d.id===folderId});if(f)f.files=(f.files||[]).filter(x=>x.id!==fileId)}else{sv(K.dc,d2.filter(x=>x.id!==fileId));_dcPendingDelete=null;cntBadge();rDcL();toast('تم الحذف','in');return}sv(K.dc,d2);_dcPendingDelete=null;cntBadge();rDcL();toast('تم الحذف','in')})}
 // تنزيل ملف
-function _dcGetFile(folderId,fileId){const docs=ld(K.dc)||[];if(folderId){const f=docs.find(d=>d.id===folderId);return f?(f.files||[]).find(x=>x.id===fileId):null}return docs.find(d=>d.id===fileId)}
+function _dcGetFile(folderId,fileId){const docs=ld(K.dc)||[];if(folderId){const f=docs.find(function(d){return d.id===folderId});return f?(f.files||[]).find(x=>x.id===fileId):null}return docs.find(d=>d.id===fileId)}
 function _dcAnchorDl(fl){const a=document.createElement('a');a.href=fl.data;a.download=fl.name||fl.title||'document';document.body.appendChild(a);a.click();setTimeout(()=>a.remove(),400)}
 function _dcIsPdf(fl){return (fl.type||'').includes('pdf')||(fl.name||'').toLowerCase().endsWith('.pdf')}
 // طباعة ملف فردي
@@ -4371,8 +4467,8 @@ else if(isPdf){document.getElementById('dcvPdf').src=fl.data}
 else{document.getElementById('dcvOtherName').textContent=fl.title||fl.name;document.getElementById('dcvOtherInfo').textContent=dcFmtSize(fl.size||0)+' · '+(fl.type||'\u0645\u0644\u0641')}
 om('mDcViewer')}
 
-function dcvZoomIn(){_dcScale=Math.min(5,_dcScale+0.2);dcvApply()}
-function dcvZoomOut(){_dcScale=Math.max(0.2,_dcScale-0.2);dcvApply()}
+function dcvZoomIn(){_dcScale=Math.min(10,_dcScale+0.25);dcvApply()}
+function dcvZoomOut(){_dcScale=Math.max(0.1,_dcScale-0.25);dcvApply()}
 function dcvRotate(){_dcRotate=(_dcRotate+90)%360;dcvApply()}
 function dcvReset(){_dcScale=1;_dcRotate=0;dcvApply()}
 function dcvApply(){var img=document.getElementById('dcvImg');img.style.transform='scale('+_dcScale+') rotate('+_dcRotate+'deg)';document.getElementById('dcvZoomLbl').textContent=Math.round(_dcScale*100)+'%';document.getElementById('dcvScale').textContent='\u0627\u0644\u062A\u0643\u0628\u064A\u0631: '+Math.round(_dcScale*100)+'% · \u0627\u0644\u062F\u0648\u0631\u0627\u0646: '+_dcRotate+'\u00b0'}
@@ -4391,27 +4487,62 @@ if(type.startsWith('image/')){const w=window.open('','_blank');w.document.write(
 else if(_dcIsPdf(fl)){const w=window.open(fl.data,'_blank');setTimeout(()=>{try{w.print()}catch(e){}},900)}
 else{toast('\u0647\u0630\u0627 \u0627\u0644\u0646\u0648\u0639 \u063A\u064A\u0631 \u0642\u0627\u0628\u0644 \u0644\u0644\u0637\u0628\u0627\u0639\u0629 \u0627\u0644\u0645\u0628\u0627\u0634\u0631\u0629 \u2014 \u0627\u0633\u062A\u062E\u062F\u0645 \u0632\u0631 \u0627\u0644\u062A\u062D\u0645\u064A\u0644','er')}}
 // طباعة كل محتويات المجلد دفعة واحدة
-function dcPrintFolder(folderId){const f=(ld(K.dc)||[]).find(d=>d.id===folderId);if(!f)return;const files=(f.files||[]).filter(x=>x.data);if(!files.length){toast('\u0647\u0630\u0627 \u0627\u0644\u0645\u0644\u0641 \u0641\u0627\u0631\u063A','er');return}
+function dcPrintFolder(folderId){const f=(ld(K.dc)||[]).find(function(d){return d.id===folderId});if(!f)return;const files=(f.files||[]).filter(function(x){return x.data});if(!files.length){toast('\u0647\u0630\u0627 \u0627\u0644\u0645\u0644\u0641 \u0641\u0627\u0631\u063A','er');return}
 const imgs=files.filter(x=>(x.type||'').startsWith('image/'));const pdfs=files.filter(x=>_dcIsPdf(x));const others=files.length-imgs.length-pdfs.length;
 if(imgs.length){const w=window.open('','_blank');w.document.write('<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8"><title>'+(f.name||'')+'</title><style>@page{margin:8mm}body{margin:0;font-family:Arial,sans-serif}.pg{page-break-after:always;display:flex;flex-direction:column;align-items:center;min-height:95vh;justify-content:center}.pg:last-child{page-break-after:auto}.cap{font-size:13px;font-weight:700;margin-bottom:6px;color:#111}img{max-width:100%;max-height:88vh;object-fit:contain}</style></head><body>'+imgs.map(x=>'<div class="pg"><div class="cap">'+(x.title||x.name||'')+'</div><img src="'+x.data+'"></div>').join('')+'</body></html>');w.document.close();setTimeout(()=>{try{w.print()}catch(e){}},700)}
 pdfs.forEach((x,i)=>{setTimeout(()=>{const pw=window.open(x.data,'_blank');setTimeout(()=>{try{pw.print()}catch(e){}},900)},1400*(i+1))});
 toast('\u062C\u0627\u0631\u064D \u062A\u062C\u0647\u064A\u0632 \u0627\u0644\u0637\u0628\u0627\u0639\u0629: '+imgs.length+' \u0635\u0648\u0631\u0629 \u0641\u064A \u0645\u0633\u062A\u0646\u062F \u0648\u0627\u062D\u062F + '+pdfs.length+' PDF'+(others?' \u2014 \u0648'+others+' \u0645\u0644\u0641 \u063A\u064A\u0631 \u0642\u0627\u0628\u0644 \u0644\u0644\u0637\u0628\u0627\u0639\u0629':''),'in')}
 // تحميل كل محتويات المجلد دفعة واحدة
-function dcDownloadAll(folderId){const f=(ld(K.dc)||[]).find(d=>d.id===folderId);if(!f)return;const files=(f.files||[]).filter(x=>x.data);if(!files.length){toast('\u0647\u0630\u0627 \u0627\u0644\u0645\u0644\u0641 \u0641\u0627\u0631\u063A','er');return}
+function dcDownloadAll(folderId){const f=(ld(K.dc)||[]).find(function(d){return d.id===folderId});if(!f)return;const files=(f.files||[]).filter(function(x){return x.data});if(!files.length){toast('\u0647\u0630\u0627 \u0627\u0644\u0645\u0644\u0641 \u0641\u0627\u0631\u063A','er');return}
 files.forEach((x,i)=>setTimeout(()=>_dcAnchorDl(x),450*i));toast('\u062C\u0627\u0631\u064D \u062A\u062D\u0645\u064A\u0644 '+files.length+' \u0645\u0644\u0641\u064B \u0625\u0644\u0649 \u0645\u062C\u0644\u0644\u062F \u0627\u0644\u062A\u0646\u0632\u064A\u0644\u0627\u062A','ok')}
 // مشاركة كل محتويات المجلد واتساب (تحميل الكل + فتح محادثة)
-function dcShareFolderWA(folderId){const f=(ld(K.dc)||[]).find(d=>d.id===folderId);if(!f)return;const files=(f.files||[]).filter(x=>x.data);if(!files.length){toast('\u0647\u0630\u0627 \u0627\u0644\u0645\u0644\u0641 \u0641\u0627\u0631\u063A','er');return}
+function dcShareFolderWA(folderId){const f=(ld(K.dc)||[]).find(function(d){return d.id===folderId});if(!f)return;const files=(f.files||[]).filter(function(x){return x.data});if(!files.length){toast('\u0647\u0630\u0627 \u0627\u0644\u0645\u0644\u0641 \u0641\u0627\u0631\u063A','er');return}
 files.forEach((x,i)=>setTimeout(()=>_dcAnchorDl(x),450*i));
 const msg='\u0627\u0644\u0633\u0644\u0627\u0645 \u0639\u0644\u064A\u0643\u0645\u060C\n\u064A\u0631\u0641\u0642 \u0645\u0648\u0627\u062F\u0629 '+files.length+' \u0645\u0644\u0641\u064B \u0645\u0646 \u0645\u0644\u0641: '+(f.name||'')+'\n'+files.map(x=>'- '+(x.title||x.name||'')).join('\n');
 setTimeout(()=>{window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank')},800);toast('\u062A\u0645 \u062A\u062D\u0645\u064A\u0644 \u0627\u0644\u0645\u0644\u0641\u0627\u062A \u0648\u0641\u062A\u062D \u0648\u0627\u062A\u0633\u0627\u0628 \u2014 \u0623\u0631\u0641\u0642 \u0627\u0644\u0645\u0644\u0641\u0627\u062A \u0627\u0644\u0645\u064F\u062D\u0645\u0651\u0644\u0629','ok')}
 
-function dcDownloadFile(folderId,fileId){const docs=ld(K.dc)||[];let fl=null;if(folderId){const f=docs.find(d=>d.id===folderId);if(f)fl=(f.files||[]).find(x=>x.id===fileId)}else{fl=docs.find(d=>d.id===fileId)}if(!fl||!fl.data){toast('المستند غير متوفر','er');return}const a=document.createElement('a');a.href=fl.data;a.download=fl.name||fl.title||'document';document.body.appendChild(a);a.click();a.remove();toast('تم تنزيل المستند','in')}
+function dcDownloadFile(folderId,fileId){const docs=ld(K.dc)||[];let fl=null;if(folderId){const f=docs.find(function(d){return d.id===folderId});if(f)fl=(f.files||[]).find(x=>x.id===fileId)}else{fl=docs.find(d=>d.id===fileId)}if(!fl||!fl.data){toast('المستند غير متوفر','er');return}const a=document.createElement('a');a.href=fl.data;a.download=fl.name||fl.title||'document';document.body.appendChild(a);a.click();a.remove();toast('تم تنزيل المستند','in')}
 // رفع ملف
-function dcUploadDlg(folderId){document.getElementById('dcUploadFolder').value=folderId||'';document.getElementById('dcUploadTitle').value='';document.getElementById('dcUploadNote').value='';document.getElementById('dcFile').value='';document.getElementById('dcDrop').classList.remove('has');document.getElementById('dcDropPh').innerHTML=`<i class="fas fa-cloud-arrow-up" style="font-size:26px;color:var(--t3);margin-bottom:5px;display:block"></i><div style="font-size:12px;font-weight:600;color:var(--t2)">اضغط لاختيار ملف</div><div style="font-size:10px;color:var(--t3)">PDF, PNG, JPG, DOCX...</div>`;om('mDcUpload')}
-function dcFilePicked(ev){const f=ev.target.files[0];if(!f)return;if(f.size>10*1024*1024){toast('حجم الملف كبير جداً (الحد 10MB)','er');ev.target.value='';return}document.getElementById('dcDrop').classList.add('has');document.getElementById('dcDropPh').innerHTML=`<i class="${dcFileIcon(f.type||f.name).replace('fa-','fas fa-')}" style="font-size:24px;color:var(--acc);margin-bottom:5px;display:block"></i><div style="font-size:12px;font-weight:700;color:var(--t1);max-width:220px;word-break:break-word">${f.name}</div><div style="font-size:10px;color:var(--t3)">${dcFmtSize(f.size)}</div>`}
-function cfDcUpload(){const fi=document.getElementById('dcFile');const f=fi.files[0];if(!f){toast('اختر ملفاً أولاً','er');return}if(f.size>10*1024*1024){toast('حجم الملف كبير جداً (الحد 10MB)','er');return}const r=new FileReader();r.onload=function(e){const data=e.target.result;const title=document.getElementById('dcUploadTitle').value.trim()||f.name.replace(/\.[^.]+$/,'');const note=document.getElementById('dcUploadNote').value.trim();const folderId=document.getElementById('dcUploadFolder').value;const docObj={id:gid(),title,name:f.name,type:f.type,size:f.size,data,note,at:Date.now()};const docs=ld(K.dc)||[];if(folderId){const fl=docs.find(d=>d.id===folderId);if(!fl){toast('الملف غير موجود','er');return}if(!fl.files)fl.files=[];fl.files.push(docObj)}else{docs.push(Object.assign({folder:false},docObj))}sv(K.dc,docs);cm('mDcUpload');cntBadge();rDcL();toast('تم رفع المستند')};r.readAsDataURL(f)}
+var _dcPendFiles=[];
+function dcUploadDlg(folderId){document.getElementById('dcUploadFolder').value=folderId||'';document.getElementById('dcUploadTitle').value='';document.getElementById('dcUploadNote').value='';document.getElementById('dcFile').value='';_dcPendFiles=[];document.getElementById('dcDrop').classList.remove('has');document.getElementById('dcDropPh').innerHTML=`<i class="fas fa-cloud-arrow-up" style="font-size:26px;color:var(--t3);margin-bottom:5px;display:block"></i><div style="font-size:12px;font-weight:600;color:var(--t2)">اضغط لاختيار ملف</div><div style="font-size:10px;color:var(--t3)">PDF, PNG, JPG, DOCX...</div>`;om('mDcUpload')}
+function dcFilePicked(ev){_dcPendFiles=Array.from(ev.target.files||[]);_dcRdrPickList()}
+function _dcRdrPickList(){
+var el=document.getElementById('dcDrop');
+if(!el)return;
+if(!_dcPendFiles.length){el.innerHTML=_dcDropDefaultHtml();return}
+var total=_dcPendFiles.reduce(function(a,f){return a+f.size},0);
+var oversize=_dcPendFiles.filter(function(f){return f.size>10*1024*1024}).length;
+el.innerHTML='<div style="text-align:right;max-height:180px;overflow-y:auto;width:100%">'+
+_dcPendFiles.map(function(f,i){return '<div style="display:flex;align-items:center;gap:8px;background:var(--bg2);border:1px solid var(--brd);border-radius:8px;padding:7px 10px;margin-bottom:5px"><i class="fas fa-file-lines" style="color:var(--acc);font-size:13px"></i><span style="flex:1;font-size:11.5px;font-weight:600;word-break:break-all">'+f.name+'</span><span style="font-size:10px;color:var(--t3);white-space:nowrap">'+(f.size/1024).toFixed(0)+' KB'+(f.size>10*1024*1024?' <b style="color:var(--red)">كبير!</b>':'')+'</span><button class="btn btn-d btn-xs" style="padding:1px 6px" onclick="_dcRmPick('+i+')"><i class="fas fa-times" style="font-size:9px"></i></button></div>'}).join('')+
+'</div><div style="font-size:10.5px;color:'+(oversize?'var(--red)':'var(--t3)')+';margin-top:5px">'+_dcPendFiles.length+' ملفًا · '+(total/1024/1024).toFixed(2)+' MB إجمالاً'+(oversize?(' · '+oversize+' ملف يتجاوز 10MB وسيُستثنى'):'')+'</div>'}
+function _dcRmPick(i){_dcPendFiles.splice(i,1);_dcRdrPickList()}
+function _dcDropDefaultHtml(){return '<i class="fas fa-cloud-arrow-up" style="font-size:38px;color:var(--t3)"></i><p style="font-size:11.5px;color:var(--t2);margin-top:6px">اسحب الملفات هنا أو انقر للاختيار</p><p style="font-size:10px;color:var(--t3)">أي عدد من الملفات — Word، Excel، صور بكافة الصيغ، PDF · حتى 10MB للملف</p>'}
+function cfDcUpload(){
+var files=(_dcPendFiles||[]).filter(function(f){return f.size<=10*1024*1024});
+if(!files.length){toast('اختر ملفًا واحدًا على الأقل (بحد 10MB للملف)','er');return}
+var docs=ld(K.dc)||[];
+var folderId=document.getElementById('dcUploadFolder').value||null;
+var folder=folderId?docs.find(function(d){return d.id===folderId&&d.folder}):null;
+toast('جارٍ رفع '+files.length+' ملفًا…','in');
+var done=0,failed=0;
+files.forEach(function(f){
+var r=new FileReader();
+r.onload=function(){
+try{
+var docs2=ld(K.dc)||[];
+var docObj={id:gid(),title:f.name,name:f.name,type:f.type||'',size:f.size,data:r.result,note:'',at:Date.now()};
+if(folderId){var f2=docs2.find(function(d){return d.id===folderId});if(!f2){failed++;return}f2.files=f2.files||[];f2.files.push(docObj)}
+else{docObj.folder=false;docs2.push(docObj)}
+sv(K.dc,docs2);done++;
+if(done+failed===files.length){
+cm('mDcUpload');cntBadge();rDcL();
+toast('تم رفع '+done+' ملفًا'+(failed?(' · فشل '+failed):'')+' ✓','ok')}}
+catch(e){failed++;console.error('upload err',e)}};
+r.onerror=function(){failed++};
+r.readAsDataURL(f)});
+}
 // مشاركة
-function dcShareDlg(folderId,fileId){const docs=ld(K.dc)||[];let fl=null;if(folderId){const f=docs.find(d=>d.id===folderId);if(f)fl=(f.files||[]).find(x=>x.id===fileId)}else{fl=docs.find(d=>d.id===fileId)}if(!fl){toast('المستند غير موجود','er');return}document.getElementById('dcShareId').value=JSON.stringify({folderId:folderId||'',fileId});const sel=document.getElementById('dcShareClient');const cs=ld(K.c);sel.innerHTML='<option value="">-- بدون --</option>';cs.forEach(c=>sel.innerHTML+=`<option value="${c.id}">${c.name}</option>`);document.getElementById('dcSharePhone').value='';document.getElementById('dcShareEmail').value='';document.getElementById('dcShareMsg').value=`السلام عليكم،\nيرفق ${fl.title||fl.name} ${fl.note?'— '+fl.note:''}`;om('mDcShare')}
+function dcShareDlg(folderId,fileId){const docs=ld(K.dc)||[];let fl=null;if(folderId){const f=docs.find(function(d){return d.id===folderId});if(f)fl=(f.files||[]).find(x=>x.id===fileId)}else{fl=docs.find(d=>d.id===fileId)}if(!fl){toast('المستند غير موجود','er');return}document.getElementById('dcShareId').value=JSON.stringify({folderId:folderId||'',fileId});const sel=document.getElementById('dcShareClient');const cs=ld(K.c);sel.innerHTML='<option value="">-- بدون --</option>';cs.forEach(c=>sel.innerHTML+=`<option value="${c.id}">${c.name}</option>`);document.getElementById('dcSharePhone').value='';document.getElementById('dcShareEmail').value='';document.getElementById('dcShareMsg').value=`السلام عليكم،\nيرفق ${fl.title||fl.name} ${fl.note?'— '+fl.note:''}`;om('mDcShare')}
 function onDcShareClient(){const v=document.getElementById('dcShareClient').value;if(!v)return;const c=ld(K.c).find(x=>x.id===v);if(!c)return;document.getElementById('dcSharePhone').value=_waPhone(c.phone);document.getElementById('dcShareEmail').value=c.email||''}
 function _dcGetSharedFile(){const m=JSON.parse(document.getElementById('dcShareId').value||'{}');const docs=ld(K.dc)||[];if(m.folderId){const f=docs.find(d=>d.id===m.folderId);if(f)return(f.files||[]).find(x=>x.id===m.fileId)}else{return docs.find(d=>d.id===m.fileId)}return null}
 function dcShareWA(){const fl=_dcGetSharedFile();if(!fl||!fl.data){toast('المستند غير متوفر','er');return}const ph=(document.getElementById('dcSharePhone').value||'').replace(/[^0-9]/g,'');const msg=document.getElementById('dcShareMsg').value||('يرفق '+fl.title);const a=document.createElement('a');a.href=fl.data;a.download=fl.name||fl.title||'document';document.body.appendChild(a);a.click();a.remove();const url=ph?`https://wa.me/${ph}?text=${encodeURIComponent(msg)}`:`https://wa.me/?text=${encodeURIComponent(msg)}`;window.open(url,'_blank');toast('تم تنزيل المستند وفتح واتساب','in')}
