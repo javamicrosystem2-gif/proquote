@@ -204,7 +204,7 @@ const TIER_FEATURES = {
 // ---------- نظام الباقات: الأقسام المفتوحة لكل باقة ----------
 // الأقسام الستة والعشرون كما في الشريط الجانبي. لوحة التحكم والإعدادات مفتوحان دائماً.
 const ALWAYS_OPEN_SECTIONS = ['dash', 'settings'];
-const _PKG_QUOTES = ['quotes', 'tech', 'receipt', 'auth', 'custom', 'full', 'samples', 'supply', 'returns', 'tenders', 'shipping'];
+const _PKG_QUOTES = ['quotes','purchase', 'tech', 'receipt', 'auth', 'custom', 'full', 'samples', 'supply', 'returns', 'tenders', 'shipping'];
 const _PKG_FINANCE = ['payments', 'receivables', 'rcpt'];
 const _PKG_MGMT = ['company', 'clients', 'products', 'warehouse', 'mfg', 'documents', 'emp', 'notes'];
 const _PKG_SYSTEM = ['ei', 'adm'];
