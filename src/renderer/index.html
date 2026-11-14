@@ -151,7 +151,7 @@ body[data-share-size="md"] .sh-ic{font-size:12px!important}
 body[data-share-size="lg"] .sh-ic{font-size:16px!important}
 body[data-share-size="md"] .btn-w.btn-sm i,body[data-share-size="md"] .md-h .btn-w i{font-size:16px!important}
 body[data-share-size="lg"] .btn-w.btn-sm i,body[data-share-size="lg"] .md-h .btn-w i{font-size:20px!important}
-.mo{position:fixed;inset:0;background:rgba(0,0,0,.72);backdrop-filter:blur(4px);z-index:100;display:none;align-items:center;justify-content:center;padding:16px}
+.mo{position:fixed;inset:0;background:rgba(0,0,0,.72);backdrop-filter:blur(4px);z-index:9999;display:none;align-items:center;justify-content:center;padding:16px}
 .mo.show{display:flex}
 .md{background:var(--bg1);border:1px solid var(--brd);border-radius:14px;width:100%;max-height:90vh;overflow-y:auto;animation:mdIn .3s ease}
 .md-s{max-width:450px}.md-m{max-width:640px}.md-l{max-width:860px}.md-xl{max-width:1060px}
@@ -161,7 +161,7 @@ body[data-share-size="lg"] .btn-w.btn-sm i,body[data-share-size="lg"] .md-h .btn
 .md-x{width:26px;height:26px;border-radius:6px;background:var(--bg3);border:none;color:var(--t3);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.2s;flex-shrink:0}
 .md-x:hover{background:var(--red2);color:var(--red)}
 .md-b{padding:18px}.md-f{padding:10px 18px;border-top:1px solid var(--brd);display:flex;align-items:center;gap:7px}
-.tc{position:fixed;top:14px;left:14px;z-index:200;display:flex;flex-direction:column;gap:7px}
+.tc{position:fixed;top:14px;left:14px;z-index:10000;display:flex;flex-direction:column;gap:7px}
 .tt{background:var(--bg1);border:1px solid var(--brd);border-radius:9px;padding:10px 14px;display:flex;align-items:center;gap:8px;min-width:260px;box-shadow:0 10px 40px rgba(0,0,0,.45);animation:ttIn .3s ease;font-size:12.5px}
 .tt.out{animation:ttOut .25s ease forwards}
 @keyframes ttIn{from{opacity:0;transform:translateX(-18px)}to{opacity:1;transform:translateX(0)}}
@@ -878,7 +878,7 @@ body[data-share-size="lg"] .btn-w.btn-sm i,body[data-share-size="lg"] .md-h .btn
 
 <style>#licLock{position:fixed;inset:0;z-index:9998;background:rgba(6,11,20,.97);display:none;align-items:center;justify-content:center}#licLock .lk{width:420px;max-width:92vw;background:var(--bg3);border:1px solid var(--brd);border-radius:16px;padding:30px;text-align:center}#licLock h3{margin:8px 0 4px}#licLock .did{background:var(--bg0);border:1px dashed var(--acc);border-radius:8px;padding:8px;margin:12px 0;font-family:monospace;font-size:16px;font-weight:800;color:var(--acc);letter-spacing:2px;direction:ltr}</style>
 <div id="licLock"><div class="lk"><i class="fas fa-key" style="font-size:30px;color:var(--org)"></i><h3>انتهت الفترة التجريبية</h3><p style="font-size:12px;color:var(--t3);margin-bottom:8px">فعّل الترخيص للمتابعة — المفتاح مرتبط بمعرف هذا الجهاز</p><div class="did" id="licLockDid">—</div><button class="btn btn-p" style="width:100%" onclick="cm('licLock');openLicenseModal()"><i class="fas fa-star"></i> مشاهدة الباقات والشراء</button>
-<div style="display:flex;gap:6px;margin-top:6px"><input class="fi" id="licLockKey" placeholder="الصق كود التفعيل هنا..." style="flex:1;font-size:11px;direction:ltr;text-align:left" onkeydown="if(event.key==='Enter'){licLockActivate()}"><button class="btn btn-p" style="flex:none" onclick="licLockActivate()"><i class="fas fa-check"></i> تفعيل</button></div>
+<div style="display:flex;gap:6px;margin-top:6px"><input class="fi" id="licLockKey" placeholder="الصق كود التفعيل هنا..." style="flex:1;font-size:11px;direction:ltr;text-align:left" onkeydown="if(event.key==='Enter'){licLockActivate()}"><button class="btn btn-p" style="flex:none" id="licLockActBtn" onclick="licLockActivate()"><i class="fas fa-check"></i> تفعيل</button></div>
 <button class="btn btn-s" style="width:100%;margin-top:6px" onclick="licReqTg()"><i class="fab fa-telegram"></i> طلب الكود عبر تيليجرام</button></div></div>
 <!-- مودال الفاتورة الإلكترونية -->
 <div class="mo" id="mEi"><div class="md md-lg"><div class="md-h"><h3 id="mEit">فاتورة ضريبية جديدة</h3><button class="md-x" onclick="cm('mEi')"><i class="fas fa-times"></i></button></div><div class="md-b">
@@ -1697,8 +1697,8 @@ function licReqWa(){try{licRequestKey&&licRequestKey('wa')}catch(e){}}
 function go(p){if(p==='sub'){try{openLicenseModal()}catch(e){};return}if(window._licBlocked){toast('فعّل الترخيص أولاً للمتابعة',"er");return}if(window._secGate&&!window._secGate(p))return;if(window._usrGate&&!_usrGate(p))return;document.querySelectorAll('.pg').forEach(e=>e.classList.remove('on'));document.querySelectorAll('.sb-it').forEach(e=>e.classList.remove('on'));const pg=document.getElementById('p-'+p);if(pg){pg.classList.add('on');const f=pg.querySelector(':scope>.topbar+*');if(f){f.classList.remove('fi-in');void f.offsetWidth;f.classList.add('fi-in')}}document.querySelectorAll('.sb-it').forEach(i=>{if(i.getAttribute('onclick')?.includes(p))i.classList.add('on')});_usrCurSec=p;if(p==='dash')updDash();if(p==='quotes')rql();if(p==='tech')rTfL();if(p==='receipt')rRcL();if(p==='custom'){rCuL();rCuTypesL();}if(p==='full')rFlL();if(p==='clients')rCG();if(p==='products')rPT();if(p==='warehouse')rWhL();if(p==='tenders')rTdL();if(p==='shipping'){rShpL();rCrL();}if(p==='auth'){rAuL();rAuTypesL();}if(p==='io')rIoL();if(p==='mfg')rMfgL();if(p==='notes')rNtL();if(p==='emp')rEmpL();if(p==='rcpt')rRcptL();if(p==='documents')rDcL();if(p==='samples')rSaL();if(p==='purchase')rPoL();if(p==='supply')rSoL();if(p==='returns')rRtL();if(p==='payments')rPayL();if(p==='receivables')rRecL();if(p==='ei')rEiL();if(p==='company')rCompL();;if(p==='adm')rAdmL();if(p==='settings'){ldSF();rTG();try{rdrThemes()}catch(e){};try{ldStampSig()}catch(e){};try{rdrPlansAdmin()}catch(e){}}document.getElementById('MC').scrollTop=0}
 function stab(t){document.querySelectorAll('.stab').forEach(e=>e.classList.remove('on'));document.querySelectorAll('.spanel').forEach(e=>e.classList.remove('on'));document.querySelector(`.stab[onclick*="${t}"]`)?.classList.add('on');document.getElementById('sp-'+t)?.classList.add('on');if(t==='tpl')rTG();if(t==='company')ldLogo()}
 function om(id){if(window._omGate&&!_omGate(id))return;document.getElementById(id).classList.add('show');document.body.style.overflow='hidden'}
-function cm(id){document.getElementById(id).classList.remove('show');document.body.style.overflow=''}
-document.querySelectorAll('.mo').forEach(o=>o.addEventListener('click',e=>{if(e.target===o){o.classList.remove('show');document.body.style.overflow=''}}));
+function cm(id){document.getElementById(id).classList.remove('show');document.body.style.overflow='';if(id==='licLock'){var lk=document.getElementById('licLock');if(lk)lk.style.display='none'}else{try{licEnforce()}catch(e){}}}
+document.querySelectorAll('.mo').forEach(o=>o.addEventListener('click',e=>{if(e.target===o){cm(o.id)}}));
 function toast(m,t='ok'){if(!window._toastRemote){try{p2pBroadcastToast(m,t)}catch(e){}}window._toastRemote=false;const c=document.getElementById('TC'),d=document.createElement('div');d.className='tt tt-'+t;const ic={ok:'fa-check-circle',er:'fa-times-circle','in':'fa-info-circle'},cl={ok:'var(--acc)',er:'var(--red)','in':'var(--blu)'};d.innerHTML=`<i class="fas ${ic[t]}" style="color:${cl[t]};font-size:15px"></i><span>${m}</span>`;c.appendChild(d);setTimeout(()=>{d.classList.add('out');setTimeout(()=>d.remove(),250)},2800)}
 
 // ===== الشعار =====
@@ -2406,9 +2406,12 @@ let _licenseState = null;
 async function licLockActivate(){
 var k=(document.getElementById('licLockKey').value||'').trim();
 if(!k){toast('الصق كود التفعيل أولاً','er');return}
+var b=document.getElementById('licLockActBtn'),oh=b?b.innerHTML:'';
+if(b){b.disabled=true;b.innerHTML='<i class="fas fa-spinner fa-spin"></i> جارٍ التفعيل...'}
 try{var r=await window.proquote.license.activate(k);
-if(r&&r.success){toast('تم التفعيل بنجاح 🎉','ok');try{refreshLicenseBadge()}catch(e){}}
-else{toast((r&&r.error)||'كود غير صالح','er')}}catch(e){toast('تعذر التفعيل: '+e.message,'er')}}
+if(r&&r.success){toast(r.message||'تم التفعيل بنجاح 🎉','ok');document.getElementById('licLockKey').value='';try{refreshLicenseBadge()}catch(e){}}
+else{toast((r&&r.error)||'كود غير صالح','er')}}catch(e){toast('تعذر التفعيل: '+e.message,'er')}
+if(b){b.disabled=false;b.innerHTML=oh}}
 function licReqTg(){try{licRequestKey&&licRequestKey('tg')}catch(e){}}
 function licEnforce(){try{var st=_licenseState;if(!st)return;if(st.status==='expired'){window._licBlocked=true;var lk=document.getElementById('licLock');if(lk)lk.style.display='flex';var ld=document.getElementById('licLockDid');if(ld)ld.textContent=st.deviceId||'—'}else{window._licBlocked=false;var lk2=document.getElementById('licLock');if(lk2)lk2.style.display='none'}}catch(e){console.warn('licEnforce',e)}}
 async function refreshLicenseBadge(){
@@ -2439,34 +2442,52 @@ function renderLicPackages(){try{subCycle(_subCycle||'m')}catch(e){}}
 async function openLicenseModal(){try{renderLicPackages()}catch(e){}
   if(!window.proquote || !window.proquote.license){toast('الترخيص متاح فقط في التطبيق المُثبَّت','in');return}
   await refreshLicenseBadge();
-  const box=document.getElementById('licenseStatusBox');
-  const actSec=document.getElementById('licenseActivateSection');
-  if(_licenseState.status==='activated'){
-    box.style.background='var(--acc2)';box.style.border='1px solid var(--acc)';
-    box.innerHTML='<i class="fas fa-check-circle" style="color:var(--acc);font-size:26px;display:block;margin-bottom:6px"></i><div style="color:var(--acc);font-weight:700;font-size:14px">الترخيص مُفعّل</div><div style="font-size:11px;color:var(--t2);margin-top:3px">'+(_licenseState.tier==='professional'?'النسخة الاحترافية':_licenseState.tier)+' — جهاز: '+_licenseState.deviceId+'</div>';
-    actSec.style.display='none';
-  }else if(_licenseState.status==='trial'){
-    box.style.background='var(--yel2)';box.style.border='1px solid var(--yel)';
-    box.innerHTML='<i class="fas fa-clock" style="color:var(--yel);font-size:26px;display:block;margin-bottom:6px"></i><div style="color:var(--yel);font-weight:700;font-size:14px">نسخة تجريبية</div><div style="font-size:11px;color:var(--t2);margin-top:3px">متبقي '+_licenseState.daysLeft+' يوماً</div>';
-    actSec.style.display='block';
-  }else{
-    box.style.background='var(--red2)';box.style.border='1px solid var(--red)';
-    box.innerHTML='<i class="fas fa-triangle-exclamation" style="color:var(--red);font-size:26px;display:block;margin-bottom:6px"></i><div style="color:var(--red);font-weight:700;font-size:14px">انتهت النسخة التجريبية</div><div style="font-size:11px;color:var(--t2);margin-top:3px">فعّل الترخيص للاستمرار في الاستخدام</div>';
-    actSec.style.display='block';
-  }
+  renderLicenseStatus();
   document.getElementById('licenseDeviceId').value=_licenseState.deviceId||'—';
   document.getElementById('licenseKey').value='';
   om('mLicense');
+  // أثناء الانتهاء: أخفِ القفل تحت النافذة — يُعاد تلقائياً عند الإغلاق (cm → licEnforce)
+  if(_licenseState.status==='expired'){try{var _lk=document.getElementById('licLock');if(_lk)_lk.style.display='none'}catch(e){}}
+}
+function _licFmtDate(ms){try{return new Date(ms).toISOString().split('T')[0]}catch(e){return '—'}}
+function renderLicenseStatus(){
+  const box=document.getElementById('licenseStatusBox');
+  const actSec=document.getElementById('licenseActivateSection');
+  const actBtn=document.getElementById('licenseActivateBtn');
+  const keyLbl=document.querySelector('#licenseActivateSection .fg:nth-of-type(2) .fl');
+  if(_licenseState.status==='activated'){
+    box.style.background='var(--acc2)';box.style.border='1px solid var(--acc)';
+    var pkgs=(_licenseState.packages||[]);
+    var rows=pkgs.map(function(p){return '<div style="font-size:12px;color:var(--tx);margin-top:4px"><i class="fas '+(p.expired?'fa-clock':'fa-circle-check')+'" style="color:'+(p.expired?'var(--yel)':'var(--acc)')+';margin-left:5px"></i><b>'+p.name+'</b>'+(p.expiry?' — '+(p.expired?'انتهت ':'حتى ')+_licFmtDate(p.expiry):' — بلا تاريخ انتهاء')+'</div>'}).join('');
+    box.innerHTML='<i class="fas fa-check-circle" style="color:var(--acc);font-size:26px;display:block;margin-bottom:6px"></i><div style="color:var(--acc);font-weight:700;font-size:14px">'+(pkgs.length>1?'باقاتك النشطة':'باقتك مُفعّلة')+'</div>'+rows+'<div style="font-size:11px;color:var(--t2);margin-top:6px">جهاز: '+_licenseState.deviceId+'</div>';
+    actSec.style.display='block';
+    if(keyLbl)keyLbl.textContent='كود باقة إضافية أو تجديد باقتك';
+    if(actBtn)actBtn.innerHTML='<i class="fas fa-plus"></i> إضافة الباقة';
+  }else if(_licenseState.status==='trial'){
+    box.style.background='var(--yel2)';box.style.border='1px solid var(--yel)';
+    box.innerHTML='<i class="fas fa-clock" style="color:var(--yel);font-size:26px;display:block;margin-bottom:6px"></i><div style="color:var(--yel);font-weight:700;font-size:14px">نسخة تجريبية</div><div style="font-size:11px;color:var(--t2);margin-top:3px">متبقي '+_licenseState.daysLeft+' يوماً — فعّل باقتك الآن لتستمر بعد التجربة</div>';
+    actSec.style.display='block';
+    if(keyLbl)keyLbl.textContent='مفتاح الترخيص';
+    if(actBtn)actBtn.innerHTML='<i class="fas fa-check"></i> تفعيل';
+  }else{
+    box.style.background='var(--red2)';box.style.border='1px solid var(--red)';
+    box.innerHTML='<i class="fas fa-triangle-exclamation" style="color:var(--red);font-size:26px;display:block;margin-bottom:6px"></i><div style="color:var(--red);font-weight:700;font-size:14px">انتهت الفترة التجريبية</div><div style="font-size:11px;color:var(--t2);margin-top:3px">فعّل الترخيص للاستمرار في الاستخدام</div>';
+    actSec.style.display='block';
+    if(keyLbl)keyLbl.textContent='مفتاح الترخيص';
+    if(actBtn)actBtn.innerHTML='<i class="fas fa-check"></i> تفعيل';
+  }
 }
 async function doActivate(){
   const key=document.getElementById('licenseKey').value.trim();
   if(!key){toast('أدخل مفتاح الترخيص','er');return}
-  toast('جارٍ التحقق...','in');
+  const b=document.getElementById('licenseActivateBtn'),oh=b?b.innerHTML:'';
+  if(b){b.disabled=true;b.innerHTML='<i class="fas fa-spinner fa-spin"></i> جارٍ التحقق...'}
   try{
     const r=await window.proquote.license.activate(key);
-    if(r.success){toast(r.message||'تم التفعيل','ok');cm('mLicense');refreshLicenseBadge();try{setTimeout(licEnforce,400)}catch(e){}}
+    if(r.success){toast(r.message||'تم التفعيل','ok');document.getElementById('licenseKey').value='';refreshLicenseBadge();try{renderLicenseStatus()}catch(e){}}
     else{toast(r.error||'فشل التفعيل','er')}
   }catch(e){toast('خطأ: '+e.message,'er')}
+  if(b){b.disabled=false;b.innerHTML=oh}
 }
 
 // ===== النسخ الاحتياطي والاستعادة (Electron — عبر IPC) =====

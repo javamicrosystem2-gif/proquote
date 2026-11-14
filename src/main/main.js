@@ -22,6 +22,18 @@ if (UITEST_MODE) {
   try { require('../../shoot/uitest').isolate(); } catch (e) { console.error('[uitest] isolation failed:', e.message); }
 }
 
+// وضع الفحص العملي للتراخيص (--probe-license): سيرفر وهمي + سيناريوهات تفعيل كاملة
+const PROBE_LICENSE_MODE = process.argv.includes('--probe-license');
+if (PROBE_LICENSE_MODE) {
+  try { require('../../shoot/probe-license').isolate(); } catch (e) { console.error('[probe-license] isolation failed:', e.message); }
+}
+
+// معاينة حية لنظام التراخيص (--lic-preview): نفس إعداد الفحص والنافذة تبقى مفتوحة للتجربة
+const LIC_PREVIEW_MODE = process.argv.includes('--lic-preview');
+if (LIC_PREVIEW_MODE) {
+  try { require('../../shoot/probe-license').isolate(); } catch (e) { console.error('[lic-preview] isolation failed:', e.message); }
+}
+
 // وضع فحص التخزين (--dbtest): تشخيص بلا نافذة — ترحيل + تكافؤ + نسخ احتياطي ذهاباً وإياباً
 // مع PQTEST_USERDATA=<مجلد> يُوجَّه الفحص لمجلد معزول بدل بيانات المستخدم
 const DBTEST_MODE = process.argv.includes('--dbtest');
@@ -331,6 +343,18 @@ app.whenReady().then(() => {
   // وضع اختبار الواجهة: مجلد معزول + سيناريوهات DOM فعلية ثم خروج
   if (UITEST_MODE) {
     require('../../shoot/uitest').run();
+    return;
+  }
+
+  // وضع الفحص العملي للتراخيص: سيرفر وهمي + تفعيل + تراكم باقات ثم خروج
+  if (PROBE_LICENSE_MODE) {
+    require('../../shoot/probe-license').run();
+    return;
+  }
+
+  // معاينة حية للتراخيص: نافذة مفتوحة للتجربة اليدوية
+  if (LIC_PREVIEW_MODE) {
+    require('../../shoot/probe-license').preview();
     return;
   }
 

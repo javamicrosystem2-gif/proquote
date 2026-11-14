@@ -18,11 +18,14 @@ const db = require('./db');
 const TRIAL_DAYS = 30;                    // مدة النسخة التجريبية
 
 // ===== مفتاح الترخيص العام (التحقق فقط — لا يولّد تراخيص) =====
-const LICENSE_PUBLIC_KEY = '-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAorORNkKr3mbHA+NG5pGS\nMbjIampmg6MoKN0sMI4+6Pb4i7xyQmdpxZU0zNmnK3jBUay+NKREMt9QRhAdq78b\nv5px6Tfu4U49UyXV9sdmvm30f1Pf/XT4YTBGmHPOZtJeZC5Uhqhki+2vf6/wcZ3e\ne/TI6BocGQKsp6jjO3uKHJjKEiCSgEpJGhPHnJcBAY6hqGMdCOMchxq7lFkScQzD\npXuMT/m9Aiu6VlDFFZwFe7Wb358H5D/BKEXcueY1oU09xaCUxjsAYBNzZiLxuAeQ\nwOSGTLxs/5VpqN1p7XQ5EGtCyEssNrdwWsxcEqRO8naSZ2kNnJH3XHebDdBuQWzA\nbQIDAQAB\n-----END PUBLIC KEY-----\n';
+// PQ_LICENSE_PUBKEY: للتشغيل المحلي/الفحص فقط (سيرفر وهمي بمفتاح خاص تجريبي) — بلا تأثير على الإنتاج
+const DEFAULT_LICENSE_PUBLIC_KEY = '-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAorORNkKr3mbHA+NG5pGS\nMbjIampmg6MoKN0sMI4+6Pb4i7xyQmdpxZU0zNmnK3jBUay+NKREMt9QRhAdq78b\nv5px6Tfu4U49UyXV9sdmvm30f1Pf/XT4YTBGmHPOZtJeZC5Uhqhki+2vf6/wcZ3e\ne/TI6BocGQKsp6jjO3uKHJjKEiCSgEpJGhPHnJcBAY6hqGMdCOMchxq7lFkScQzD\npXuMT/m9Aiu6VlDFFZwFe7Wb358H5D/BKEXcueY1oU09xaCUxjsAYBNzZiLxuAeQ\nwOSGTLxs/5VpqN1p7XQ5EGtCyEssNrdwWsxcEqRO8naSZ2kNnJH3XHebDdBuQWzA\nbQIDAQAB\n-----END PUBLIC KEY-----\n';
+function getPublicKeyPem() { return process.env.PQ_LICENSE_PUBKEY || DEFAULT_LICENSE_PUBLIC_KEY; }
 
 // خادم التفعيل (دالة Edge في مشروع المطور) — للتجربة المحلية يمكن تجاوزه بمتغير PQ_LICENSE_SERVER
 const SB_KEY = 'sb_publishable_VFdPDdUF0T0h_aof5D_WJQ_jh7VxdOS'; // مفتاح Supabase العمومي (آمن للنشر — مثل anon)
-const LICENSE_SERVER = process.env.PQ_LICENSE_SERVER || 'https://fxyvnmocjwtzddlqeyve.supabase.co/functions/v1/activate-license';
+const DEFAULT_LICENSE_SERVER = 'https://fxyvnmocjwtzddlqeyve.supabase.co/functions/v1/activate-license';
+function getLicenseServer() { return process.env.PQ_LICENSE_SERVER || DEFAULT_LICENSE_SERVER; }
 
 // فلفلة ملفات التجربة فقط (مغايرة تماماً لأي سرّ قديم — لا تفتح التراخيص بحال)
 const _TP = ['6f3a5d28696f6c771636257e2f0a68194b6d77356b27693409238f6427656c61636f6c771636257e2f0a68194b6d77356b27693409238f6427656c61636f6c771636257e2f0a68194b6d77'].join('');
@@ -74,7 +77,31 @@ function readSingleLicense(filePath) {
   try {
     if (!fs.existsSync(filePath)) return null;
     const envelope = JSON.parse(fs.readFileSync(filePath, 'utf8'));
-    if (!envelope || !envelope.payload || !envelope.sig) return null;
+    if (!envelope) return null;
+
+    // 0) التنسيق v2: عدة مظاريف موقعة — باقة مُفعّلة لكل عنصر (تراكم الباقات)
+    if (Array.isArray(envelope.items)) {
+      const items = [];
+      for (const it of envelope.items) {
+        if (!it || !it.payload || !it.sig) continue;
+        let p = null; try { p = JSON.parse(it.payload); } catch (_) { continue; }
+        if (!p || p.deviceId === undefined || !p.tier) continue;
+        let ok = false;
+        try {
+          ok = crypto.verify(
+            'RSA-SHA256',
+            Buffer.from(it.payload, 'utf8'),
+            crypto.createPublicKey({ key: getPublicKeyPem(), format: 'pem', type: 'spki' }),
+            Buffer.from(it.sig, 'base64')
+          );
+        } catch (_) { ok = false; }
+        if (ok) items.push({ payload: it.payload, sig: it.sig, timestamp: it.timestamp || 0 });
+      }
+      if (!items.length) return null;
+      return { type: 'activated-multi', items, timestamp: envelope.timestamp || 0 };
+    }
+
+    if (!envelope.payload || !envelope.sig) return null;
     const payloadStr = envelope.payload;
 
     // 1) ترخيص مُوقَّع من الخادم — تحقق بالمفتاح العام (أوفلاين، بلا أسرار في البرنامج)
@@ -84,11 +111,11 @@ function readSingleLicense(filePath) {
       const ok = crypto.verify(
         'RSA-SHA256',
         Buffer.from(payloadStr, 'utf8'),
-        crypto.createPublicKey({ key: LICENSE_PUBLIC_KEY, format: 'pem', type: 'spki' }),
+        crypto.createPublicKey({ key: getPublicKeyPem(), format: 'pem', type: 'spki' }),
         Buffer.from(envelope.sig, 'base64')
       );
       if (!ok) { console.warn('[license] توقيع ترخيص غير صالح في', filePath); return null; }
-      return { type: 'activated', ...parsed, timestamp: envelope.timestamp || 0 };
+      return { type: 'activated', ...parsed, payload: payloadStr, sig: envelope.sig, timestamp: envelope.timestamp || 0 };
     }
 
     // 2) ملف تجربة — تحقق بفلفلة التجربة (مقاومة أساسية لتلاعب التاريخ)
@@ -103,9 +130,8 @@ function readSingleLicense(filePath) {
   }
 }
 
-function writeLicenseEnvelope(envelope) {
-  const wrapped = { ...envelope, timestamp: Date.now() };
-  const body = JSON.stringify(wrapped);
+function writeLicenseFileRaw(obj) {
+  const body = JSON.stringify(obj);
   // كتابة في الموقعين
   try {
     const dir1 = path.dirname(getLicensePath());
@@ -119,6 +145,30 @@ function writeLicenseEnvelope(envelope) {
   } catch (e) { console.error('[license] فشل كتابة الموقع 2:', e.message); }
 }
 
+function writeLicenseEnvelope(envelope) {
+  writeLicenseFileRaw({ ...envelope, timestamp: Date.now() });
+}
+
+// إضافة/تجديد باقة مُفعّلة: نفس الباقة تُستبدل (تجديد بمدة ممتدة) وباقة جديدة تُضاف — دون مسح السابقة
+function upsertActivatedItem(payloadStr, sig) {
+  const existing = readLicenseFile();
+  let items = [];
+  if (existing && existing.type === 'activated-multi') {
+    items = existing.items.slice();
+  } else if (existing && existing.type === 'activated' && existing.payload) {
+    items = [{ payload: existing.payload, sig: existing.sig, timestamp: existing.timestamp || 0 }];
+  }
+  const tierOf = (payload) => { try { return (JSON.parse(payload) || {}).tier || null; } catch (_) { return null; } };
+  const newTier = tierOf(payloadStr);
+  if (!newTier) return { items, renewed: false };
+  const renewed = items.some(it => tierOf(it.payload) === newTier);
+  items = items.filter(it => tierOf(it.payload) !== newTier);
+  items.push({ payload: payloadStr, sig, timestamp: Date.now() });
+  if (items.length > 12) items = items.slice(-12);
+  writeLicenseFileRaw({ v: 2, items, timestamp: Date.now() });
+  return { items, renewed };
+}
+
 function startTrial() {
   const payloadStr = JSON.stringify({ trialStart: Date.now(), deviceId: getMachineId() });
   const sig = crypto.createHmac('sha256', TRIAL_PEPPER).update(payloadStr).digest('hex');
@@ -129,30 +179,57 @@ function startTrial() {
 function getState() {
   const license = readLicenseFile();
   const now = Date.now();
+  const myDevice = getShortDeviceId();
 
-  // 1. مُفعّل بترخيص مُوقَّع صالح؟
-  if (license && license.type === 'activated' && license.deviceId === getShortDeviceId()) {
-    if (license.expiry && now > license.expiry) {
+  // 1) باقات مُفعّلة متراكمة (v2) أو ترخيص مفرد قديم — كل باقة تُقرأ على حدة
+  let actItems = null; // [{tier, deviceId, expiry, issued}]
+  if (license && license.type === 'activated-multi') {
+    actItems = license.items
+      .map(it => { try { return JSON.parse(it.payload); } catch (_) { return null; } })
+      .filter(p => p && p.tier);
+  } else if (license && license.type === 'activated') {
+    actItems = [license];
+  }
+  if (actItems && actItems.length) {
+    const mine = actItems.filter(p => p.deviceId === myDevice);
+    const active = mine.filter(p => !p.expiry || now <= p.expiry);
+    const packages = mine.map(p => ({
+      tier: p.tier,
+      name: tierDisplayName(p.tier),
+      expiry: p.expiry || null,
+      expired: !!(p.expiry && now > p.expiry)
+    }));
+    if (active.length) {
+      const tiers = active.map(p => p.tier);
+      const primary = tiers.includes('full') ? 'full' : tiers[0];
+      const maxUsers = tiers.reduce((m, t) => {
+        const u = maxUsersForTier(t);
+        return (u === 0 || m === 0) ? 0 : Math.max(m, u);
+      }, 1);
       return {
-        status: 'expired',
-        tier: null,
-        deviceId: getShortDeviceId(),
-        message: 'انتهت صلاحية الترخيص — جدّد اشتراكك',
-        maxUsers: 0
+        status: 'activated',
+        tier: primary,
+        tiers,
+        packages,
+        deviceId: myDevice,
+        activatedAt: active[0].issued || null,
+        expiry: Math.max(...active.map(p => p.expiry || 0)) || null,
+        message: 'مُفعّل — ' + tiers.map(t => tierDisplayName(t)).join(' + '),
+        maxUsers
       };
     }
     return {
-      status: 'activated',
-      tier: license.tier || 'professional',
-      deviceId: getShortDeviceId(),
-      activatedAt: license.issued || null,
-      expiry: license.expiry || null,
-      message: 'مُفعّل — ' + tierDisplayName(license.tier || 'professional'),
-        maxUsers: maxUsersForTier(license.tier || 'professional')
+      status: 'expired',
+      tier: null,
+      tiers: [],
+      packages,
+      deviceId: myDevice,
+      message: 'انتهت صلاحية جميع الباقات — جدّد اشتراكك',
+      maxUsers: 0
     };
   }
 
-  // 2. نسخة تجريبية
+  // 2) نسخة تجريبية
   let trialStart = license?.trialStart;
   if (!trialStart) {
     // أول تشغيل: ابدأ التجربة
@@ -167,6 +244,8 @@ function getState() {
     return {
       status: 'expired',
       tier: null,
+      tiers: [],
+      packages: [],
       deviceId: getShortDeviceId(),
       trialStart,
       trialEnd,
@@ -178,6 +257,8 @@ function getState() {
   return {
     status: 'trial',
     tier: 'trial',
+    tiers: ['trial'],
+    packages: [],
     deviceId: getShortDeviceId(),
     trialStart,
     trialEnd,
@@ -242,14 +323,21 @@ let _sectionsCache = { tier: null, status: null, sections: null };
 
 function getAllowedSections() {
   const s = getState();
-  if (_sectionsCache.tier === s.tier && _sectionsCache.status === s.status && _sectionsCache.sections) {
+  const cacheKey = (s.tiers && s.tiers.length ? s.tiers : [s.tier]).join(',');
+  if (_sectionsCache.tier === cacheKey && _sectionsCache.status === s.status && _sectionsCache.sections) {
     return _sectionsCache.sections;
   }
   let sections;
   if (s.status === 'trial') sections = TIER_SECTIONS.trial;
+  else if (s.status === 'activated' && s.tiers && s.tiers.length) {
+    // اتحاد أقسام كل الباقات النشطة — المفتوح بأي باقة يبقى مفتوحاً
+    const set = new Set(ALWAYS_OPEN_SECTIONS);
+    s.tiers.forEach(t => (TIER_SECTIONS[t] || []).forEach(x => set.add(x)));
+    sections = Array.from(set);
+  }
   else if (s.status === 'activated' && s.tier && TIER_SECTIONS[s.tier]) sections = TIER_SECTIONS[s.tier];
   else sections = ALWAYS_OPEN_SECTIONS.slice(); // منتهي/غير معروف: الأساسيات فقط (الواجهة تمنع الباقي عبر licEnforce عموماً)
-  _sectionsCache = { tier: s.tier, status: s.status, sections: sections.slice() };
+  _sectionsCache = { tier: cacheKey, status: s.status, sections: sections.slice() };
   return _sectionsCache.sections;
 }
 
@@ -292,7 +380,7 @@ async function activate(keyStr) {
   const deviceId = getShortDeviceId();
   let r, j;
   try {
-    r = await fetch(LICENSE_SERVER, {
+    r = await fetch(getLicenseServer(), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'apikey': SB_KEY },
       body: JSON.stringify({ key: clean, deviceId })
@@ -311,7 +399,7 @@ async function activate(keyStr) {
     ok = crypto.verify(
       'RSA-SHA256',
       Buffer.from(payloadStr, 'utf8'),
-      crypto.createPublicKey({ key: LICENSE_PUBLIC_KEY, format: 'pem', type: 'spki' }),
+      crypto.createPublicKey({ key: getPublicKeyPem(), format: 'pem', type: 'spki' }),
       Buffer.from(j.license.sig, 'base64')
     );
   } catch (_) { ok = false; }
@@ -321,11 +409,14 @@ async function activate(keyStr) {
   if (payload.deviceId !== deviceId) return { success: false, error: 'هذا الترخيص مرتبط بجهاز آخر' };
   if (payload.expiry && Date.now() > payload.expiry) return { success: false, error: 'انتهت صلاحية هذا الكود' };
 
-  writeLicenseEnvelope({ payload: payloadStr, sig: j.license.sig });
+  // إضافة الباقة (أو تجديدها) دون مسح الباقات الأخرى المُفعّلة
+  const { items, renewed } = upsertActivatedItem(payloadStr, j.license.sig);
+  const pkgName = tierDisplayName(payload.tier);
   return {
     success: true,
     tier: payload.tier,
-    message: 'تم التفعيل بنجاح! شكراً لشراء ProQuote.'
+    tiers: items.map(it => { try { return (JSON.parse(it.payload) || {}).tier; } catch (_) { return null; } }).filter(Boolean),
+    message: (renewed ? 'تم تجديد «' + pkgName + '» بنجاح!' : 'تمت إضافة «' + pkgName + '» بنجاح! شكراً لشراء ProQuote.')
   };
 }
 
