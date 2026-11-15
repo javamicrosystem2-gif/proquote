@@ -115,8 +115,8 @@ async function run() {
     t = await js(`(function(){return window.proquote.license.sections().then(function(secs){return secs.indexOf('quotes')>=0&&secs.indexOf('purchase')>=0&&secs.indexOf('payments')<0&&secs.indexOf('clients')<0&&secs.indexOf('ei')<0})})()`);
     R('أقسام عروض الأسعار مفتوحة والباقي مقفول', t === true);
 
-    t = await js(`(function(){var hidden=0,shown=0;document.querySelectorAll('.sb-it').forEach(function(it){if(it.style.display==='none')hidden++;else shown++});return {hidden:hidden,shown:shown,blocked:!window._secGate('payments'),open:window._secGate('quotes')}})()`);
-    R('الشريط الجانبي: أقسام الباقة فقط + بوابة التنقل تعمل', !!(t && t.blocked && t.open && t.hidden > 0), t ? ('مخفي: ' + t.hidden + ' / ظاهر: ' + t.shown) : '');
+    t = await js(`(function(){var locked=0,shown=0,hidden=0;document.querySelectorAll('.sb-it').forEach(function(it){if(it.style.display==='none')hidden++;else if(it.classList.contains('sec-locked'))locked++;else shown++});return {locked:locked,shown:shown,hidden:hidden,blocked:!window._secGate('payments'),open:window._secGate('quotes')}})()`);
+    R('الشريط الجانبي: كل الأقسام ظاهرة — خارج الباقة مقفول بشارة القفل + البوابة تعمل', !!(t && t.blocked && t.open && t.locked > 0 && t.hidden === 0), t ? ('مقفول ظاهر: ' + t.locked + ' / مفتوح: ' + t.shown + ' / مخفي: ' + t.hidden) : '');
 
     // ===== السيناريو 4: إضافة باقة الأمور المالية من نافذة التراخيص =====
     await js(`(function(){try{openLicenseModal();return true}catch(e){return 'ERR:'+e.message}})()`);
@@ -168,7 +168,12 @@ async function run() {
     await pjs(`(function(){document.getElementById('genTier').value='mgmt';document.getElementById('genDevice').value='${deviceId}';genKey();return true})()`);
     const genKeyVal = await waitPanelKey(pjs);
     R('اللوحة ولّدت كوداً (v1.2) مقفولاً على معرف الجهاز', !!genKeyVal, genKeyVal || '');
-    const rowForGen = mock.getRows().find((r) => r.key === genKeyVal);
+    // انتظار وصول الصف للسيرفر (الرفع غير متزامن — بلا سباق زمني)
+    let rowForGen = null;
+    for (let i = 0; i < 16 && !rowForGen; i++) {
+      rowForGen = mock.getRows().find((r) => r.key === genKeyVal) || null;
+      if (!rowForGen) await sleep(300);
+    }
     R('الكود محفوظ بالسيرفر الوهمي بـ bound_device = معرف الجهاز', !!(rowForGen && rowForGen.bound_device === deviceId && rowForGen.tier === 'mgmt'));
 
     t = await js(`(function(){return window.proquote.license.activate('${genKeyVal}').then(function(r){return r.success})})()`);

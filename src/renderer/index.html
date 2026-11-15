@@ -109,6 +109,9 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg0);color:var(--t1);over
 .sb-it:hover{background:var(--bg3);color:var(--t1)}.sb-it.on{background:var(--acc2);color:var(--acc)}
 .sb-it.on::before{content:'';position:absolute;right:-8px;top:50%;transform:translateY(-50%);width:3px;height:16px;background:var(--acc);border-radius:0 3px 3px 0}
 .sb-it i{width:16px;text-align:center;font-size:13px}
+.sb-it.sec-locked{opacity:.48}
+.sb-it.sec-locked:hover{opacity:.8}
+.sb-it.sec-locked::after{content:'\f023';font-family:'Font Awesome 6 Free','Font Awesome 5 Free';font-weight:900;font-size:9px;color:var(--t3);margin-right:auto;padding-left:2px}
 .sb-badge{margin-right:auto;background:var(--acc);color:#000;font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px}
 .main{margin-right:252px;height:100vh;overflow-y:auto;background:var(--bg0)}
 .topbar{position:sticky;top:0;z-index:40;background:rgba(6,11,20,.88);backdrop-filter:blur(20px);border-bottom:1px solid var(--brd);padding:11px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
@@ -1528,7 +1531,8 @@ localStorage.setItem('pq5_usr',val);usrBoot();if(msg)msg.textContent='تم جل�
 function usrBoot(){var us=ld(K.usr);if(!us.length){try{_cldPullUsers().then(function(v){if(v){try{var u=JSON.parse(v);if(Array.isArray(u)&&u.length){localStorage.setItem('pq5_usr',v);usrBoot();return}}catch(e){}}})}catch(e){}}const b=document.getElementById('usrCnt');if(b)b.textContent=us.length;if(!us.length){document.getElementById('loginScreen').style.display='none';applySidebarVisibility();return}document.getElementById('loginScreen').style.display='flex';setTimeout(function(){const el=document.getElementById('loginU');if(el)el.focus()},150)}
 async function loginTry(){const u=(document.getElementById('loginU').value||'').trim().toLowerCase();const p=document.getElementById('loginP').value||'';const err=document.getElementById('loginErr');err.textContent='';if(!u||!p){err.textContent='أدخل اسم المستخدم والرمز';return}const us=ld(K.usr);const usr=us.find(function(x){return (x.username||'').toLowerCase()===u});if(!usr){err.textContent='اسم المستخدم غير موجود';return}if(usr.active===false){err.textContent='هذا الحساب موقوف — راجع المسؤول';return}const h=await _usrHash(usr.salt+p);if(h!==usr.pinHash){err.textContent='الرمز السري غير صحيح';return}_usrCur=usr;sessionStorage.setItem('pq5_uid',usr.id);document.getElementById('loginScreen').style.display='none';document.getElementById('loginP').value='';document.getElementById('loginU').value='';usrApplySession();toast('مرحباً '+usr.name,'ok')}
 function usrApplySession(){if(!_usrCur)return;document.getElementById('usrBar').style.display='';document.getElementById('usrBarName').textContent=_usrCur.name;document.getElementById('usrBarRole').textContent=(USR_ROLES[_usrCur.role]||{}).l||'';applySidebarVisibility();_usrApplyViewOnly(_usrCurSec)}
-// ===== رؤية الشريط الجانبي المدمجة: القسم يظهر فقط إن سمحت الباقة (الترخيص) وسمحت صلاحية المستخدم =====
+// ===== رؤية الشريط الجانبي: كل الأقسام تظل ظاهرة دائماً — صلاحية الموظف تخفي، والباقة تقفل (لا تخفي) =====
+// القسم المقفول بالباقة يبقى ظاهراً بشارة قفل تشجيعاً على الترقية، والدخول تمنعه بوابة _secGate
 function applySidebarVisibility(){
 document.querySelectorAll('.sb-it').forEach(function(it){
 var oc=it.getAttribute('onclick')||'';var m=oc.match(/go\('([^']+)'\)/);if(!m)return;
@@ -1536,7 +1540,8 @@ var sec=m[1];
 var byLic=(_licSections)?_licSections.has(sec):true;
 var byUsr=true;
 if(_usrCur){var v=_usrPerm(sec);byUsr=(v!=='none')}
-it.style.display=(byLic&&byUsr)?'':'none'})}
+it.style.display=byUsr?'':'none';
+if(byLic){it.classList.remove('sec-locked')}else{it.classList.add('sec-locked')}})}
 // ===== بوابة الأقسام حسب الباقة (الأقسام المسموحة من الترخيص الموقّع في الخلفية) =====
 var _licSections=null;
 var _licPkgName='';
@@ -1686,8 +1691,8 @@ return 'أرغب في الاشتراك بخطة '+t.en+' ('+t.l+') — '+( _subC
 async function subTelegram(k){const msg=await _subMsg(k);try{await navigator.clipboard.writeText(msg)}catch(e){}
 window.open('https://t.me/javamicro','_blank');toast('نُسخت رسالة الطلب — ألصقها في المحادثة','ok')}
 async function subEmail(k){const msg=await _subMsg(k);try{await navigator.clipboard.writeText(msg)}catch(e){}
-window.open('https://t.me/javamicro','_blank');
-toast('نُسخت رسالة الطلب — ألصقها في تيليجرام','ok')}
+window.open('mailto:amrnada@mail.ru?subject='+encodeURIComponent('طلب كود تفعيل ProQuote — باقة '+k)+'&body='+encodeURIComponent(msg),'_self');
+toast('فُتح البريد — الرسالة جاهزة بالإرسال (ونسخة منها بالحافظة)','ok')}
 async function subActivate(){const k=(document.getElementById('subKey').value||'').trim();if(!k){toast('ألصق كود التفعيل أولاً','er');return}try{const r=await window.proquote.license.activate(k);if(r&&r.success){toast('تم التفعيل بنجاح 🎉','ok');document.getElementById('subKey').value='';try{refreshLicenseBadge()}catch(e){}}else{toast((r&&r.error)||'كود غير صالح','er')}}catch(e){toast('تعذر التفعيل: '+e.message,'er')}}
 
 
@@ -3327,8 +3332,9 @@ w.document.close();setTimeout(function(){try{w.print()}catch(e){}},450)}
 // ===== بطاقات الباقات والشراء (PayPal + طلب الكود بالبريد) =====
 
 function licBuy(){const s=ls();const url=(s.paypalUrl||'').trim();if(!url){toast('\u0623\u0636\u0641 \u0631\u0627\u0628\u0637 PayPal \u0645\u0646 \u0627\u0644\u0625\u0639\u062F\u0627\u062F\u0627\u062A \u2190 \u0639\u0627\u0645 \u0623\u0648\u0644\u0627\u064B','er');return}window.open(url,'_blank')}
-function licRequestKey(n){const did=(_licenseState&&_licenseState.deviceId)||'\u2014';const sub=encodeURIComponent('\u0637\u0644\u0628 \u0643\u0648\u062F \u062A\u0641\u0639\u064A\u0644 ProQuote \u2014 \u0628\u0627\u0642\u0629 '+n);const body=encodeURIComponent('\u0627\u0644\u0633\u0644\u0627\u0645 \u0639\u0644\u064A\u0643\u0645\u060C\n\n\u0623\u0631\u063A\u0628 \u0641\u064A \u062A\u0641\u0639\u064A\u0644 \u0628\u0627\u0642\u0629: '+n+'\n\u0631\u0642\u0645 \u0627\u0644\u062C\u0647\u0627\u0632 (Device ID): '+did+'\n\u0627\u0644\u062A\u0627\u0631\u064A\u062E: '+new Date().toLocaleDateString('en-GB')+'\n\n\u062A\u0645 \u0627\u0644\u062F\u0641\u0639 \u0639\u0628\u0631 PayPal.\n\n\u0634\u0643\u0631\u0627\u064B');var _txt=decodeURIComponent(sub)+'\n\n'+decodeURIComponent(body);
+function licRequestKey(n){const did=(_licenseState&&_licenseState.deviceId)||'—';const sub=encodeURIComponent('طلب كود تفعيل ProQuote — باقة '+n);const body=encodeURIComponent('السلام عليكم،\n\nأرغب في تفعيل باقة: '+n+'\nرقم الجهاز (Device ID): '+did+'\nالتاريخ: '+new Date().toLocaleDateString('en-GB')+'\n\nتم الدفع عبر PayPal.\n\nشكراً');var _txt=decodeURIComponent(sub)+'\n\n'+decodeURIComponent(body);
 try{navigator.clipboard.writeText(_txt)}catch(e){}
+if(n==='em'){window.open('mailto:amrnada@mail.ru?subject='+sub+'&body='+body,'_self');toast('فُتح البريد — الرسالة جاهزة بالإرسال','ok');return}
 window.open('https://t.me/javamicro','_blank');
 toast('نُسخت رسالة الطلب — ألصقها في تيليجرام','ok')}
 // ============================================================

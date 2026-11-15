@@ -277,13 +277,13 @@ return {savedHidden:!!savedHidden,restoredHidden:restoredHidden,ok:!!savedHidden
   t = await js(`(function(){try{openLicenseModal();const html=document.getElementById('subPlans').innerHTML;const cards=(html.match(/subPay\\('/g)||[]).length;return {cards:cards, hasFull:html.includes('الأفضل قيمة'), hasDesc:html.includes('المناقصات')&&html.includes('إيصالات النقدية'), ok:cards===5&&html.includes('الأفضل قيمة')}}catch(e){return 'ERR:'+e.message}})()`);
   R('نافذة الاشتراك: 5 بطاقات بوصف الأقسام', t && t.ok === true, typeof t === 'string' ? t : JSON.stringify(t));
 
-  // 37) بوابة الأقسام: محاكاة باقة مالية (أقسام مالية+dash+settings فقط)
-  t = await js(`(function(){try{_licSections=new Set(['dash','settings','payments','receivables','rcpt']);_licPkgName='باقة الأمور المالية';licApplySections2();function licApplySections2(){};applySidebarVisibility();
-const hiddenQuotes=(function(){var el=Array.from(document.querySelectorAll('.sb-it')).find(function(i){return (i.getAttribute('onclick')||'').includes(\"go('quotes')\")});return el&&el.style.display==='none'})();
-const visPay=(function(){var el=Array.from(document.querySelectorAll('.sb-it')).find(function(i){return (i.getAttribute('onclick')||'').includes(\"go('payments')\")});return el&&el.style.display===''})();
+  // 37) بوابة الأقسام: محاكاة باقة مالية — خارج الباقة يبقى ظاهراً مقفولاً (قفل الترقية) وداخلها مفتوح
+  t = await js(`(function(){try{_licSections=new Set(['dash','settings','payments','receivables','rcpt']);_licPkgName='باقة الأمور المالية';applySidebarVisibility();
+const lockedQuotes=(function(){var el=Array.from(document.querySelectorAll('.sb-it')).find(function(i){return (i.getAttribute('onclick')||'').includes(\"go('quotes')\")});if(!el)return false;var c=String(getComputedStyle(el,'::after').content||'').replace(/"/g,'');return el.classList.contains('sec-locked')&&el.style.display!=='none'&&c.charCodeAt(0)===61475})();
+const openPay=(function(){var el=Array.from(document.querySelectorAll('.sb-it')).find(function(i){return (i.getAttribute('onclick')||'').includes(\"go('payments')\")});return el&&!el.classList.contains('sec-locked')&&el.style.display===''})();
 window._secGate=undefined;licApplySections();
-return {hiddenQuotes:hiddenQuotes, visPay:visPay, ok:hiddenQuotes&&visPay}}catch(e){return 'ERR:'+e.message}})()`);
-  R('البوابة: إخفاء خارج الباقة وإظهار داخلها بالشريط الجانبي', t && t.ok === true, typeof t === 'string' ? t : JSON.stringify(t));
+return {lockedQuotes:lockedQuotes, openPay:openPay, ok:lockedQuotes&&openPay}}catch(e){return 'ERR:'+e.message}})()`);
+  R('البوابة: خارج الباقة ظاهر بشارة قفل (ترقية) وداخلها مفتوح', t && t.ok === true, typeof t === 'string' ? t : JSON.stringify(t));
 
   // ===== الإصلاح G+H: إعادة تسمية المستندات والشركة =====
   // 38) إعادة تسمية مجلد مستندات + مستند داخل مجلد (كانتا معطلتين بسبب prompt)

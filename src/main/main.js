@@ -219,6 +219,21 @@ function createMainWindow() {
     return { action: 'allow' };
   });
 
+  // الروابط المنطلقة من داخل الصفحة نفسها (أيقونات البريد mailto: وأزرار location.href)
+  // بدون هذا المعالج تكون ميتة في Electron — will-navigate يُلغى ويُمرَّر للنظام
+  mainWindow.webContents.on('will-navigate', (e, url) => {
+    try {
+      if (!url || url.startsWith('file://')) return; // تنقّل داخلي عادي داخل التطبيق
+      e.preventDefault();
+      if (url.startsWith('mailto:') || url.startsWith('tel:')) { shell.openExternal(url).catch(() => {}); return; }
+      if (url.startsWith('http://') || url.startsWith('https://')) {
+        if (url.includes('wa.me')) { openWhatsAppLink(url); }
+        else if (url.includes('t.me/') || url.includes('web.telegram.org')) { openTelegramLink(url); }
+        else { shell.openExternal(url).catch(() => {}); }
+      }
+    } catch (_) {}
+  });
+
   // السماح بالكاميرا لقارئ QR في المزامنة (وسائط فقط)
   mainWindow.webContents.session.setPermissionRequestHandler((wc, permission, callback) => {
     callback(permission === 'media');
