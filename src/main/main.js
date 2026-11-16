@@ -34,6 +34,18 @@ if (LIC_PREVIEW_MODE) {
   try { require('../../shoot/probe-license').isolate(); } catch (e) { console.error('[lic-preview] isolation failed:', e.message); }
 }
 
+// وضع الفحص العملي للفاتورة الإلكترونية (--probe-einvoice): منظومة وهمية محلية
+const PROBE_EINVOICE_MODE = process.argv.includes('--probe-einvoice');
+if (PROBE_EINVOICE_MODE) {
+  try { require('../../shoot/probe-einvoice').isolate(); } catch (e) { console.error('[probe-einvoice] isolation failed:', e.message); }
+}
+
+// معاينة حية للفاتورة الإلكترونية (--ei-preview): منظومة وهمية والنافذة تبقى مفتوحة
+const EI_PREVIEW_MODE = process.argv.includes('--ei-preview');
+if (EI_PREVIEW_MODE) {
+  try { require('../../shoot/preview-einvoice').isolate(); } catch (e) { console.error('[ei-preview] isolation failed:', e.message); }
+}
+
 // وضع فحص التخزين (--dbtest): تشخيص بلا نافذة — ترحيل + تكافؤ + نسخ احتياطي ذهاباً وإياباً
 // مع PQTEST_USERDATA=<مجلد> يُوجَّه الفحص لمجلد معزول بدل بيانات المستخدم
 const DBTEST_MODE = process.argv.includes('--dbtest');
@@ -99,6 +111,7 @@ const updater = require('./updater');
 const productImport = require('./product-import');
 const filestore = require('./filestore');
 const dataMigrations = require('./data-migrations');
+const einvoice = require('./einvoice');
 
 // منع فتح أكثر من نافذة رئيسية
 let mainWindow = null;
@@ -373,6 +386,18 @@ app.whenReady().then(() => {
     return;
   }
 
+  // فحص الفاتورة الإلكترونية: منظومة وهمية + سيناريوهات كاملة ثم خروج
+  if (PROBE_EINVOICE_MODE) {
+    require('../../shoot/probe-einvoice').run();
+    return;
+  }
+
+  // معاينة حية للفاتورة الإلكترونية: نافذة مفتوحة للتجربة اليدوية
+  if (EI_PREVIEW_MODE) {
+    require('../../shoot/preview-einvoice').preview();
+    return;
+  }
+
   createMainWindow();
   buildMenu();
 
@@ -588,6 +613,18 @@ ipcMain.handle('license:getTier', () => license.getTier());
 ipcMain.handle('license:features', () => license.getAvailableFeatures());
 ipcMain.handle('license:sections', () => license.getAllowedSections());
 ipcMain.handle('license:sectionAllowed', (_evt, sec) => license.sectionAllowed(sec));
+
+// قنوات الفاتورة الإلكترونية v2 (منظومات متعددة + فحص اتصال + تقديم من الخلفية)
+ipcMain.handle('einvoice:authorities', () => einvoice.listAuthorities());
+ipcMain.handle('einvoice:list', () => einvoice.listProfiles());
+ipcMain.handle('einvoice:save', (_evt, p) => einvoice.saveProfile(p));
+ipcMain.handle('einvoice:delete', (_evt, id) => einvoice.deleteProfile(id));
+ipcMain.handle('einvoice:setDefault', (_evt, id) => einvoice.setDefaultProfile(id));
+ipcMain.handle('einvoice:migrate', (_evt, legacyCfg) => einvoice.migrateLegacy(legacyCfg));
+ipcMain.handle('einvoice:test', (_evt, id) => einvoice.testConnection(id));
+ipcMain.handle('einvoice:signerStatus', (_evt, id) => einvoice.signerStatus(id));
+ipcMain.handle('einvoice:submit', (_evt, profileId, doc) => einvoice.submitInvoice(profileId, doc));
+ipcMain.handle('einvoice:logs', () => einvoice.logs());
 
 
 // منع إنشاء نوافذ عرض إضافية غير مرغوبة تلقائياً

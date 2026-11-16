@@ -830,7 +830,8 @@ body[data-share-size="lg"] .btn-w.btn-sm i,body[data-share-size="lg"] .md-h .btn
 </div>
 </div><!-- الفاتورة الإلكترونية -->
 <div class="pg" id="p-ei">
-<div class="topbar"><div><h2 data-i18n="page.ei.title">الفاتورة الإلكترونية</h2><p data-i18n="page.ei.sub">الفواتير الضريبية الإلكترونية — منظومة الضرائب المصرية ETA وضرائب عالمية</p></div><div style="display:flex;gap:7px;flex-wrap:wrap"><div class="sbx"><i class="fas fa-search"></i><input class="fi" style="width:170px" placeholder="بحث..." id="sEi" oninput="rEiL()"></div><button class="btn btn-s btn-sm" onclick="openEiCfg()"><i class="fas fa-plug"></i>ربط الضرائب</button><button class="btn btn-p" onclick="openEi()"><i class="fas fa-file-circle-plus"></i>فاتورة جديدة</button></div></div>
+<div class="topbar"><div><h2 data-i18n="page.ei.title">الفاتورة الإلكترونية</h2><p data-i18n="page.ei.sub">الفواتير الضريبية الإلكترونية — منظومة الضرائب المصرية ETA وضرائب عالمية</p></div><div style="display:flex;gap:7px;flex-wrap:wrap"><div class="sbx"><i class="fas fa-search"></i><input class="fi" style="width:170px" placeholder="بحث..." id="sEi" oninput="rEiL()"></div><button class="btn btn-s btn-sm" onclick="openEiLogs()"><i class="fas fa-list-ul"></i>سجل العمليات</button><button class="btn btn-s btn-sm" onclick="openEiCfg()"><i class="fas fa-plug"></i>ربط الضرائب</button><button class="btn btn-p" onclick="openEi()"><i class="fas fa-file-circle-plus"></i>فاتورة جديدة</button></div></div>
+<div style="padding:0 24px" class="fi-in"><div id="eiStatus" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:10px 0 2px"></div></div>
 <div style="padding:20px 24px" class="fi-in"><div style="background:var(--bg3);border:1px solid var(--brd);border-radius:10px;overflow:visible"><table class="dt"><thead><tr><th>الرقم</th><th>التاريخ</th><th>المستلم</th><th>النوع</th><th>الإجمالي</th><th>الحالة</th><th style="text-align:center">إجراءات</th></tr></thead><tbody id="eiTb"><tr><td colspan="7" style="text-align:center;padding:28px;color:var(--t3)"><i class="fas fa-file-invoice" style="font-size:28px;opacity:.3;display:block;margin-bottom:6px"></i>لا توجد فواتير</td></tr></tbody></table></div></div>
 </div>
 
@@ -903,18 +904,32 @@ body[data-share-size="lg"] .btn-w.btn-sm i,body[data-share-size="lg"] .md-h .btn
 <div class="fg" style="margin-top:10px"><label class="fl">ملاحظات داخلية</label><input class="fi" id="eino"></div>
 </div><div class="md-f"><button class="btn btn-p" onclick="saveEi()"><i class="fas fa-save"></i>حفظ</button><button class="btn btn-s" onclick="saveEi(true)"><i class="fas fa-eye"></i>حفظ ومعاينة</button><button class="btn btn-s" onclick="cm('mEi')">إغلاق</button></div></div></div>
 
-<!-- مودال إعدادات ربط الضرائب -->
-<div class="mo" id="mEiCfg"><div class="md md-m"><div class="md-h"><h3><i class="fas fa-plug" style="color:var(--acc);margin-left:5px"></i>ربط منظومة الضرائب (ETA)</h3><button class="md-x" onclick="cm('mEiCfg')"><i class="fas fa-times"></i></button></div><div class="md-b">
+<!-- مودال إدارة منظومات الضرائب (متعددة الدول — ملفات متعددة) -->
+<div class="mo" id="mEiCfg"><div class="md md-m"><div class="md-h"><h3><i class="fas fa-plug" style="color:var(--acc);margin-left:5px"></i>ربط منظومات الضرائب</h3><button class="md-x" onclick="cm('mEiCfg')"><i class="fas fa-times"></i></button></div><div class="md-b">
+<div id="eiProfList"></div>
+<div id="eiProfForm" style="display:none;margin-top:12px;border-top:1px dashed var(--brd);padding-top:12px">
+<input type="hidden" id="eicId_">
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-<div class="fg"><label class="fl">البيئة</label><select class="fi" id="eicEnv"><option value="pre">تجريبية (Pre-production)</option><option value="prod">إنتاجية (Production)</option></select></div>
-<div class="fg"><label class="fl">كود النشاط الضريبي</label><input class="fi" id="eicAct" dir="ltr" style="text-align:left" placeholder="مثال: 4620"></div>
+<div class="fg"><label class="fl">المنظومة / الدولة</label><select class="fi" id="eicAuth" onchange="eiAuthChange()"><option value="eg-eta">🇪🇬 مصر — منظومة الفاتورة الإلكترونية ETA</option><option value="generic">🌍 منظومة أخرى (قالب عام لأي دولة)</option></select></div>
+<div class="fg"><label class="fl">اسم الملف / الفرع</label><input class="fi" id="eicLabel" placeholder="مثال: الفرع الرئيسي — القاهرة"></div>
+<div class="fg"><label class="fl">البيئة</label><select class="fi" id="eicEnv" onchange="eiEnvChange()"><option value="pre">تجريبية (Pre-production)</option><option value="prod">إنتاجية (Production)</option></select></div>
+<div class="fg"><label class="fl">الرقم الضريبي للمنشأة</label><input class="fi" id="eicTaxNum" dir="ltr" style="text-align:left" placeholder="يُستخدم بإرسال الفواتير"></div>
+<div id="eicUrlsWrap" style="display:none;grid-column:1/-1"><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+<div class="fg"><label class="fl">رابط المصادقة (Token URL) — <span id="eicEnvLbl">تجريبية</span></label><input class="fi" id="eicAuthUrl" dir="ltr" style="text-align:left" placeholder="https://…/connect/token"></div>
+<div class="fg"><label class="fl">رابط تقديم الفواتير (API URL)</label><input class="fi" id="eicApiUrl" dir="ltr" style="text-align:left" placeholder="https://…/documentsubmissions"></div>
+</div></div>
 <div class="fg"><label class="fl">Client ID</label><input class="fi" id="eicId" dir="ltr" style="text-align:left"></div>
-<div class="fg"><label class="fl">Client Secret</label><input class="fi" id="eicSec" type="password" dir="ltr" style="text-align:left"></div>
-<div class="fg" style="grid-column:1/-1"><label class="fl">مسار أداة التوقيع (EInvoicingSigner.exe) — اختياري</label><input class="fi" id="eicSigner" dir="ltr" style="text-align:left" placeholder="C:\Signer\EInvoicingSigner.exe"></div>
+<div class="fg"><label class="fl" id="eicSecLbl">Client Secret</label><input class="fi" id="eicSec" type="password" dir="ltr" style="text-align:left" placeholder="مشفّر وحفظ بأمان على جهازك"></div>
+<div class="fg" id="eicActWrap"><label class="fl">كود النشاط الضريبي</label><input class="fi" id="eicAct" dir="ltr" style="text-align:left" placeholder="مثال: 4620"></div>
+<div class="fg"><label class="fl">أداة التوقيع (توكن USB) — اختياري</label><div style="display:flex;gap:6px"><input class="fi" id="eicSigner" dir="ltr" style="text-align:left" placeholder="C:\Signer\EInvoicingSigner.exe"><button class="btn btn-s" style="flex:none" onclick="eiBrowseSigner()"><i class="fas fa-folder-open"></i></button></div></div>
 </div>
-<div style="font-size:10.5px;color:var(--t3);margin-top:8px;line-height:1.8">بدون أداة التوقيع تُحفظ الفاتورة محلياً بتوقيع مؤقت وتُوسم «غير مُقدمة» — للإرسال الرسمي وصل فلاشة التوقيع وراجع دليل docs/ONLINE-GUIDE.md</div>
-<div style="margin-top:12px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><b style="font-size:12px">أنواع الضرائب</b><button class="btn btn-s btn-xs" onclick="eiAddTaxDlg()"><i class="fas fa-plus"></i>ضريبة</button></div><div id="eiTaxList" style="background:var(--bg0);border:1px solid var(--brd);border-radius:8px;padding:6px 12px;max-height:180px;overflow:auto"></div></div>
-</div><div class="md-f"><button class="btn btn-p" onclick="saveEiCfg()"><i class="fas fa-save"></i>حفظ</button><button class="btn btn-s" onclick="cm('mEiCfg')">إغلاق</button></div></div></div>
+<div style="font-size:10.5px;color:var(--t3);margin-top:8px;line-height:1.8">بدون أداة التوقيع تُحفظ الفاتورة محلياً بتوقيع مؤقت — للإرسال الرسمي وصل فلاشة التوقيع. السر يُشفَّر بـ Windows DPAPI ولا يظهر بعد الحفظ.</div>
+</div>
+<div style="margin-top:12px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><b style="font-size:12px">أنواع الضرائب (لكل الدول)</b><button class="btn btn-s btn-xs" onclick="eiAddTaxDlg()"><i class="fas fa-plus"></i>ضريبة</button></div><div id="eiTaxList" style="background:var(--bg0);border:1px solid var(--brd);border-radius:8px;padding:6px 12px;max-height:180px;overflow:auto"></div></div>
+</div><div class="md-f"><button class="btn btn-p" onclick="eiSaveProfile()"><i class="fas fa-save"></i>حفظ الملف</button><button class="btn btn-s" onclick="eiFormTest()"><i class="fas fa-plug-circle-check"></i>اختبار الاتصال</button><button class="btn btn-s" onclick="eiProfFormHide()">إلغاء</button></div></div></div>
+
+<!-- مودال سجل عمليات الفاتورة الإلكترونية -->
+<div class="mo" id="mEiLogs"><div class="md md-m"><div class="md-h"><h3><i class="fas fa-list-ul" style="color:var(--acc);margin-left:5px"></i>سجل عمليات الفاتورة الإلكترونية</h3><button class="md-x" onclick="cm('mEiLogs')"><i class="fas fa-times"></i></button></div><div class="md-b"><div style="background:var(--bg3);border:1px solid var(--brd);border-radius:10px;max-height:420px;overflow:auto"><table class="dt"><thead><tr><th>الوقت</th><th>العملية</th><th>الملف</th><th>النتيجة</th><th>التفاصيل</th></tr></thead><tbody id="eiLogsTb"></tbody></table></div><div style="font-size:10.5px;color:var(--t3);margin-top:8px">يُحفظ آخر 100 عملية محلياً لدعمك الفني في تشخيص أي مشكلة بسرعة</div></div><div class="md-f"><button class="btn btn-s" onclick="eiRdrLogs()"><i class="fas fa-refresh"></i>تحديث</button><button class="btn btn-s" onclick="cm('mEiLogs')">إغلاق</button></div></div></div>
 
 <!-- مودال إضافة ضريبة -->
 <div class="mo" id="mEiTax"><div class="md md-s"><div class="md-h"><h3>إضافة نوع ضريبة</h3><button class="md-x" onclick="cm('mEiTax')"><i class="fas fa-times"></i></button></div><div class="md-b"><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px"><div class="fg"><label class="fl">الدولة</label><input class="fi" id="eitCountry" value="EG" dir="ltr"></div><div class="fg"><label class="fl">النوع الرئيسي</label><input class="fi" id="eitType" dir="ltr" placeholder="T1 / SALES_TAX"></div><div class="fg"><label class="fl">النوع الفرعي</label><input class="fi" id="eitSub" dir="ltr" placeholder="V009"></div><div class="fg"><label class="fl">الاسم</label><input class="fi" id="eitName"></div><div class="fg"><label class="fl">النسبة %</label><input type="number" class="fi" id="eitRate" dir="ltr" style="text-align:left"></div></div></div><div class="md-f"><button class="btn btn-p" onclick="cfEiTax()">إضافة</button><button class="btn btn-s" onclick="cm('mEiTax')">إلغاء</button></div></div></div>
@@ -1596,7 +1611,6 @@ function delUsr(id){if(!confirm('حذف هذا المستخدم نهائياً؟
 const EI_TAX_DEF=[{country:'EG',type:'T1',sub:'V009',name:'ضريبة القيمة المضافة 14%',rate:14},{country:'EG',type:'T1',sub:'V001',name:'قيمة مضافة 0% (تصدير)',rate:0},{country:'EG',type:'T4',sub:'W002',name:'خصم وإضافة — توريدات 1%',rate:1},{country:'EG',type:'T4',sub:'W004',name:'خصم وإضافة — خدمات 3%',rate:3}];
 function _eiTaxes(){const s=ls();if(!s.eiTaxes||!s.eiTaxes.length){s.eiTaxes=JSON.parse(JSON.stringify(EI_TAX_DEF));sv(K.s,s)}return s.eiTaxes}
 function _eiCfg(){return ls().eiCfg||{env:'pre',act:'',clientId:'',clientSecret:'',signer:''}}
-const EI_URLS={pre:{id:'https://id.preprod.eta.gov.eg/connect/token',api:'https://api.preprod.eta.gov.eg/api/v1/documentsubmissions'},prod:{id:'https://id.eta.gov.eg/connect/token',api:'https://api.invoicing.eta.gov.eg/api/v1.0/documentsubmissions'}};
 function rEiL(){const es=ld(K.ei);const b=document.getElementById('eiCnt');if(b){b.textContent=es.length;b.style.display=es.length?'':'none'}const se=(document.getElementById('sEi')?.value||'').toLowerCase();
 let fl=es.filter(function(x){return !se||(x.number||'').toLowerCase().includes(se)||((x.receiver&&x.receiver.name)||'').toLowerCase().includes(se)});fl.sort(function(a,b2){return (b2.at||0)-(a.at||0)});
 const tb=document.getElementById('eiTb');cntBadge();
@@ -1631,7 +1645,7 @@ sv(K.ei,es);cm('mEi');rEiL();if(preview)vEi(d.id)}
 function delEi(id){if(!confirm('حذف هذه الفاتورة؟'))return;sv(K.ei,ld(K.ei).filter(function(x){return x.id!==id}));rEiL();toast('تم حذف الفاتورة','ok')}
 function vEi(id){const x=ld(K.ei).find(function(z){return z.id===id});if(!x)return;const s=ls();const t=TP[s.template||'classic'];const qr=mkQR(x.number+'|'+(x.totalAmount||0),4);
 document.getElementById('pvC').innerHTML=`<div id="qPA" data-docnumber="${x.number}" style="background:#fff;color:#111;padding:30px;font-family:Tahoma,Arial,sans-serif;direction:rtl;max-width:740px;margin:0 auto">
-<div style="display:flex;justify-content:space-between;border-bottom:3px solid #00a885;padding-bottom:10px"><div><div style="font-size:20px;font-weight:900;color:#00a885">${s.companyName||''}</div><div style="font-size:11px">ض.ر: ${s.taxNumber||'—'} · نشاط: ${_eiCfg().act||'—'}</div></div><div style="text-align:left"><div style="font-size:18px;font-weight:900">فاتورة ضريبية إلكترونية</div><div style="font-size:12px">${x.number} · ${x.docType}</div><div style="font-size:11px">${fmtD(x.date)}</div></div></div>
+<div style="display:flex;justify-content:space-between;border-bottom:3px solid #00a885;padding-bottom:10px"><div><div style="font-size:20px;font-weight:900;color:#00a885">${s.companyName||''}</div><div style="font-size:11px">ض.ر: ${s.taxNumber||'—'} · نشاط: ${_eiActCode()||'—'}</div></div><div style="text-align:left"><div style="font-size:18px;font-weight:900">فاتورة ضريبية إلكترونية</div><div style="font-size:12px">${x.number} · ${x.docType}</div><div style="font-size:11px">${fmtD(x.date)}</div></div></div>
 <div style="display:flex;justify-content:space-between;margin:12px 0;font-size:12px"><div><b>المستلم:</b> ${x.receiver.name} (${x.receiver.type})<div>ض.ر: ${x.receiver.regN||'—'} · ${x.receiver.address||''}</div></div><div>${qr?`<img src="${qr}" style="width:80px;height:80px">`:''}</div></div>
 <table style="width:100%;border-collapse:collapse;font-size:11.5px"><thead><tr style="background:#e6f9f3"><th style="border:1px solid #ccc;padding:6px">#</th><th style="border:1px solid #ccc;padding:6px;text-align:right">الوصف</th><th style="border:1px solid #ccc;padding:6px">الكود</th><th style="border:1px solid #ccc;padding:6px">كمية</th><th style="border:1px solid #ccc;padding:6px">سعر</th><th style="border:1px solid #ccc;padding:6px">ضريبة</th><th style="border:1px solid #ccc;padding:6px">ق.الضريبة</th><th style="border:1px solid #ccc;padding:6px">إجمالي</th></tr></thead><tbody>
 ${(x.lines||[]).map((l,i)=>`<tr><td style="border:1px solid #ccc;padding:5px;text-align:center">${i+1}</td><td style="border:1px solid #ccc;padding:5px">${l.description}</td><td style="border:1px solid #ccc;padding:5px;text-align:center;direction:ltr">${l.code||'—'}</td><td style="border:1px solid #ccc;padding:5px;text-align:center">${l.qty}</td><td style="border:1px solid #ccc;padding:5px">${fmtN(l.price)}</td><td style="border:1px solid #ccc;padding:5px;text-align:center">${l.taxType}/${l.taxSub}</td><td style="border:1px solid #ccc;padding:5px">${fmtN(l.taxAmount)}</td><td style="border:1px solid #ccc;padding:5px;font-weight:700">${fmtN(l.total)}</td></tr>`).join('')}
@@ -1640,32 +1654,106 @@ ${(x.lines||[]).map((l,i)=>`<tr><td style="border:1px solid #ccc;padding:5px;tex
 ${x.status==='draft'?'<div style="margin-top:10px;text-align:center;font-size:11px;color:#c47f17;border:1px dashed #c47f17;border-radius:6px;padding:6px">مسودة محلية — غير مُقدمة للمنظومة</div>':''}
 </div>`;
 pvId=null;_pvCurDoc={kind:'einvoice',id:x.id};document.getElementById('pvGenBtns').style.display='none';var _mb3=document.getElementById('pvMfgBtn');if(_mb3)_mb3.style.display='none';om('mP')}
-function openEiCfg(){const cfg=_eiCfg();document.getElementById('eicEnv').value=cfg.env||'pre';document.getElementById('eicAct').value=cfg.act||'';document.getElementById('eicId').value=cfg.clientId||'';document.getElementById('eicSec').value=cfg.clientSecret||'';document.getElementById('eicSigner').value=cfg.signer||'';rdrEiTaxList();om('mEiCfg')}
+// ===== إدارة منظومات الفاتورة الإلكترونية (متعددة الدول — ملفات متعددة) =====
+var _eiProfiles=null,_eiLastAuto=0,_eiFormUrls={pre:{authUrl:'',apiUrl:''},prod:{authUrl:'',apiUrl:''}};
+function _eiApi(){return (window.proquote&&window.proquote.einvoice)||null}
+function _eiDef(){return (_eiProfiles||[]).find(function(p){return p.isDefault})||(_eiProfiles||[])[0]||null}
+function _eiActCode(){var d=_eiDef();return (d&&d.activityCode)||(_eiCfg().act)||'0000'}
+async function _eiBoot(){var api=_eiApi();if(!api)return;
+try{await api.migrate(ls().eiCfg||null)}catch(e){}
+try{_eiProfiles=await api.list()}catch(e){_eiProfiles=[]}
+_eiRdrStatus(null);
+var d=_eiDef();
+if(d&&Date.now()-_eiLastAuto>120000){_eiLastAuto=Date.now();_eiTest(d.id,true)}}
+function _eiRdrStatus(res){var el=document.getElementById('eiStatus');if(!el)return;var d=_eiDef();
+if(!d){el.innerHTML='<span class="stb st-grey"><span class="st-dot"></span>غير مُهيّأ</span><span style="font-size:11px;color:var(--t3)">لا يوجد ربط بمنظومة ضريبية</span><button class="btn btn-s btn-xs" onclick="openEiCfg()"><i class="fas fa-plug"></i> ابدأ الربط</button>';return}
+var t=res||d.lastTest||null;var cls,txt,hint='';
+if(!t){cls='st-grey';txt='لم يُفحص بعد'}
+else if(t.status==='checking'){cls='st-yellow';txt='جارٍ فحص الاتصال…'}
+else if(t.status==='connected'){cls='st-green';txt='متصل بالمنظومة';hint=' — استجابة '+t.latencyMs+'ms'}
+else{cls='st-red';txt='غير متصل';hint=' — '+(t.message||'')}
+el.innerHTML='<span class="stb '+cls+'"><span class="st-dot"></span>'+txt+'</span>'+(hint?'<span style="font-size:11px;color:var(--t3)">'+hint+'</span>':'')+'<span style="font-size:11px;color:var(--t3)">الملف: '+d.label+' ('+(d.env==='prod'?'فعلي':'تجريبي')+')</span><button class="btn btn-s btn-xs" onclick="eiTestDefault()"><i class="fas fa-rotate"></i> إعادة الفحص</button><span id="eiSign"></span>';
+_eiRdrSigner()}
+async function _eiRdrSigner(){var api=_eiApi();if(!api)return;try{var st=await api.signerStatus();var el=document.getElementById('eiSign');if(!el)return;
+if(!st.configured){el.innerHTML='<span class="stb st-grey" title="'+st.message+'" style="margin-right:6px"><span class="st-dot"></span>التوقيع: غير مطلوب</span>'}
+else if(st.exists){el.innerHTML='<span class="stb st-green" title="'+st.path+'" style="margin-right:6px"><span class="st-dot"></span>التوقيع: جاهز</span>'}
+else{el.innerHTML='<span class="stb st-red" title="'+st.message+'" style="margin-right:6px"><span class="st-dot"></span>التوقيع: غير مربوط</span>'}}catch(e){}}
+async function eiTestDefault(){var d=_eiDef();if(d)_eiTest(d.id)}
+async function _eiTest(id,auto){_eiRdrStatus({status:'checking'});
+try{var r=await _eiApi().test(id);try{_eiProfiles=await _eiApi().list()}catch(e){}_eiRdrStatus(r);
+if(!auto)toast(r.status==='connected'?('متصل ✓ — استجابة '+r.latencyMs+'ms'):('غير متصل: '+r.message),r.status==='connected'?'ok':'er')}catch(e){_eiRdrStatus({status:'disconnected',message:e.message})}}
+async function openEiCfg(){try{_eiProfiles=await _eiApi().list()}catch(e){};rdrEiTaxList();eiRdrProfList();eiProfFormHide();om('mEiCfg')}
+function eiRdrProfList(){var el=document.getElementById('eiProfList');if(!el)return;var ps=_eiProfiles||[];
+var AUTH={};try{AUTH={'eg-eta':'🇪🇬 مصر ETA','generic':'🌍 منظومة عامة'}}catch(e){}
+el.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><b style="font-size:12.5px">ملفات الربط ('+ps.length+')</b><button class="btn btn-p btn-xs" onclick="eiNewProfile()"><i class="fas fa-plus"></i> منظومة جديدة</button></div>'+
+(ps.length?ps.map(function(p){var t=p.lastTest||{};var st=t.status==='connected'?'<span class="stb st-green" style="font-size:9.5px"><span class="st-dot"></span>متصل</span>':t.status==='disconnected'?'<span class="stb st-red" style="font-size:9.5px"><span class="st-dot"></span>غير متصل</span>':'<span class="stb st-grey" style="font-size:9.5px"><span class="st-dot"></span>لم يُفحص</span>';
+var cid=(p.credsView&&p.credsView.clientId)?(String(p.credsView.clientId).slice(0,16)+'…'):'—';
+var sec=(p.credsView&&p.credsView.clientSecretSet)?'★ السر محفوظ مشفّراً':'السر: غير محفوظ';
+return '<div style="background:var(--bg2);border:1px solid '+(p.isDefault?'var(--acc)':'var(--brd)')+';border-radius:9px;padding:9px 12px;margin-bottom:7px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">'+
+'<div style="flex:1;min-width:180px"><div style="font-size:12.5px;font-weight:700">'+(p.isDefault?'⭐ ':'')+p.label+' <span style="font-size:10px;color:var(--t3)">('+(AUTH[p.authorityId]||p.authorityId)+' · '+(p.env==='prod'?'فعلي':'تجريبي')+')</span></div><div style="font-size:10px;color:var(--t3);margin-top:2px">Client ID: '+cid+' · '+sec+'</div></div>'+st+
+'<div style="display:flex;gap:4px">'+(p.isDefault?'':'<button class="btn btn-s btn-xs" title="تعيين افتراضياً" onclick="eiSetDefault(\''+p.id+'\')"><i class="fas fa-star"></i></button>')+'<button class="btn btn-s btn-xs" title="اختبار الاتصال" onclick="eiTestOne(\''+p.id+'\')"><i class="fas fa-plug-circle-check"></i></button><button class="btn btn-s btn-xs" title="تعديل" onclick="edEiProfile(\''+p.id+'\')"><i class="fas fa-pen"></i></button><button class="btn btn-d btn-xs" title="حذف" onclick="eiDelProfile(\''+p.id+'\')"><i class="fas fa-trash"></i></button></div></div>'}).join(''):'<div style="color:var(--t3);font-size:11.5px;text-align:center;padding:10px">لا توجد ملفات ربط — أضف منظومتك الأولى (مصر أو أي دولة)</div>')}
+function eiNewProfile(){_eiFillForm(null)}
+function edEiProfile(id){var p=(_eiProfiles||[]).find(function(x){return x.id===id});if(p)_eiFillForm(p)}
+function _eiFillForm(p){document.getElementById('eiProfForm').style.display='';
+document.getElementById('eicId_').value=p?p.id:'';
+document.getElementById('eicAuth').value=p?p.authorityId:'eg-eta';
+document.getElementById('eicLabel').value=p?p.label:'';
+document.getElementById('eicEnv').value=p?p.env:'pre';
+document.getElementById('eicTaxNum').value=p?(p.taxNumber||''):(ls().taxNumber||'');
+document.getElementById('eicId').value=(p&&p.credsView&&p.credsView.clientId)||'';
+var sec=document.getElementById('eicSec');sec.value='';sec.placeholder=(p&&p.credsView&&p.credsView.clientSecretSet)?'★★★★★★ محفوظ مشفّراً — اتركه فارغاً للإبقاء عليه':'مشفّر (Windows DPAPI) ولا يظهر بعد الحفظ';
+document.getElementById('eicAct').value=p?(p.activityCode||''):'';
+document.getElementById('eicSigner').value=p?(p.signerPath||''):'';
+_eiFormUrls=(p&&p.customUrls)?JSON.parse(JSON.stringify(p.customUrls)):{pre:{authUrl:'',apiUrl:''},prod:{authUrl:'',apiUrl:''}};
+eiAuthChange()}
+function eiAuthChange(){var custom=document.getElementById('eicAuth').value==='generic';
+document.getElementById('eicUrlsWrap').style.display=custom?'':'none';
+document.getElementById('eicActWrap').style.display=custom?'none':'';
+eiEnvChange()}
+function eiEnvChange(){var env=document.getElementById('eicEnv').value==='prod'?'prod':'pre';
+document.getElementById('eicEnvLbl').textContent=env==='prod'?'إنتاجية':'تجريبية';
+var u=_eiFormUrls[env]||{};
+document.getElementById('eicAuthUrl').value=u.authUrl||'';
+document.getElementById('eicApiUrl').value=u.apiUrl||''}
+function _eiFormUrlsSync(){var env=document.getElementById('eicEnv').value==='prod'?'prod':'pre';_eiFormUrls[env]={authUrl:(document.getElementById('eicAuthUrl').value||'').trim(),apiUrl:(document.getElementById('eicApiUrl').value||'').trim()}}
+async function eiSaveProfile(){if(!(document.getElementById('eicLabel').value||'').trim()){toast('أدخل اسم الملف (مثال: الفرع الرئيسي)','er');return null}
+_eiFormUrlsSync();
+var p={id:document.getElementById('eicId_').value||undefined,
+authorityId:document.getElementById('eicAuth').value,
+env:document.getElementById('eicEnv').value,
+label:document.getElementById('eicLabel').value.trim(),
+taxNumber:(document.getElementById('eicTaxNum').value||'').trim(),
+activityCode:(document.getElementById('eicAct').value||'').trim(),
+signerPath:(document.getElementById('eicSigner').value||'').trim(),
+creds:{clientId:(document.getElementById('eicId').value||'').trim(),clientSecret:document.getElementById('eicSec').value},
+customUrls:document.getElementById('eicAuth').value==='generic'?_eiFormUrls:null};
+try{var out=await _eiApi().save(p);_eiProfiles=await _eiApi().list();eiRdrProfList();eiProfFormHide();_eiRdrStatus(null);toast('حُفظ ملف الربط ✓','ok');return out.id}catch(e){toast('فشل الحفظ: '+e.message,'er');return null}}
+function eiProfFormHide(){var f=document.getElementById('eiProfForm');if(f)f.style.display='none'}
+async function eiDelProfile(id){if(!confirm('حذف هذا الملف من الربط؟'))return;try{await _eiApi().remove(id);_eiProfiles=await _eiApi().list();eiRdrProfList();_eiRdrStatus(null)}catch(e){toast('تعذّر الحذف','er')}}
+async function eiSetDefault(id){try{await _eiApi().setDefault(id);_eiProfiles=await _eiApi().list();eiRdrProfList();_eiRdrStatus(null);toast('أصبح الملف الافتراضي للإرسال ✓','ok')}catch(e){}}
+async function eiTestOne(id){toast('جارٍ فحص الاتصال…','in');try{var r=await _eiApi().test(id);_eiProfiles=await _eiApi().list();eiRdrProfList();_eiRdrStatus(r);toast(r.status==='connected'?('متصل ✓ ('+r.latencyMs+'ms)'):('غير متصل: '+r.message),r.status==='connected'?'ok':'er')}catch(e){toast('تعذّر الفحص: '+e.message,'er')}}
+async function eiFormTest(){var nid=await eiSaveProfile();if(nid)eiTestOne(nid)}
+async function eiBrowseSigner(){try{var r=await window.proquote.showOpenDialog({title:'اختر أداة التوقيع',filters:[{name:'أداة التوقيع',extensions:['exe']},{name:'كل الملفات',extensions:['*']}],properties:['openFile']});if(r&&!r.canceled&&r.filePaths&&r.filePaths[0]){document.getElementById('eicSigner').value=r.filePaths[0]}}catch(e){toast('تعذّر اختيار الملف','er')}}
+async function openEiLogs(){await eiRdrLogs();om('mEiLogs')}
+async function eiRdrLogs(){var el=document.getElementById('eiLogsTb');if(!el)return;var api=_eiApi();
+if(!api){el.innerHTML='<tr><td colspan="5" style="text-align:center;color:var(--t3)">متاح في نسخة الكمبيوتر</td></tr>';return}
+try{var rows=await api.logs();
+el.innerHTML=(rows||[]).map(function(l){var c=(l.status==='connected'||l.status==='accepted'||l.status==='ok')?'st-green':(l.status==='disconnected'||l.status==='rejected')?'st-red':'st-grey';
+return '<tr><td style="font-size:10.5px;color:var(--t3)" dir="ltr">'+new Date(l.at).toLocaleString('en-GB')+'</td><td style="font-size:11.5px;font-weight:600">'+l.action+'</td><td style="font-size:11px">'+l.label+'</td><td><span class="stb '+c+'"><span class="st-dot"></span>'+l.status+'</span></td><td style="font-size:10.5px;color:var(--t3);max-width:260px;word-break:break-word">'+(l.message||'')+'</td></tr>'}).join('')||'<tr><td colspan="5" style="text-align:center;color:var(--t3)">لا توجد عمليات بعد</td></tr>'}catch(e){el.innerHTML='<tr><td colspan="5" style="text-align:center;color:var(--red)">تعذّر التحميل</td></tr>'}}
 function rdrEiTaxList(){const l=document.getElementById('eiTaxList');if(!l)return;l.innerHTML=_eiTaxes().map(function(t,i){return '<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px dashed var(--brd);font-size:11.5px"><span><b style="color:var(--acc)">'+t.type+'/'+t.sub+'</b> '+t.name+' <span style="color:var(--t3)">('+t.country+' · '+t.rate+'%)</span></span><i class="fas fa-times" style="cursor:pointer;color:var(--red);font-size:10px" onclick="rmEiTax('+i+')"></i></div>'}).join('')||'<div style="color:var(--t3);font-size:11px">لا توجد ضرائب</div>'}
 function eiAddTaxDlg(){document.getElementById('eitCountry').value='EG';document.getElementById('eitType').value='';document.getElementById('eitSub').value='';document.getElementById('eitName').value='';document.getElementById('eitRate').value='';om('mEiTax')}
 function cfEiTax(){const t={country:document.getElementById('eitCountry').value.trim()||'EG',type:document.getElementById('eitType').value.trim()||'T1',sub:document.getElementById('eitSub').value.trim()||'V009',name:document.getElementById('eitName').value.trim()||'ضريبة',rate:parseFloat(document.getElementById('eitRate').value)||0};const s=ls();s.eiTaxes=s.eiTaxes||[];s.eiTaxes.push(t);sv(K.s,s);cm('mEiTax');rdrEiTaxList();toast('تمت إضافة الضريبة','ok')}
 function rmEiTax(i){const s=ls();s.eiTaxes=(s.eiTaxes||[]);s.eiTaxes.splice(i,1);sv(K.s,s);rdrEiTaxList()}
-function saveEiCfg(){const s=ls();s.eiCfg={env:document.getElementById('eicEnv').value,act:document.getElementById('eicAct').value.trim(),clientId:document.getElementById('eicId').value.trim(),clientSecret:document.getElementById('eicSec').value.trim(),signer:document.getElementById('eicSigner').value.trim()};sv(K.s,s);cm('mEiCfg');toast('تم حفظ إعدادات الربط','ok')}
-function _eiBuildDoc(x){const s=ls();const cfg=_eiCfg();const now=new Date();const iso=now.toISOString().split('.')[0]+'Z';
-return {issuer:{address:{country:'EG',governate:'Cairo',regionCity:'Cairo',street:s.companyAddress||'',buildingNumber:'0'},type:'B',id:s.taxNumber||'',name:s.companyName||''},receiver:{address:{country:'EG',governate:'Cairo',regionCity:'Cairo',street:'',buildingNumber:'0'},type:x.receiver.type,id:x.receiver.regN||'',name:x.receiver.name},documentType:x.docType||'I',documentTypeVersion:'1.0',dateTimeIssued:iso,taxpayerActivityCode:cfg.act||'0000',internalId:x.number,invoiceLines:(x.lines||[]).map(function(l){return{description:l.description,itemCode:l.code||'EGS-UNKNOWN',unitType:{code:'EA'},quantity:l.qty,internalCode:l.code,internalCode_:undefined,salesTotal:Math.round(l.qty*l.price*100)/100,total:Math.round(l.total*100000)/100000,valueDifference:0,taxableFees:0,itemsDiscount:0,unitValue:{currencySold:'EGP',amountEGP:Math.round(l.price*100000)/100000},net:Math.round(l.qty*l.price*100)/1000000*0+Math.round(l.qty*l.price*100000)/100000,invoiceLineTaxes:[{taxType:l.taxType,subType:l.taxSub,rate:l.taxRate,amount:Math.round(l.taxAmount*100000)/100000}]}}),totalDiscountAmount:0,totalSalesAmount:Math.round(x.totalSales*100000)/100000,netAmount:Math.round(x.totalSales*100000)/100000,taxTotals:Object.keys(x.taxTotals||{}).map(function(k){return{taxType:k,amount:Math.round(x.taxTotals[k]*100000)/100000}}),totalAmount:Math.round(x.totalAmount*100000)/100000,totalItemsCount:(x.lines||[]).length}}
+function _eiBuildDoc(x){const s=ls();const d=_eiDef();const now=new Date();const iso=now.toISOString().split('.')[0]+'Z';
+return {issuer:{address:{country:'EG',governate:'Cairo',regionCity:'Cairo',street:s.companyAddress||'',buildingNumber:'0'},type:'B',id:s.taxNumber||(d&&d.taxNumber)||'',name:s.companyName||''},receiver:{address:{country:'EG',governate:'Cairo',regionCity:'Cairo',street:'',buildingNumber:'0'},type:x.receiver.type,id:x.receiver.regN||'',name:x.receiver.name},documentType:x.docType||'I',documentTypeVersion:'1.0',dateTimeIssued:iso,taxpayerActivityCode:_eiActCode(),internalId:x.number,invoiceLines:(x.lines||[]).map(function(l){return{description:l.description,itemCode:l.code||'EGS-UNKNOWN',unitType:{code:'EA'},quantity:l.qty,internalCode:l.code,internalCode_:undefined,salesTotal:Math.round(l.qty*l.price*100)/100,total:Math.round(l.total*100000)/100000,valueDifference:0,taxableFees:0,itemsDiscount:0,unitValue:{currencySold:'EGP',amountEGP:Math.round(l.price*100000)/100000},net:Math.round(l.qty*l.price*100)/1000000*0+Math.round(l.qty*l.price*100000)/100000,invoiceLineTaxes:[{taxType:l.taxType,subType:l.taxSub,rate:l.taxRate,amount:Math.round(l.taxAmount*100000)/100000}]}}),totalDiscountAmount:0,totalSalesAmount:Math.round(x.totalSales*100000)/100000,netAmount:Math.round(x.totalSales*100000)/100000,taxTotals:Object.keys(x.taxTotals||{}).map(function(k){return{taxType:k,amount:Math.round(x.taxTotals[k]*100000)/100000}}),totalAmount:Math.round(x.totalAmount*100000)/100000,totalItemsCount:(x.lines||[]).length}}
 async function sendEi(id){const es=ld(K.ei);const x=es.find(function(z){return z.id===id});if(!x)return;
-const cfg=_eiCfg();if(!window.proquote||!window.proquote.eiRequest){toast('الإرسال متاح في نسخة الكمبيوتر فقط','er');return}
-if(!cfg.clientId||!cfg.clientSecret){toast('أكمل بيانات الربط (Client ID/Secret) من زر «ربط الضرائب»','er');return}
-toast('جارٍ جلب رمز الدخول من المنظومة…','in');
-try{
-const body='grant_type=client_credentials&client_id='+encodeURIComponent(cfg.clientId)+'&client_secret='+encodeURIComponent(cfg.clientSecret);
-const tok=await window.proquote.eiRequest({url:EI_URLS[cfg.env||'pre'].id,method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:body});
-let token=null;try{token=JSON.parse(tok.body).access_token}catch(e){}
-if(!token){x.status='rejected';x.statusMessage='فشل توليد رمز الدخول — راجع بيانات الاعتماد';sv(K.ei,es);rEiL();toast(x.statusMessage,'er');return}
-const doc=_eiBuildDoc(x);const docStr=JSON.stringify(doc);
-let sig=null;if(cfg.signer){toast('جارٍ التوقيع عبر أداة الفلاشة…','in');const sr=await window.proquote.eiSign(cfg.signer,docStr);if(sr&&sr.ok){try{sig=JSON.parse(sr.out)}catch(e){}}}
-if(!sig){sig={signatureType:'I',value:'LOCAL-UNSIGNED-'+Date.now()};toast('لم تُنفَّذ أداة التوقيع — ستُرسل بتوقيع مؤقت (غير معتمد رسمياً)','in')}
-doc.signatures=[sig];
-toast('جارٍ إرسال الفاتورة…','in');
-const res=await window.proquote.eiRequest({url:EI_URLS[cfg.env||'pre'].api,method:'POST',headers:{'Authorization':'Bearer '+token,'Content-Type':'application/json'},body:JSON.stringify({documents:[doc]})});
-let rd={};try{rd=JSON.parse(res.body)}catch(e){}
-if(res.ok){x.status='signed';x.submissionId=rd.submissionId||null;const acc=(rd.acceptedDocuments||[])[0];const rej=(rd.rejectedDocuments||[])[0];if(acc){x.status='accepted';x.statusMessage=null;toast('قُبلت الفاتورة — إرسال: '+(rd.submissionId||''),'ok')}else if(rej){x.status='rejected';x.statusMessage='رفض: '+((rej.error&&rej.error.details&&rej.error.details[0]&&rej.error.details[0].message)||'غير محدد');toast(x.statusMessage,'er')}else{toast('أُرسلت — تتبع برقم: '+(rd.submissionId||''),'ok')}}
-else{x.status='rejected';x.statusMessage='HTTP '+res.status+' — '+(res.body||'').slice(0,180);toast('فشل الإرسال: HTTP '+res.status,'er')}
+if(!window.proquote||!window.proquote.einvoice){toast('الإرسال متاح في نسخة الكمبيوتر فقط','er');return}
+var d=_eiDef();if(!d){toast('لا يوجد ملف ربط — ابدأ من «ربط الضرائب»','er');try{openEiCfg()}catch(e){};return}
+toast('جارٍ الإرسال عبر «'+d.label+'» ('+(d.env==='prod'?'فعلي':'تجريبي')+')…','in');
+try{const r=await window.proquote.einvoice.submit(d.id,_eiBuildDoc(x));
+if(r.ok&&r.status==='accepted'){x.status='accepted';x.submissionId=r.submissionId||null;x.statusMessage=null;toast('قُبلت الفاتورة — إرسال: '+(r.submissionId||''),'ok')}
+else if(r.ok&&r.status==='rejected'){x.status='rejected';x.submissionId=r.submissionId||null;x.statusMessage=r.message||'رفضت المنظومة المستند';toast(x.statusMessage,'er')}
+else{x.status='rejected';x.statusMessage=r.error||'فشل الإرسال';toast(r.error||'فشل الإرسال','er')}
 sv(K.ei,es);rEiL()}catch(e){x.status='rejected';x.statusMessage=e.message||'خطأ';sv(K.ei,es);rEiL();toast('خطأ بالإرسال: '+e.message,'er')}}
 
 // ===== الاشتراكات =====
@@ -1699,7 +1787,7 @@ async function subActivate(){const k=(document.getElementById('subKey').value||'
 
 
 function licReqWa(){try{licRequestKey&&licRequestKey('wa')}catch(e){}}
-function go(p){if(p==='sub'){try{openLicenseModal()}catch(e){};return}if(window._licBlocked){toast('فعّل الترخيص أولاً للمتابعة',"er");return}if(window._secGate&&!window._secGate(p))return;if(window._usrGate&&!_usrGate(p))return;document.querySelectorAll('.pg').forEach(e=>e.classList.remove('on'));document.querySelectorAll('.sb-it').forEach(e=>e.classList.remove('on'));const pg=document.getElementById('p-'+p);if(pg){pg.classList.add('on');const f=pg.querySelector(':scope>.topbar+*');if(f){f.classList.remove('fi-in');void f.offsetWidth;f.classList.add('fi-in')}}document.querySelectorAll('.sb-it').forEach(i=>{if(i.getAttribute('onclick')?.includes(p))i.classList.add('on')});_usrCurSec=p;if(p==='dash')updDash();if(p==='quotes')rql();if(p==='tech')rTfL();if(p==='receipt')rRcL();if(p==='custom'){rCuL();rCuTypesL();}if(p==='full')rFlL();if(p==='clients')rCG();if(p==='products')rPT();if(p==='warehouse')rWhL();if(p==='tenders')rTdL();if(p==='shipping'){rShpL();rCrL();}if(p==='auth'){rAuL();rAuTypesL();}if(p==='io')rIoL();if(p==='mfg')rMfgL();if(p==='notes')rNtL();if(p==='emp')rEmpL();if(p==='rcpt')rRcptL();if(p==='documents')rDcL();if(p==='samples')rSaL();if(p==='purchase')rPoL();if(p==='supply')rSoL();if(p==='returns')rRtL();if(p==='payments')rPayL();if(p==='receivables')rRecL();if(p==='ei')rEiL();if(p==='company')rCompL();;if(p==='adm')rAdmL();if(p==='settings'){ldSF();rTG();try{rdrThemes()}catch(e){};try{ldStampSig()}catch(e){};try{rdrPlansAdmin()}catch(e){}}document.getElementById('MC').scrollTop=0}
+function go(p){if(p==='sub'){try{openLicenseModal()}catch(e){};return}if(window._licBlocked){toast('فعّل الترخيص أولاً للمتابعة',"er");return}if(window._secGate&&!window._secGate(p))return;if(window._usrGate&&!_usrGate(p))return;document.querySelectorAll('.pg').forEach(e=>e.classList.remove('on'));document.querySelectorAll('.sb-it').forEach(e=>e.classList.remove('on'));const pg=document.getElementById('p-'+p);if(pg){pg.classList.add('on');const f=pg.querySelector(':scope>.topbar+*');if(f){f.classList.remove('fi-in');void f.offsetWidth;f.classList.add('fi-in')}}document.querySelectorAll('.sb-it').forEach(i=>{if(i.getAttribute('onclick')?.includes(p))i.classList.add('on')});_usrCurSec=p;if(p==='dash')updDash();if(p==='quotes')rql();if(p==='tech')rTfL();if(p==='receipt')rRcL();if(p==='custom'){rCuL();rCuTypesL();}if(p==='full')rFlL();if(p==='clients')rCG();if(p==='products')rPT();if(p==='warehouse')rWhL();if(p==='tenders')rTdL();if(p==='shipping'){rShpL();rCrL();}if(p==='auth'){rAuL();rAuTypesL();}if(p==='io')rIoL();if(p==='mfg')rMfgL();if(p==='notes')rNtL();if(p==='emp')rEmpL();if(p==='rcpt')rRcptL();if(p==='documents')rDcL();if(p==='samples')rSaL();if(p==='purchase')rPoL();if(p==='supply')rSoL();if(p==='returns')rRtL();if(p==='payments')rPayL();if(p==='receivables')rRecL();if(p==='ei'){rEiL();try{_eiBoot()}catch(e){}}if(p==='company')rCompL();;if(p==='adm')rAdmL();if(p==='settings'){ldSF();rTG();try{rdrThemes()}catch(e){};try{ldStampSig()}catch(e){};try{rdrPlansAdmin()}catch(e){}}document.getElementById('MC').scrollTop=0}
 function stab(t){document.querySelectorAll('.stab').forEach(e=>e.classList.remove('on'));document.querySelectorAll('.spanel').forEach(e=>e.classList.remove('on'));document.querySelector(`.stab[onclick*="${t}"]`)?.classList.add('on');document.getElementById('sp-'+t)?.classList.add('on');if(t==='tpl')rTG();if(t==='company')ldLogo()}
 function om(id){if(window._omGate&&!_omGate(id))return;document.getElementById(id).classList.add('show');document.body.style.overflow='hidden'}
 function cm(id){document.getElementById(id).classList.remove('show');document.body.style.overflow='';if(id==='licLock'){var lk=document.getElementById('licLock');if(lk)lk.style.display='none'}else{try{licEnforce()}catch(e){}}}
@@ -4745,6 +4833,7 @@ bar.innerHTML=parts.join('');bar.style.display=parts.length?'flex':'none'}
 
 try { updDash(); } catch(e) { console.error('updDash error:', e); }
 try { refreshLicenseBadge(); } catch(e) { console.error('license badge err', e); }
+try { _eiBoot(); } catch(e) { } // فحص اتصال الفاتورة الإلكترونية تلقائياً عند فتح البرنامج
 setInterval(function(){try{saRenderAlerts()}catch(e){}},3600000);
 // ===== المزامنة السحابية (Supabase REST — أونلاين/أوفلاين) =====
 const CLD={on:false,url:'',key:'',dev:'',snap:null,busy:false,lastSync:null};

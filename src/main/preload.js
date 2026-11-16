@@ -124,6 +124,20 @@ contextBridge.exposeInMainWorld('proquote', {
   eiRequest: (opts) => ipcRenderer.invoke('ei:request', opts),
   eiSign: (signerPath, docJson) => ipcRenderer.invoke('ei:sign', signerPath, docJson),
 
+  // ---------- الفاتورة الإلكترونية v2 (منظومات متعددة الدول) ----------
+  einvoice: {
+    authorities: () => ipcRenderer.invoke('einvoice:authorities'),
+    list: () => ipcRenderer.invoke('einvoice:list'),
+    save: (p) => ipcRenderer.invoke('einvoice:save', p),
+    remove: (id) => ipcRenderer.invoke('einvoice:delete', id),
+    setDefault: (id) => ipcRenderer.invoke('einvoice:setDefault', id),
+    migrate: (legacyCfg) => ipcRenderer.invoke('einvoice:migrate', legacyCfg),
+    test: (id) => ipcRenderer.invoke('einvoice:test', id),
+    signerStatus: (id) => ipcRenderer.invoke('einvoice:signerStatus', id),
+    submit: (profileId, doc) => ipcRenderer.invoke('einvoice:submit', profileId, doc),
+    logs: () => ipcRenderer.invoke('einvoice:logs')
+  },
+
   onMenuNewQuote: (callback) => {
     const handler = () => callback();
     ipcRenderer.on('menu-new-quote', handler);
