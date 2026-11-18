@@ -34,6 +34,12 @@ if (LIC_PREVIEW_MODE) {
   try { require('../../shoot/probe-license').isolate(); } catch (e) { console.error('[lic-preview] isolation failed:', e.message); }
 }
 
+// وضع الفحص الحي لقسم المخزن والإدخال المتعدد (--probe-warehouse)
+const PROBE_WAREHOUSE_MODE = process.argv.includes('--probe-warehouse');
+if (PROBE_WAREHOUSE_MODE) {
+  try { require('../../shoot/probe-warehouse').isolate(); } catch (e) { console.error('[probe-warehouse] isolation failed:', e.message); }
+}
+
 // وضع الفحص العملي للفاتورة الإلكترونية (--probe-einvoice): منظومة وهمية محلية
 const PROBE_EINVOICE_MODE = process.argv.includes('--probe-einvoice');
 if (PROBE_EINVOICE_MODE) {
@@ -383,6 +389,12 @@ app.whenReady().then(() => {
   // معاينة حية للتراخيص: نافذة مفتوحة للتجربة اليدوية
   if (LIC_PREVIEW_MODE) {
     require('../../shoot/probe-license').preview();
+    return;
+  }
+
+  // فحص المخزن: إدخال متعدد + منتقى موحد + إنشاء أصناف تلقائي
+  if (PROBE_WAREHOUSE_MODE) {
+    require('../../shoot/probe-warehouse').run();
     return;
   }
 
