@@ -155,6 +155,8 @@ body[data-share-size="lg"] .sh-ic{font-size:16px!important}
 body[data-share-size="md"] .btn-w.btn-sm i,body[data-share-size="md"] .md-h .btn-w i{font-size:16px!important}
 body[data-share-size="lg"] .btn-w.btn-sm i,body[data-share-size="lg"] .md-h .btn-w i{font-size:20px!important}
 .mo{position:fixed;inset:0;background:rgba(0,0,0,.72);backdrop-filter:blur(4px);z-index:9999;display:none;align-items:center;justify-content:center;padding:16px}
+/* نافذة اختيار الطابعة: فوق كل النوافذ المفتوحة (تُفتح فوق المعاينة ونافذة الطباعة) */
+#mPrnPick{z-index:10050}
 .mo.show{display:flex}
 .md{background:var(--bg1);border:1px solid var(--brd);border-radius:14px;width:100%;max-height:90vh;overflow-y:auto;animation:mdIn .3s ease}
 .md-s{max-width:450px}.md-m{max-width:640px}.md-l{max-width:860px}.md-xl{max-width:1060px}
@@ -931,6 +933,13 @@ body[data-share-size="lg"] .btn-w.btn-sm i,body[data-share-size="lg"] .md-h .btn
 <!-- مودال سجل عمليات الفاتورة الإلكترونية -->
 <div class="mo" id="mEiLogs"><div class="md md-m"><div class="md-h"><h3><i class="fas fa-list-ul" style="color:var(--acc);margin-left:5px"></i>سجل عمليات الفاتورة الإلكترونية</h3><button class="md-x" onclick="cm('mEiLogs')"><i class="fas fa-times"></i></button></div><div class="md-b"><div style="background:var(--bg3);border:1px solid var(--brd);border-radius:10px;max-height:420px;overflow:auto"><table class="dt"><thead><tr><th>الوقت</th><th>العملية</th><th>الملف</th><th>النتيجة</th><th>التفاصيل</th></tr></thead><tbody id="eiLogsTb"></tbody></table></div><div style="font-size:10.5px;color:var(--t3);margin-top:8px">يُحفظ آخر 100 عملية محلياً لدعمك الفني في تشخيص أي مشكلة بسرعة</div></div><div class="md-f"><button class="btn btn-s" onclick="eiRdrLogs()"><i class="fas fa-refresh"></i>تحديث</button><button class="btn btn-s" onclick="cm('mEiLogs')">إغلاق</button></div></div></div>
 
+<!-- مودال اختيار الطابعة (ذاكرة لكل قسم — أول طباعة فقط) -->
+<div class="mo" id="mPrnPick"><div class="md md-s"><div class="md-h"><h3><i class="fas fa-print" style="color:var(--acc);margin-left:5px"></i>اختر الطابعة</h3><button class="md-x" onclick="cm('mPrnPick')"><i class="fas fa-times"></i></button></div><div class="md-b">
+<div style="font-size:11px;color:var(--t3);margin-bottom:8px" id="prnCtxLbl">—</div>
+<div class="fg"><label class="fl">الطابعة</label><select class="fi" id="prnSel" style="width:100%"><option>جارٍ جلب الطابعات…</option></select></div>
+<label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:11.5px;color:var(--t2);margin:8px 0"><input type="checkbox" id="prnRemember" checked style="accent-color:var(--acc)"><i class="fas fa-memory" style="font-size:10px;color:var(--acc)"></i>تذكّر هذه الطابعة لهذا القسم — الطباعة القادمة تلقائية بلا اختيار</label>
+<div id="prnSaved" style="font-size:10.5px;color:var(--t3);margin-bottom:6px"></div>
+</div><div class="md-f"><button class="btn btn-p" onclick="prnPickGo()"><i class="fas fa-print"></i>طباعة</button><button class="btn btn-s" onclick="prnSystemDlg()"><i class="fas fa-window-restore"></i>نافذة النظام</button><button class="btn btn-s" onclick="cm('mPrnPick')">إلغاء</button></div></div></div>
 <!-- مودال إضافة ضريبة -->
 <div class="mo" id="mEiTax"><div class="md md-s"><div class="md-h"><h3>إضافة نوع ضريبة</h3><button class="md-x" onclick="cm('mEiTax')"><i class="fas fa-times"></i></button></div><div class="md-b"><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px"><div class="fg"><label class="fl">الدولة</label><input class="fi" id="eitCountry" value="EG" dir="ltr"></div><div class="fg"><label class="fl">النوع الرئيسي</label><input class="fi" id="eitType" dir="ltr" placeholder="T1 / SALES_TAX"></div><div class="fg"><label class="fl">النوع الفرعي</label><input class="fi" id="eitSub" dir="ltr" placeholder="V009"></div><div class="fg"><label class="fl">الاسم</label><input class="fi" id="eitName"></div><div class="fg"><label class="fl">النسبة %</label><input type="number" class="fi" id="eitRate" dir="ltr" style="text-align:left"></div></div></div><div class="md-f"><button class="btn btn-p" onclick="cfEiTax()">إضافة</button><button class="btn btn-s" onclick="cm('mEiTax')">إلغاء</button></div></div></div>
 
@@ -990,7 +999,7 @@ body[data-share-size="lg"] .btn-w.btn-sm i,body[data-share-size="lg"] .md-h .btn
 </div><div style="overflow-x:auto;margin-bottom:10px"><table class="dt itt" style="min-width:680px"><thead id="qTh"><tr><th style="width:30px">#</th><th style="width:110px">كود المنتج</th><th>الوصف</th><th style="width:75px">الكمية</th><th style="width:95px">السعر</th><th style="width:95px">الإجمالي</th><th style="width:36px"></th></tr></thead><tbody id="qib"></tbody></table></div><div style="display:flex;gap:6px;position:relative;align-items:center;justify-content:center"><button class="btn btn-s btn-sm" onclick="addItem()"><i class="fas fa-plus"></i>بند</button><div style="flex:0 0 80px"></div><div class="am"><button class="btn btn-p btn-sm" onclick="tglPP(this)" style="position:relative"><i class="fas fa-box"></i>إضافة منتج<div class="pp" onclick="event.stopPropagation()" id="pp"><div class="pp-s"><div class="sbx"><i class="fas fa-search"></i><input class="fi" style="width:100%" placeholder="ابحث عن منتج..." id="ppS" oninput="filterPP()"></div></div><div class="pp-l" id="ppL"></div></div></button></div></div><div class="dv"></div><div style="display:flex;justify-content:flex-end"><div style="width:240px"><div style="display:flex;justify-content:space-between;padding:4px 0;font-size:12.5px"><span style="color:var(--t3)">المجموع</span><span id="dsub">0.00</span></div><div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0;font-size:12.5px"><span style="color:var(--t3)">الخصم %</span><input type="number" class="fi" id="qdi" value="0" min="0" max="100" step="0.5" style="width:65px;padding:3px 7px;text-align:left;direction:ltr" oninput="recalc()"></div><div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0;font-size:12.5px"><span style="color:var(--t3)" id="qShipLbl">الشحن</span><input type="number" class="fi" id="qship" value="0" min="0" step="0.5" style="width:65px;padding:3px 7px;text-align:left;direction:ltr" oninput="recalc()"></div><div style="display:flex;justify-content:space-between;padding:4px 0;font-size:12.5px"><span style="color:var(--t3)">الضريبة (<span id="dtr">15</span>%)</span><span id="dtax">0.00</span></div><div id="qQtyRow" style="display:none;justify-content:space-between;padding:4px 0;font-size:12.5px;color:#22c55e;font-weight:700"><span>إجمالي الكميات</span><span>0</span></div><div class="dv"></div><div style="display:flex;justify-content:space-between;padding:4px 0;font-size:17px;font-weight:800;color:var(--acc)"><span>الإجمالي</span><span id="dtot">0.00</span></div></div></div><div class="dv"></div><div class="fg"><label class="fl">ملاحظات</label><textarea class="fi" id="qno" rows="2" placeholder="ملاحظات..."></textarea></div></div><div class="md-f"><button class="btn btn-p btn-lg" onclick="saveQ()"><i class="fas fa-save"></i>حفظ</button><button class="btn btn-s" onclick="cm('mQ')">إلغاء</button><div style="margin-right:auto;display:flex;gap:5px;flex-wrap:wrap;border-right:1px solid var(--brd);padding-right:7px"><span style="font-size:10px;color:var(--t3);align-self:center">توليد من هذا العرض:</span><button class="btn btn-s btn-xs" onclick="genTechFromQ()" title="إنشاء عرض فني بنفس البيانات"><i class="fas fa-screwdriver-wrench"></i>عرض فني</button><button class="btn btn-s btn-xs" onclick="genReceiptFromQ()" title="إنشاء إذن استلام"><i class="fas fa-clipboard-check"></i>إذن استلام</button><button class="btn btn-s btn-xs" onclick="genAuthFromQ()" title="إنشاء تفويض"><i class="fas fa-file-signature"></i>تفويض</button><button class="btn btn-s btn-xs" onclick="genSamplesFromQ()" title="إنشاء عينات"><i class="fas fa-vials"></i>العينات</button><button class="btn btn-s btn-xs" onclick="genSupplyFromQ()" title="إنشاء أمر توريد"><i class="fas fa-truck-fast"></i>أمر توريد</button></div></div></div></div>
 
 <!-- مودال المعاينة -->
-<div class="mo" id="mP"><div class="md md-xl" style="max-width:820px"><div class="md-h"><h3>معاينة</h3><div style="display:flex;gap:5px;flex-wrap:wrap;align-items:center"><button class="btn btn-w btn-xs" id="pvMfgBtn" style="display:none;background:rgba(0,212,170,.12);color:var(--acc);font-weight:700" onclick="pvGenMfg()"><i class="fas fa-industry"></i>أمر تشغيل</button><div id="pvGenBtns" style="display:flex;gap:4px;flex-wrap:wrap;border-left:1px solid var(--brd);padding-left:7px;margin-left:2px"><button class="btn btn-s btn-xs" onclick="genFromPreview('tech')" title="إنشاء عرض فني"><i class="fas fa-screwdriver-wrench"></i>عرض فني</button><button class="btn btn-s btn-xs" onclick="genFromPreview('receipt')" title="إنشاء إذن استلام"><i class="fas fa-clipboard-check"></i>إذن استلام</button><button class="btn btn-s btn-xs" onclick="genFromPreview('auth')" title="إنشاء تفويض"><i class="fas fa-file-signature"></i>تفويض</button><button class="btn btn-s btn-xs" onclick="genFromPreview('samples')" title="إنشاء عينات"><i class="fas fa-vials"></i>العينات</button><button class="btn btn-s btn-xs" onclick="genFromPreview('supply')" title="إنشاء أمر توريد"><i class="fas fa-truck-fast"></i>أمر توريد</button></div><button class="btn btn-w btn-sm" onclick="shareWA()"><i class="fab fa-whatsapp sh-ic"></i>واتساب</button><button class="btn btn-s btn-sm" style="background:rgba(34,158,217,.15);color:#229ED9;border:1px solid rgba(34,158,217,.4)" onclick="shareTG()" title="مشاركة عبر تيليجرام"><i class="fab fa-telegram sh-ic"></i>تيليجرام</button><button class="btn btn-s btn-sm" onclick="shareEM()"><i class="fas fa-envelope sh-ic"></i>بريد</button><button class="btn btn-p btn-sm" onclick="dlPDF()"><i class="fas fa-file-pdf"></i>PDF</button><button class="btn btn-s btn-sm" onclick="prQ()"><i class="fas fa-print"></i>طباعة</button><button class="md-x" onclick="cm('mP')"><i class="fas fa-times"></i></button></div></div><div class="md-b" style="padding:0;background:#e5e7eb"><div id="pvC"></div></div></div></div>
+<div class="mo" id="mP"><div class="md md-xl" style="max-width:820px"><div class="md-h"><h3>معاينة</h3><div style="display:flex;gap:5px;flex-wrap:wrap;align-items:center"><button class="btn btn-w btn-xs" id="pvMfgBtn" style="display:none;background:rgba(0,212,170,.12);color:var(--acc);font-weight:700" onclick="pvGenMfg()"><i class="fas fa-industry"></i>أمر تشغيل</button><div id="pvGenBtns" style="display:flex;gap:4px;flex-wrap:wrap;border-left:1px solid var(--brd);padding-left:7px;margin-left:2px"><button class="btn btn-s btn-xs" onclick="genFromPreview('tech')" title="إنشاء عرض فني"><i class="fas fa-screwdriver-wrench"></i>عرض فني</button><button class="btn btn-s btn-xs" onclick="genFromPreview('receipt')" title="إنشاء إذن استلام"><i class="fas fa-clipboard-check"></i>إذن استلام</button><button class="btn btn-s btn-xs" onclick="genFromPreview('auth')" title="إنشاء تفويض"><i class="fas fa-file-signature"></i>تفويض</button><button class="btn btn-s btn-xs" onclick="genFromPreview('samples')" title="إنشاء عينات"><i class="fas fa-vials"></i>العينات</button><button class="btn btn-s btn-xs" onclick="genFromPreview('supply')" title="إنشاء أمر توريد"><i class="fas fa-truck-fast"></i>أمر توريد</button></div><button class="btn btn-w btn-sm" onclick="shareWA()"><i class="fab fa-whatsapp sh-ic"></i>واتساب</button><button class="btn btn-s btn-sm" style="background:rgba(34,158,217,.15);color:#229ED9;border:1px solid rgba(34,158,217,.4)" onclick="shareTG()" title="مشاركة عبر تيليجرام"><i class="fab fa-telegram sh-ic"></i>تيليجرام</button><button class="btn btn-s btn-sm" onclick="shareEM()"><i class="fas fa-envelope sh-ic"></i>بريد</button><button class="btn btn-p btn-sm" onclick="dlPDF()"><i class="fas fa-file-pdf"></i>PDF</button><button class="btn btn-s btn-sm" onclick="prQ()"><i class="fas fa-print"></i>طباعة</button><button class="btn btn-s btn-xs" title="تغيير طابعة هذا القسم (محفوظة تلقائياً)" onclick="prnChangeFor('a4')"><i class="fas fa-gear"></i></button><button class="md-x" onclick="cm('mP')"><i class="fas fa-times"></i></button></div></div><div class="md-b" style="padding:0;background:#e5e7eb"><div id="pvC"></div></div></div></div>
 
 <!-- مودال العميل -->
 <div class="mo" id="mC"><div class="md md-s"><div class="md-h"><h3 id="mCt">عميل جديد</h3><button class="md-x" onclick="cm('mC')"><i class="fas fa-times"></i></button></div><div class="md-b"><input type="hidden" id="ceId"><div style="display:grid;grid-template-columns:110px 1fr;gap:10px"><div class="fg"><label class="fl">كود العميل</label><input class="fi" id="ccd" readonly placeholder="تلقائي" style="opacity:.7;text-align:center"></div><div class="fg"><label class="fl">الجهة</label><input class="fi" id="cn" placeholder="مثال: شركة جي دبليو للاستيراد"></div><div class="fg"><label class="fl">المسمى الوظيفي</label><input class="fi" id="cjt" placeholder="مثال: أ. أسامة مدير المشتريات"></div></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px"><div class="fg"><label class="fl">البريد</label><input class="fi" id="cem" placeholder="email@example.com"></div><div class="fg"><label class="fl">الهاتف</label><input class="fi" id="cph" placeholder="+2010..."></div></div><div class="fg"><label class="fl">العنوان</label><input class="fi" id="cad" placeholder="العنوان"></div><div class="fg"><label class="fl">اللوكيشن / الموقع</label><input class="fi" id="cloc" placeholder="إحداثيات (30.05, 31.23) أو رابط خرائط أو وصف الموقع" style="direction:ltr;text-align:left;font-size:11.5px"></div>
@@ -1427,7 +1436,9 @@ body[data-share-size="lg"] .btn-w.btn-sm i,body[data-share-size="lg"] .md-h .btn
 
 <!-- مودال إعدادات طباعة البوليصة (حراري/A4/عادي) -->
 <div class="mo" id="mWbPrint"><div class="md"><div class="md-h"><h3><i class="fas fa-print" style="color:var(--acc);margin-left:5px"></i>طباعة البوليصة — إعدادات احترافية</h3><button class="md-x" onclick="cm('mWbPrint')"><i class="fas fa-times"></i></button></div><div class="md-b">
-<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px">
+<div style="display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:10px;margin-bottom:10px">
+<div class="fg"><label class="fl">القالب</label><select class="fi" id="wbpLayout" onchange="wbpLayoutChange()"><option value="exact" selected>مطابق للمعاينة بالضبط (A4)</option><option value="thermal">حراري مضغوط (قديم)</option></select></div>
+<div class="fg" style="display:none"><label class="fl">_</label></div>
 <div class="fg"><label class="fl">مقاس الورقة</label><select class="fi" id="wbpSize" onchange="wbpOnSize()"><option value="58xauto">حراري 58 مم (طول تلقائي)</option><option value="80xauto" selected>حراري 80 مم (طول تلقائي)</option><option value="58x100">حراري 58×100 مم</option><option value="80x140">حراري 80×140 مم</option><option value="100x150">حراري/ملصق 100×150 مم</option><option value="a4">A4 عادي</option><option value="custom">مخصص…</option></select></div>
 <div class="fg" id="wbpCW" style="display:none"><label class="fl">العرض (مم)</label><input type="number" class="fi" id="wbpW" value="80" min="30" max="220" style="text-align:left;direction:ltr"></div>
 <div class="fg" id="wbpCH" style="display:none"><label class="fl">الارتفاع (مم — 0=تلقائي)</label><input type="number" class="fi" id="wbpH" value="0" min="0" max="300" style="text-align:left;direction:ltr"></div>
@@ -1438,12 +1449,17 @@ body[data-share-size="lg"] .btn-w.btn-sm i,body[data-share-size="lg"] .md-h .btn
 <div class="fg"><label class="fl">تكبير الخط العام <b id="wbpFsLbl">80%</b></label><input type="range" id="wbpFs" min="60" max="110" value="80" style="width:100%;accent-color:var(--acc)" oninput="document.getElementById('wbpFsLbl').textContent=this.value+'%'"></div>
 <div class="fg"><label class="fl">الهامش (مم)</label><input type="number" class="fi" id="wbpMargin" value="2" min="0" max="10" style="text-align:center"></div>
 </div>
+<div id="wbpThermalOpts" style="display:none">
 <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:10px">
 <label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:11.5px;color:var(--t2)"><input type="checkbox" id="wbpShowQr" checked style="accent-color:var(--acc)">QR</label>
 <label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:11.5px;color:var(--t2)"><input type="checkbox" id="wbpCompactHdr" checked style="accent-color:var(--acc)">هيدر مضغوط (سطر واحد)</label><label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:11.5px;color:var(--t2)"><input type="checkbox" id="wbpFullHdr" style="accent-color:var(--acc)" onchange="wbpPrev()">الهيدر الافتراضي الكامل</label><label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:11.5px;color:var(--t2)"><input type="checkbox" id="wbpMeta" checked style="accent-color:var(--acc)" onchange="wbpPrev()">عنوان البوليصة والرقم والتاريخ</label>
 <label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:11.5px;color:var(--t2)"><input type="checkbox" id="wbpShowSign" checked style="accent-color:var(--acc)">التواقيع</label>
 <label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:11.5px;color:var(--t2)"><input type="checkbox" id="wbpShowTot" checked style="accent-color:var(--acc)">إجمالي الكمية</label>
+</div>
+<div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:10px">
 <span style="font-size:10.5px;color:var(--t3)">تُحفظ إعداداتك تلقائياً</span>
+<div style="flex:1"></div>
+<span id="wbpPrnLbl" style="font-size:10.5px;color:var(--acc)">الطابعة: —</span><button class="btn btn-s btn-xs" onclick="prnChangeFor('waybill')"><i class="fas fa-gear"></i> تغيير الطابعة</button>
 </div>
 <div style="background:#fff;border-radius:8px;padding:8px;display:flex;justify-content:center;overflow:auto;max-height:220px"><div id="wbpPrev" style="background:#fff"></div></div>
 </div><div class="md-f"><button class="btn btn-p" onclick="wbpPrintNow()"><i class="fas fa-print"></i>طباعة الآن</button><button class="btn btn-s" onclick="cm('mWbPrint')">إلغاء</button></div></div></div>
@@ -2110,10 +2126,14 @@ pqPrompt('إعادة تسمية الفرع','الاسم الجديد:',w.name,''
 
 // ===== طابعة بوليصة الشحن الاحترافية (حراري/A4 — ورقة واحدة) =====
 function wbpOnSize(){const v=document.getElementById('wbpSize').value;const cust=(v==='custom');document.getElementById('wbpCW').style.display=cust?'':'none';document.getElementById('wbpCH').style.display=cust?'':'none';wbpPrev()}
-function _wbpSet(){return {size:document.getElementById('wbpSize').value,w:document.getElementById('wbpW').value,h:document.getElementById('wbpH').value,hdr:document.getElementById('wbpHdr').value,tbl:document.getElementById('wbpTbl').value,fs:document.getElementById('wbpFs').value,margin:document.getElementById('wbpMargin').value,qr:document.getElementById('wbpShowQr').checked,compact:document.getElementById('wbpCompactHdr').checked,fullHdr:document.getElementById('wbpFullHdr').checked,meta:document.getElementById('wbpMeta').checked,sign:document.getElementById('wbpShowSign').checked,tot:document.getElementById('wbpShowTot').checked}}
+function _wbpSet(){return {layout:(document.getElementById('wbpLayout')?document.getElementById('wbpLayout').value:'exact'),size:document.getElementById('wbpSize').value,w:document.getElementById('wbpW').value,h:document.getElementById('wbpH').value,hdr:document.getElementById('wbpHdr').value,tbl:document.getElementById('wbpTbl').value,fs:document.getElementById('wbpFs').value,margin:document.getElementById('wbpMargin').value,qr:document.getElementById('wbpShowQr').checked,compact:document.getElementById('wbpCompactHdr').checked,fullHdr:document.getElementById('wbpFullHdr').checked,meta:document.getElementById('wbpMeta').checked,sign:document.getElementById('wbpShowSign').checked,tot:document.getElementById('wbpShowTot').checked}}
 function _wbpDims(p){if(p.size==='custom')return [Math.max(30,parseInt(p.w)||80),Math.max(0,parseInt(p.h)||0)];if(p.size==='a4')return [210,297];const pr=p.size.split('x');return [parseInt(pr[0]),(pr[1]==='auto'||pr[1]===undefined)?0:parseInt(pr[1])]}
+function wbpLayoutChange(){const ex=(document.getElementById('wbpLayout').value!=='thermal');var th=document.getElementById('wbpThermalOpts');if(th)th.style.display=ex?'none':'';wbpPrev()}
+function _wbpCurDoc(){return ld(K.wb).find(function(x){return x.id===((_pvCurDoc||{}).id)})||ld(K.wb)[ld(K.wb).length-1]}
 function _wbpBuild(p){
-const d=ld(K.wb).find(function(x){return x.id===((_pvCurDoc||{}).id)})||ld(K.wb)[ld(K.wb).length-1];if(!d)return '';
+const d=_wbpCurDoc();if(!d)return '';
+// القالب المطابق للمعاينة بالضبط — نفس ثيم المعاينة وأعمدتها بمقاييس المنزلقات
+if(p.layout==='exact'){const inner=_wbDocHtml(d,p.hdr/100,p.tbl/100,p.fs/100);return '<div style="background:#fff;direction:rtl">'+inner+'</div>'}
 const s=ls();const W=_wbpDims(p)[0];
 const scale=p.fs/100,hdrS=p.hdr/100,tblS=p.tbl/100;
 var _fullHdrHtml='';
@@ -2136,15 +2156,26 @@ const tot=(p.tot&&d.items)?('<div style="text-align:left;font-size:'+(base*0.85)
 const sign=p.sign?('<div style="display:flex;justify-content:space-between;margin-top:'+(8*scale)+'px;font-size:'+(base*0.8)+'px"><div style="border-top:1px solid #000;padding-top:2px;width:'+(W*0.35)+'px;text-align:center">توقيع المستلم</div><div style="border-top:1px solid #000;padding-top:2px;width:'+(W*0.35)+'px;text-align:center">توقيع الشركة</div></div>'):'';
 return '<div style="direction:rtl;font-family:Tajawal,Arial,sans-serif;color:#000;background:#fff;padding:'+(p.margin)+'mm;width:'+(W)+'mm'+((_wbpDims(p)[1])?(';height:'+_wbpDims(p)[1]+'mm;overflow:hidden'):'')+';box-sizing:border-box">'+head+meta+cliBlock+tbl+tot+sign+'</div>'}
 function wbpPrev(){const p=_wbpSet();const box=document.getElementById('wbpPrev');if(box)box.innerHTML=_wbpBuild(p)}
-function wbpOpenPrint(){try{const p=(ls().wbpPrefs)||{};if(p.size)document.getElementById('wbpSize').value=p.size;if(p.w)document.getElementById('wbpW').value=p.w;if(p.h)document.getElementById('wbpH').value=p.h;if(p.hdr)document.getElementById('wbpHdr').value=p.hdr;if(p.tbl)document.getElementById('wbpTbl').value=p.tbl;if(p.fs)document.getElementById('wbpFs').value=p.fs;if(p.margin!==undefined)document.getElementById('wbpMargin').value=p.margin;if(p.qr!==undefined)document.getElementById('wbpShowQr').checked=p.qr;if(p.compact!==undefined)document.getElementById('wbpCompactHdr').checked=p.compact;if(p.fullHdr!==undefined)document.getElementById('wbpFullHdr').checked=p.fullHdr;if(p.meta!==undefined)document.getElementById('wbpMeta').checked=p.meta;if(p.sign!==undefined)document.getElementById('wbpShowSign').checked=p.sign;if(p.tot!==undefined)document.getElementById('wbpShowTot').checked=p.tot}catch(e){}
-wbpOnSize();om('mWbPrint');setTimeout(wbpPrev,150)}
+function wbpOpenPrint(){try{const p=(ls().wbpPrefs)||{};if(p.size)document.getElementById('wbpSize').value=p.size;if(p.w)document.getElementById('wbpW').value=p.w;if(p.h)document.getElementById('wbpH').value=p.h;if(p.hdr)document.getElementById('wbpHdr').value=p.hdr;if(p.tbl)document.getElementById('wbpTbl').value=p.tbl;if(p.fs)document.getElementById('wbpFs').value=p.fs;if(p.margin!==undefined)document.getElementById('wbpMargin').value=p.margin;if(p.qr!==undefined)document.getElementById('wbpShowQr').checked=p.qr;if(p.compact!==undefined)document.getElementById('wbpCompactHdr').checked=p.compact;if(p.fullHdr!==undefined)document.getElementById('wbpFullHdr').checked=p.fullHdr;if(p.meta!==undefined)document.getElementById('wbpMeta').checked=p.meta;if(p.sign!==undefined)document.getElementById('wbpShowSign').checked=p.sign;if(p.tot!==undefined)document.getElementById('wbpShowTot').checked=p.tot;if(p.layout)document.getElementById('wbpLayout').value=p.layout}catch(e){}
+wbpOnSize();
+try{var _wprn=(_prnSaved()||{})['waybill'];var _wlb=document.getElementById('wbpPrnLbl');if(_wlb)_wlb.textContent=_wprn?('الطابعة المحفوظة: '+_wprn):'لم تُحدد طابعة بعد — ستُختار عند أول طباعة وتُحفظ تلقائياً'}catch(e){}
+wbpLayoutChange();
+om('mWbPrint');setTimeout(wbpPrev,150)}
 function wbpPrintNow(){
 const p=_wbpSet();try{const s=ls();s.wbpPrefs=p;sv(K.s,s)}catch(e){}
+let css,inner;
+if(p.layout==='exact'){
+css='@page{size:A4;margin:0}';
+inner=_wbDocHtml(_wbpCurDoc(),p.hdr/100,p.tbl/100,p.fs/100);
+}else{
 const dims=_wbpDims(p);const W=dims[0],H=dims[1];
-const css='@page{size:'+W+'mm'+(H?(' '+H+'mm'):'')+';margin:0}';
-const html='<!DOCTYPE html><html dir="rtl" lang="ar"><head><meta charset="UTF-8"><title>بوليصة شحن</title><link href="fonts/google-fonts.css" rel="stylesheet"><style>'+css+'*{margin:0;padding:0;box-sizing:border-box}body{margin:0;background:#fff}@media screen{body{padding:8mm;background:#555;display:flex;justify-content:center}}</style></head><body>'+_wbpBuild(p)+'</body></html>';
-const w=window.open('','_blank');
-w.document.write(html);w.document.close();setTimeout(function(){try{w.print()}catch(e){}},450)}
+css='@page{size:'+W+'mm'+(H?(' '+H+'mm'):'')+';margin:0}';
+inner=_wbpBuild(p);
+}
+const assetsDir=location.href.replace(/[^/]*$/,'')+'assets/';
+const html='<!DOCTYPE html><html dir="rtl" lang="ar"><head><meta charset="UTF-8"><title>بوليصة شحن</title><base href="'+assetsDir+'"><link href="fonts/google-fonts.css" rel="stylesheet"><style>'+css+'*{margin:0;padding:0;box-sizing:border-box}body{margin:0;background:#fff}@media screen{body{padding:8mm;background:#555;display:flex;justify-content:center}}</style></head><body>'+inner+'</body></html>';
+pqPrint({ctx:'waybill',html:html});
+cm('mWbPrint')}
 
 // ===== محرك PDF للمستندات (html2pdf API — الحزمة المضمونة) =====
 function _dcPdfReady(){try{return typeof html2pdf==='function'}catch(e){return false}}
@@ -2382,7 +2413,67 @@ toast('جارٍ إنشاء PDF للمشاركة...','in');
 dlPDF().then(()=>{window.open(tgUrl,'_blank');toast('تم تنزيل PDF وفتح تيليجرام — أرفق الملف المحفوظ','in')}).catch(()=>{window.open(tgUrl,'_blank');toast('تم فتح تيليجرام (تعذّر إنشاء PDF)','er')})}
 function shareEM(){const info=_getPvDocInfo();if(!info){toast('لا يوجد مستند للمعاينة','er');return}let body=`${info.label} ${info.number}\nالعميل: ${info.clientName}`;if(info.total!=null&&info.total>0)body+=`\nالإجمالي: ${fmtN(info.total)} ${info.cu}`;window.location.href=`mailto:?subject=${encodeURIComponent(info.label+' '+info.number)}&body=${encodeURIComponent(body)}`}
 function dlPDF(){const el=document.getElementById('qPA');if(!el){toast('لا توجد معاينة','er');return Promise.resolve()}let fname='document.pdf';if(pvId){const q=ld(K.q).find(x=>x.id===pvId);if(q)fname=q.number+'.pdf'}else{const titleEl=el.querySelector('[data-docnumber]');if(titleEl)fname=titleEl.getAttribute('data-docnumber')+'.pdf'}toast('جارٍ إنشاء PDF...','in');return html2pdf().set({margin:[10,10,10,10],filename:fname,image:{type:'jpeg',quality:.98},html2canvas:{scale:2,useCORS:true},jsPDF:{unit:'mm',format:'a4',orientation:'portrait'},pagebreak:{mode:['css','legacy'],before:'.page-break-before',after:'.page-break-after'}}).from(el).save().then(()=>toast('تم التحميل'))}
-function prQ(){if(_pvCurDoc&&_pvCurDoc.kind==='waybill'){wbpOpenPrint();return}const c=document.getElementById('qPA').innerHTML,w=window.open('','_blank');const _assetsDir=location.href.replace(/[^\\/]*$/,'')+'assets/';w.document.write(`<!DOCTYPE html><html dir="rtl" lang="ar"><head><meta charset="UTF-8"><title>طباعة</title><base href="${_assetsDir}"><link href="fonts/google-fonts.css" rel="stylesheet"><link rel="stylesheet" href="fontawesome/css/all.min.css"><style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Tajawal',sans-serif;padding:10px}table{width:100%;border-collapse:collapse}th,td{padding:7px 9px;font-size:10px}th{font-weight:700}.page-break-after{page-break-after:always;break-after:page}@media print{body{padding:0}}</style></head><body>${c}</body></html>`);w.document.close();setTimeout(()=>w.print(),350)}
+// ===== ذاكرة الطابعات لكل قسم: طباعة صامتة تلقائية بعد أول اختيار =====
+var PRN_CTX_LBL={'a4':'المستندات (A4)','waybill':'بوليصة الشحن','wbc':'ملصق باركود المخزن','salabel':'ملصق عينات','docs':'مستندات الملفات'};
+var _prnQueue=null; // طلب الطباعة المعلّق أثناء اختيار الطابعة
+function _prnApi(){return (window.proquote&&window.proquote.printers)||null}
+function _prnSaved(){try{return (ls().printers)||{}}catch(e){return {}}}
+function _prnSave(ctx,name){try{const s=ls();s.printers=_prnSaved();s.printers[ctx]=name;sv(K.s,s)}catch(e){}}
+function _prnForget(ctx){try{const s=ls();const pr=_prnSaved();delete pr[ctx];s.printers=pr;sv(K.s,s)}catch(e){}}
+// الطباعة الموحدة: ctx = قسم الذاكرة، html = مستند كامل (head+body)، أو bodyHtml + wrap
+function _prnEsc(v){return String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;')}
+async function pqPrint(o){
+o=o||{};const ctx=o.ctx||'a4';
+const html=o.html||_prnWrap(o.body||'',o);
+const api=_prnApi();
+if(!api){_prnLegacy(html,o);return}
+const remembered=_prnSaved()[ctx];
+if(remembered){
+const r=await api.printHtml({html:html,printer:remembered,silent:true,baseHref:location.href,landscape:!!o.landscape});
+if(r&&r.ok){toast('تمت الطباعة: '+remembered+(r.dry?' (تشغيل جاف)':''),'ok');return}
+toast('تعذرت الطباعة على «'+remembered+'» — اختر طابعة','er');
+}
+_prnQueue={ctx:ctx,html:html,landscape:!!o.landscape};
+await prnOpenPicker(ctx);
+}
+function _prnWrap(body,o){
+const assetsDir=location.href.replace(/[^\/]*$/,'')+'assets/';
+return '<!DOCTYPE html><html dir="rtl" lang="ar"><head><meta charset="UTF-8"><title>طباعة</title><base href="'+assetsDir+'"><link href="fonts/google-fonts.css" rel="stylesheet"><link rel="stylesheet" href="fontawesome/css/all.min.css"><style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:\'Tajawal\',sans-serif;padding:10px}table{width:100%;border-collapse:collapse}th,td{padding:7px 9px;font-size:10px}th{font-weight:700}.page-break-after{page-break-after:always;break-after:page}@media print{body{padding:0}}'+((o&&o.extraCss)||'')+'</style></head><body>'+body+'</body></html>';
+}
+function _prnLegacy(html,o){const w=window.open('','_blank');w.document.write(html);w.document.close();setTimeout(function(){try{w.print()}catch(e){}},400)}
+async function prnOpenPicker(ctx){
+const lbl=document.getElementById('prnCtxLbl');
+if(lbl)lbl.textContent='القسم: '+(PRN_CTX_LBL[ctx]||ctx)+' — تُحفظ الطابعة لهذا القسم وتُستخدم تلقائياً بعدها';
+const sv2=document.getElementById('prnSaved');
+if(sv2){const cur=_prnSaved()[ctx];sv2.textContent=cur?('المحفوظة حالياً: '+cur):''}
+const sel=document.getElementById('prnSel');
+if(sel)sel.innerHTML='<option>جارٍ جلب الطابعات…</option>';
+om('mPrnPick');
+const api=_prnApi();if(!api)return;
+try{
+const list=await api.list();
+if(!Array.isArray(list)||!list.length){if(sel)sel.innerHTML='<option value="">لم تُكتشف طابعات — استخدم نافذة النظام</option>';return}
+if(sel)sel.innerHTML=list.map(function(p){return '<option value="'+String(p.name).replace(/"/g,'&quot;')+'">'+String(p.name)+(p.description&&p.description!==p.name?(' — '+String(p.description).replace(/</g,'&lt;').slice(0,40)):'')+'</option>'}).join('');
+const cur=_prnSaved()[ctx];
+if(cur&&sel){const ex=list.some(function(p){return p.name===cur});sel.value=ex?cur:sel.value}
+}catch(e){if(sel)sel.innerHTML='<option value="">تعذّر جلب الطابعات — استخدم نافذة النظام</option>'}
+}
+async function prnPickGo(){
+const sel=document.getElementById('prnSel');
+const name=sel?sel.value:'';
+if(!name){toast('اختر طابعة أولاً','er');return}
+if(document.getElementById('prnRemember').checked)_prnSave(_prnQueue.ctx,name);else _prnForget(_prnQueue.ctx);
+const q=_prnQueue;cm('mPrnPick');
+const api=_prnApi();
+if(api){
+const r=await api.printHtml({html:q.html,printer:name,silent:true,baseHref:location.href,landscape:!!q.landscape});
+if(r&&r.ok){toast('تمت الطباعة: '+name+(r.dry?' (تشغيل جاف)':''),'ok');return}
+toast('فشلت الطباعة: '+((r&&r.error)||''),'er');return}
+_prnLegacy(q.html,q);
+}
+function prnSystemDlg(){const q=_prnQueue;if(!q)return;cm('mPrnPick');_prnLegacy(q.html,q)}
+function prnChangeFor(ctx){_prnQueue={ctx:ctx,html:'',landscape:false};prnOpenPicker(ctx);const b=document.getElementById('prnRemember');if(b)b.checked=false;const lb=document.getElementById('prnCtxLbl');if(lb)lb.textContent='تغيير طابعة القسم: '+(PRN_CTX_LBL[ctx]||ctx)}
+function prQ(){if(_pvCurDoc&&_pvCurDoc.kind==='waybill'){wbpOpenPrint();return}const c=document.getElementById('qPA').innerHTML;pqPrint({ctx:'a4',body:c})}
 
 // ===== العملاء =====
 function rCG(){const cs=ld(K.c),se=(document.getElementById('scl')?.value||'').toLowerCase();const fl=sfFilter('clients',cs);const g=document.getElementById('cg');if(!fl.length){g.innerHTML='<div style="text-align:center;padding:36px;color:var(--t3);grid-column:1/-1"><i class="fas fa-users" style="font-size:28px;margin-bottom:6px;opacity:.3"></i><p>لا يوجد عملاء</p></div>';return}g.innerHTML=fl.map(c=>`<div class="sc"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px"><div style="width:32px;height:32px;border-radius:7px;background:var(--blu2);display:flex;align-items:center;justify-content:center"><i class="fas fa-user" style="color:var(--blu);font-size:12px"></i></div><div style="display:flex;gap:3px"><button class="btn btn-w btn-xs" style="padding:2px 5px" onclick="shareClientWA('${c.id}')" title="مشاركة معلومات العميل" title="مشاركة بيانات العميل عبر واتساب"><i class="fab fa-whatsapp sh-ic" style="font-size:9px"></i></button><button class="btn btn-xs" style="padding:2px 5px;background:rgba(59,130,246,.15);color:#3b82f6" title="مراسلة العميل" onclick="directMsgClient('${c.id}')"><i class="fab fa-whatsapp" style="font-size:9px"></i></button><button class="btn btn-xs" style="padding:2px 5px;background:rgba(249,115,22,.15);color:#f97316" title="inDrive" onclick="shareRide('indrive','${c.id}')"><i class="fas fa-car" style="font-size:9px"></i></button><button class="btn-xs" style="padding:2px 5px;background:rgba(0,0,0,.4);color:#fff" title="Uber" onclick="shareRide('uber','${c.id}')"><i class="fab fa-uber" style="font-size:9px"></i></button><button class="btn btn-xs" style="padding:2px 5px;background:rgba(34,158,217,.15);color:#229ED9;border:1px solid rgba(34,158,217,.4)" onclick="shareClientTG('${c.id}')" title="مشاركة بيانات العميل عبر تليجرام"><i class="fab fa-telegram sh-ic" style="font-size:9px"></i></button><button class="btn btn-s btn-xs" style="padding:2px 5px" onclick="printClientCard('${c.id}')"><i class="fas fa-print" style="font-size:9px"></i></button><button class="btn btn-s btn-xs" style="padding:2px 5px" onclick="edC('${c.id}')"><i class="fas fa-pen" style="font-size:8px"></i></button><button class="btn btn-d btn-xs" style="padding:2px 5px" onclick="delC('${c.id}')"><i class="fas fa-trash" style="font-size:8px"></i></button></div></div><div style="font-size:13px;font-weight:700;margin-bottom:3px">${c.name}${c.code?` <span style="font-size:9.5px;color:var(--blu);background:var(--blu2);padding:1px 6px;border-radius:9px;font-weight:600">${c.code}</span>`:''}</div>${c.jobTitle?`<div style="font-size:11px;color:var(--acc);margin-bottom:2px"><i class="fas fa-user-tie" style="margin-left:3px;font-size:8px"></i>${c.jobTitle}</div>`:''}${c.email?`<div style="font-size:11px;color:var(--t3)"><i class="fas fa-envelope" style="margin-left:3px;font-size:8px"></i>${c.email}</div>`:''}${c.phone?`<div style="font-size:11px;color:var(--t3)"><i class="fas fa-phone" style="margin-left:3px;font-size:8px"></i>${c.phone}</div>`:''}${c.address?`<div style="font-size:11px;color:var(--t3)"><i class="fas fa-location-crosshairs" style="margin-left:3px;font-size:8px"></i>${c.address}</div>`:''}${c.warehouse?`<div style="font-size:10px;color:var(--t2)"><i class="fas fa-warehouse" style="margin-left:3px;font-size:8px;color:var(--yel)"></i>${c.warehouse}</div>`:""}${c.location?`<div style="font-size:10px;color:var(--t3);direction:ltr;text-align:right;word-break:break-all"><i class="fas fa-location-dot" style="margin-left:3px;font-size:8px;color:var(--acc)"></i>${c.location}</div>`:''}${c.payMethodType?`<div style="font-size:10px;color:var(--t2)"><i class="fas fa-credit-card" style="margin-left:3px;font-size:8px;color:var(--yel)"></i>${PM_TYPE_LBL[c.payMethodType]||c.payMethodType}${c.payMethodDetails?': '+c.payMethodDetails:''}${c.payMethodHolder?' — '+c.payMethodHolder:''}</div>`:''}${c.taxNumber?`<div style="font-size:10px;color:var(--t3)"><i class="fas fa-receipt" style="margin-left:3px;font-size:8px"></i>ض.ر: ${c.taxNumber}</div>`:''}${c.commercialRegister?`<div style="font-size:10px;color:var(--t3)"><i class="fas fa-building" style="margin-left:3px;font-size:8px"></i>س.ت: ${c.commercialRegister}</div>`:''}</div>`).join('')}
@@ -2885,10 +2976,8 @@ if(al.length&&!_saNotified){_saNotified=true;try{if(window.Notification){if(Noti
 function saPrintLabel(id){const d=ld(K.sa).find(function(x){return x.id===id});if(!d)return;const s=ls();const qr=mkQR(d.number,4);
 const refTxt=d.referenceNumber?((d.referenceType==='quote'?'عرض سعر: ':d.referenceType==='supply'?'أمر توريد: ':'مناقصة: ')+d.referenceNumber):'';
 const items=(d.items||[]).map(function(i){return i.name}).join('، ');
-const w=window.open('','_blank','width=420,height=320');
-w.document.write('<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><style>@page{size:50mm 30mm;margin:0}body{margin:0;font-family:Tahoma,Arial,sans-serif}.lb{width:50mm;height:30mm;box-sizing:border-box;padding:2mm;text-align:center;overflow:hidden;border:1px dashed #999}.t{font-weight:700;font-size:9px}.n{font-size:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.c{font-family:monospace;font-weight:700;font-size:10px;letter-spacing:1px}</style></head><body>');
-w.document.write('<div class="lb"><div class="t">'+(s.companyName||'')+'</div><div class="n">'+(items||d.subject||'عينة')+'</div>'+(refTxt?'<div class="n">'+refTxt+'</div>':'')+(qr?'<img src="'+qr+'" style="width:11mm;height:11mm">':'')+'<div class="c">'+d.number+'</div></div>');
-w.document.write('<scr'+'ipt>window.onload=function(){setTimeout(function(){window.print()},300)}</scr'+'ipt></body></html>');w.document.close()}
+const html='<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><style>@page{size:50mm 30mm;margin:0}body{margin:0;font-family:Tahoma,Arial,sans-serif}.lb{width:50mm;height:30mm;box-sizing:border-box;padding:2mm;text-align:center;overflow:hidden;border:1px dashed #999}.t{font-weight:700;font-size:9px}.n{font-size:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.c{font-family:monospace;font-weight:700;font-size:10px;letter-spacing:1px}</style></head><body><div class="lb"><div class="t">'+_prnEsc(s.companyName||'')+'</div><div class="n">'+_prnEsc(items||d.subject||'عينة')+'</div>'+(refTxt?'<div class="n">'+_prnEsc(refTxt)+'</div>':'')+(qr?'<img src="'+qr+'" style="width:11mm;height:11mm">':'')+'<div class="c">'+_prnEsc(d.number)+'</div></div></body></html>';
+pqPrint({ctx:'salabel',html:html})}
 let _saCamStream=null,_saCamRAF=null;
 function openSaScan(){document.getElementById('saScanRes').innerHTML='';om('mSaScan');setTimeout(function(){const li=document.getElementById('saScanLaser');if(li)li.focus()},100);
 navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}}).then(function(st){_saCamStream=st;const v=document.getElementById('saScanV');v.srcObject=st;v.play();_saCamLoop()}).catch(function(e){})}
@@ -3424,8 +3513,8 @@ const dims=_wbcDims();const W=dims[0],H=dims[1];
 const n=Math.max(1,parseInt(p.copies)||1);
 let svg='';try{const svgEl=document.createElementNS('http://www.w3.org/2000/svg','svg');document.body.appendChild(svgEl);JsBarcode(svgEl,String(it.code||''),{format:'CODE128',width:parseFloat(p.bw)||2,height:Math.round((parseFloat(p.bch)||12)*3.78),fontSize:Math.round((parseFloat(p.fs)||8)*1.25),margin:1,lineColor:'#000',background:'#fff'});svg=svgEl.outerHTML.replace(/\s(width|height)="[^"]*"/g,'');svgEl.remove()}catch(e){toast('تعذر توليد الباركود','er');return}
 if(!svg){toast('تعذر توليد الباركود','er');return}
-const nm=p.showName?('<div class="nm"></div>'):'';
-const cd=p.showCode?('<div class="cd"></div>'):'';
+const nm=p.showName?('<div class="nm">'+_prnEsc(it.name)+'</div>'):'';
+const cd=p.showCode?('<div class="cd">'+_prnEsc(String(it.code||''))+'</div>'):'';
 const lblInner=nm+((p.showBc!==false)?('<div class="bc">'+svg.replace('<svg','<svg style="max-width:'+(W-2)+'mm;height:auto"')+'</div>'):'')+cd;
 let html,fill;
 if(p.mode==='a4'){
@@ -3434,10 +3523,7 @@ html='<!DOCTYPE html><html><head><meta charset="UTF-8"><title>ملصقات A4</t
 }else{
 html='<!DOCTYPE html><html><head><meta charset="UTF-8"><title>ملصقات حرارية</title><style>@page{size:'+W+'mm '+H+'mm;margin:0}body{margin:0;font-family:Arial}.lbl{width:'+W+'mm;height:'+H+'mm;display:flex;flex-direction:column;align-items:center;justify-content:center;page-break-after:always;text-align:center;overflow:hidden;box-sizing:border-box;padding:0.5mm}.nm{font-size:'+p.fs+'pt;font-weight:700;max-width:'+(W-2)+'mm;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.cd{font-size:7pt;letter-spacing:1px}</style></head><body>'+Array(n).fill('<div class="lbl">'+lblInner+'</div>').join('')+'</body></html>';
 }
-const w=window.open('','_blank');
-w.document.write(html);
-w.document.querySelectorAll('.lbl').forEach(function(l){const e1=l.querySelector('.nm');if(e1)e1.textContent=it.name;const e2=l.querySelector('.cd');if(e2)e2.textContent=it.code});
-w.document.close();setTimeout(function(){try{w.print()}catch(e){}},450)}
+pqPrint({ctx:'wbc',html:html})}
 
 // ============================================================
 // ===== بطاقات الباقات والشراء (PayPal + طلب الكود بالبريد) =====
@@ -4328,13 +4414,16 @@ const d={id:eid||gid(),number:document.getElementById('wbnu').value.trim(),date:
 if(eid){const ix=wbs.findIndex(function(x){return x.id===eid});if(ix!==-1)wbs[ix]=d;toast('تم التحديث')}else{wbs.push(d);localStorage.setItem(K.nwb,String(gnN(K.nwb)+1));toast('تم إنشاء البوليصة: '+d.number,'ok')}
 sv(K.wb,wbs);cm('mWb');rShpL();return d.id}
 function wbPreviewCur(){const r=saveWb();if(r){setTimeout(function(){vWb(r)},250)}}
-function vWb(id){const d=ld(K.wb).find(function(x){return x.id===id});if(!d)return;
-const s=ls(),tk=s.template||'classic',t=TP[tk],hf=s.headingFont||'Tajawal',bf=s.bodyFont||'Tajawal',hs=s.headingSize||22,bs=s.bodySize||13;
+// قالب البوليصة المشترك — يبني نفس شكل المعاينة بالضبط مع مقاييس الهيدر/الأصناف/الخط (1=مطابق للمعاينة)
+function _wbDocHtml(d,sh,st,sf){
+sh=sh||1;st=st||1;sf=sf||1;
+const s=ls(),tk=s.template||'classic',t=TP[tk],hf=s.headingFont||'Tajawal',bf=s.bodyFont||'Tajawal';
+const hs=Math.max(9,Math.round((s.headingSize||22)*sh*sf)),bs=Math.max(8,Math.round((s.bodySize||13)*sf)),bsT=Math.max(7,Math.round(((s.bodySize||13)-1)*st*sf));
 const dk=!!t.dk,txC=dk?'#ffffff':t.txC,txL=dk?'rgba(255,255,255,.7)':t.txL,txM=dk?'rgba(255,255,255,.5)':t.txM;
 const hdr=buildCompanyHeader(t,s,hf,bf,hs,bs,txC,txL,txM);
 const qr=mkQR(d.number,4);
 const totQty=(d.items||[]).reduce(function(a,i){return a+(i.qty||0)},0);
-document.getElementById('pvC').innerHTML=`<div id="qPA" data-docnumber="${d.number}" style="background:${t.bg};color:${t.txC};padding:36px;font-family:'${bf}',sans-serif;direction:rtl;max-width:740px;margin:0 auto">
+return `<div id="qPA" data-docnumber="${d.number}" style="background:${t.bg};color:${t.txC};padding:36px;font-family:'${bf}',sans-serif;direction:rtl;max-width:740px;margin:0 auto">
 ${hdr}
 <div style="text-align:center;font-family:'${hf}',sans-serif;font-size:${hs}px;font-weight:900;color:${t.totC};margin:12px 0 4px">بوليصة شحن صادرة</div>
 <div style="text-align:center;font-size:12px;color:${txM};margin-bottom:14px">رقم البوليصة: <b>${d.number}</b> — بتاريخ ${fmtD(d.date)}</div>
@@ -4352,9 +4441,11 @@ ${qr?`<img src="${qr}" style="width:90px;height:90px">`:''}
 <div style="font-size:10px;color:${txM}">إجمالي القطع: ${fmtN(totQty)}</div>
 </div></div>
 <table style="width:100%;border-collapse:collapse;margin:10px 0"><thead><tr><th style="background:${t.thBg};padding:6px 8px;font-size:10px;font-weight:700;text-align:center;border-bottom:2px solid ${t.thBd}">#</th><th style="background:${t.thBg};padding:6px 8px;font-size:10px;font-weight:700;text-align:right;border-bottom:2px solid ${t.thBd}">المنتج</th>${d.showSize!==false?'<th style="background:'+t.thBg+';padding:6px 8px;font-size:10px;font-weight:700;text-align:center;border-bottom:2px solid '+t.thBd+'">المقاس</th>':''}${d.showColor!==false?'<th style="background:'+t.thBg+';padding:6px 8px;font-size:10px;font-weight:700;text-align:center;border-bottom:2px solid '+t.thBd+'">اللون</th>':''}${(d.extraCols||[]).map(function(cc){return '<th style="background:'+t.thBg+';padding:6px 8px;font-size:10px;font-weight:700;text-align:center;border-bottom:2px solid '+t.thBd+'">'+cc.name+'</th>'}).join('')}<th style="background:${t.thBg};padding:6px 8px;font-size:10px;font-weight:700;text-align:left;border-bottom:2px solid ${t.thBd}">الكمية المشحونة</th></tr></thead><tbody>
-${(d.items||[]).map((it,i)=>`<tr style="background:${i%2?t.bgA:'transparent'}"><td style="padding:6px 8px;font-size:${bs-1}px;text-align:center;color:${txM}">${i+1}</td><td style="padding:6px 8px;font-size:${bs-1}px;font-weight:700">${it.name}</td>${d.showSize!==false?'<td style="padding:6px 8px;font-size:'+(bs-1)+'px;text-align:center">'+(it.size||'—')+'</td>':''}${d.showColor!==false?'<td style="padding:6px 8px;font-size:'+(bs-1)+'px;text-align:center">'+(it.color||'—')+'</td>':''}${(d.extraCols||[]).map(function(cc){return '<td style="padding:6px 8px;font-size:'+(bs-1)+'px;text-align:center">'+(((it.extra||{})[cc.key])||'—')+'</td>'}).join('')}<td style="padding:6px 8px;font-size:${bs-1}px;text-align:left;font-weight:800">${fmtN(it.qty||0)}</td></tr>`).join('')}
+${(d.items||[]).map((it,i)=>`<tr style="background:${i%2?t.bgA:'transparent'}"><td style="padding:6px 8px;font-size:${bsT}px;text-align:center;color:${txM}">${i+1}</td><td style="padding:6px 8px;font-size:${bsT}px;font-weight:700">${it.name}</td>${d.showSize!==false?'<td style="padding:6px 8px;font-size:'+bsT+'px;text-align:center">'+(it.size||'—')+'</td>':''}${d.showColor!==false?'<td style="padding:6px 8px;font-size:'+bsT+'px;text-align:center">'+(it.color||'—')+'</td>':''}${(d.extraCols||[]).map(function(cc){return '<td style="padding:6px 8px;font-size:'+bsT+'px;text-align:center">'+(((it.extra||{})[cc.key])||'—')+'</td>'}).join('')}<td style="padding:6px 8px;font-size:${bsT}px;text-align:left;font-weight:800">${fmtN(it.qty||0)}</td></tr>`).join('')}
 </tbody></table>
-<div style="margin-top:36px;display:flex;justify-content:space-between;align-items:flex-end"><div style="text-align:center"><div style="border-top:1px solid ${t.bdr};padding-top:5px;font-size:${bs}px;color:${t.txM};width:160px">توقيع المستلم</div></div><div style="text-align:center"><div style="border-top:1px solid ${t.bdr};padding-top:5px;font-size:${bs}px;color:${t.txM};width:160px">توقيع ${s.companyName||'الشركة'}</div></div></div></div>`;
+<div style="margin-top:36px;display:flex;justify-content:space-between;align-items:flex-end"><div style="text-align:center"><div style="border-top:1px solid ${t.bdr};padding-top:5px;font-size:${bs}px;color:${t.txM};width:160px">توقيع المستلم</div></div><div style="text-align:center"><div style="border-top:1px solid ${t.bdr};padding-top:5px;font-size:${bs}px;color:${t.txM};width:160px">توقيع ${s.companyName||'الشركة'}</div></div></div></div>`}
+function vWb(id){const d=ld(K.wb).find(function(x){return x.id===id});if(!d)return;
+document.getElementById('pvC').innerHTML=_wbDocHtml(d,1,1,1);
 pvId=null;_pvCurDoc={kind:'waybill',id:d.id};
 document.getElementById('pvGenBtns').style.display='none';var _mb3=document.getElementById('pvMfgBtn');if(_mb3)_mb3.style.display='none';om('mP')}
 function delWb(id){if(!confirm('حذف هذه البوليصة؟'))return;sv(K.wb,ld(K.wb).filter(function(x){return x.id!==id}));rShpL();toast('تم حذف البوليصة','ok')}
@@ -4697,7 +4788,7 @@ function dcvReset(){_dcScale=1;_dcRotate=0;dcvApply()}
 function dcvApply(){var img=document.getElementById('dcvImg');img.style.transform='scale('+_dcScale+') rotate('+_dcRotate+'deg)';document.getElementById('dcvZoomLbl').textContent=Math.round(_dcScale*100)+'%';document.getElementById('dcvScale').textContent='\u0627\u0644\u062A\u0643\u0628\u064A\u0631: '+Math.round(_dcScale*100)+'% · \u0627\u0644\u062F\u0648\u0631\u0627\u0646: '+_dcRotate+'\u00b0'}
 
 function dcvPrint(){if(!_dcvFile)return;var fl=_dcvFile;var nm=fl.title||fl.name||'\u0645\u0633\u062A\u0646\u062F'
-if((fl.type||'').startsWith('image/')){var w=window.open('','_blank');w.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><title>'+nm+'</title><style>@page{margin:8mm}body{margin:0;display:flex;align-items:center;justify-content:center;min-height:96vh}img{max-width:100%;max-height:96vh;object-fit:contain}</style></head><body><img src="'+fl.data+'"></body></html>');w.document.close();setTimeout(function(){try{w.print()}catch(e){}},500)}
+if((fl.type||'').startsWith('image/')){var w=window.open('','_blank');pqPrint({ctx:'a4',html:'<!DOCTYPE html><html><head><meta charset="UTF-8"><title>'+_prnEsc(nm)+'</title><style>@page{margin:8mm}body{margin:0;display:flex;align-items:center;justify-content:center;min-height:96vh}img{max-width:100%;max-height:96vh;object-fit:contain}</style></head><body><img src="'+fl.data+'"></body></html>'})}
 else if(_dcIsPdf(fl)){var w2=window.open(fl.data,'_blank');setTimeout(function(){try{w2.print()}catch(e){}},900)}
 else{toast('\u0647\u0630\u0627 \u0627\u0644\u0646\u0648\u0639 \u063A\u064A\u0631 \u0642\u0627\u0628\u0644 \u0644\u0644\u0637\u0628\u0627\u0639\u0629 \u0627\u0644\u0645\u0628\u0627\u0634\u0631\u0629','er')}}
 
@@ -4706,13 +4797,13 @@ function dcvShareWA(){if(!_dcvFile)return;_dcAnchorDl(_dcvFile);var nm=_dcvFile.
 function dcvShareEM(){if(!_dcvFile)return;_dcAnchorDl(_dcvFile);var nm=_dcvFile.title||_dcvFile.name||'مستند';var msg='السلام عليكم، تجدون في المرفقات المستند: '+nm;setTimeout(function(){window.location.href='mailto:?subject='+encodeURIComponent(nm)+'&body='+encodeURIComponent(msg)},400)}
 function dcPrintFile(folderId,fileId){const fl=_dcGetFile(folderId,fileId);if(!fl||!fl.data){toast('\u0627\u0644\u0645\u0633\u062A\u0646\u062F \u063A\u064A\u0631 \u0645\u062A\u0648\u0641\u0631','er');return}
 const type=fl.type||'';const nm=fl.title||fl.name||'\u0645\u0633\u062A\u0646\u062F';
-if(type.startsWith('image/')){const w=window.open('','_blank');w.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><title>'+nm+'</title><style>@page{margin:8mm}body{margin:0;display:flex;align-items:center;justify-content:center;min-height:96vh}img{max-width:100%;max-height:96vh;object-fit:contain}</style></head><body><img src="'+fl.data+'"></body></html>');w.document.close();setTimeout(()=>{try{w.print()}catch(e){}},500)}
+if(type.startsWith('image/')){const w=window.open('','_blank');pqPrint({ctx:'a4',html:'<!DOCTYPE html><html><head><meta charset="UTF-8"><title>'+_prnEsc(nm)+'</title><style>@page{margin:8mm}body{margin:0;display:flex;align-items:center;justify-content:center;min-height:96vh}img{max-width:100%;max-height:96vh;object-fit:contain}</style></head><body><img src="'+fl.data+'"></body></html>'})}
 else if(_dcIsPdf(fl)){const w=window.open(fl.data,'_blank');setTimeout(()=>{try{w.print()}catch(e){}},900)}
 else{toast('\u0647\u0630\u0627 \u0627\u0644\u0646\u0648\u0639 \u063A\u064A\u0631 \u0642\u0627\u0628\u0644 \u0644\u0644\u0637\u0628\u0627\u0639\u0629 \u0627\u0644\u0645\u0628\u0627\u0634\u0631\u0629 \u2014 \u0627\u0633\u062A\u062E\u062F\u0645 \u0632\u0631 \u0627\u0644\u062A\u062D\u0645\u064A\u0644','er')}}
 // طباعة كل محتويات المجلد دفعة واحدة
 function dcPrintFolder(folderId){const f=(ld(K.dc)||[]).find(function(d){return d.id===folderId});if(!f)return;const files=(f.files||[]).filter(function(x){return x.data});if(!files.length){toast('\u0647\u0630\u0627 \u0627\u0644\u0645\u0644\u0641 \u0641\u0627\u0631\u063A','er');return}
 const imgs=files.filter(x=>(x.type||'').startsWith('image/'));const pdfs=files.filter(x=>_dcIsPdf(x));const others=files.length-imgs.length-pdfs.length;
-if(imgs.length){const w=window.open('','_blank');w.document.write('<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8"><title>'+(f.name||'')+'</title><style>@page{margin:8mm}body{margin:0;font-family:Arial,sans-serif}.pg{page-break-after:always;display:flex;flex-direction:column;align-items:center;min-height:95vh;justify-content:center}.pg:last-child{page-break-after:auto}.cap{font-size:13px;font-weight:700;margin-bottom:6px;color:#111}img{max-width:100%;max-height:88vh;object-fit:contain}</style></head><body>'+imgs.map(x=>'<div class="pg"><div class="cap">'+(x.title||x.name||'')+'</div><img src="'+x.data+'"></div>').join('')+'</body></html>');w.document.close();setTimeout(()=>{try{w.print()}catch(e){}},700)}
+if(imgs.length){const html='<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8"><title>'+_prnEsc(f.name||'')+'</title><style>@page{margin:8mm}body{margin:0;font-family:Arial,sans-serif}.pg{page-break-after:always;display:flex;flex-direction:column;align-items:center;min-height:95vh;justify-content:center}.pg:last-child{page-break-after:auto}.cap{font-size:13px;font-weight:700;margin-bottom:6px;color:#111}img{max-width:100%;max-height:88vh;object-fit:contain}</style></head><body>'+imgs.map(x=>'<div class="pg"><div class="cap">'+_prnEsc(x.title||x.name||'')+'</div><img src="'+x.data+'"></div>').join('')+'</body></html>';pqPrint({ctx:'a4',html:html})}
 pdfs.forEach((x,i)=>{setTimeout(()=>{const pw=window.open(x.data,'_blank');setTimeout(()=>{try{pw.print()}catch(e){}},900)},1400*(i+1))});
 toast('\u062C\u0627\u0631\u064D \u062A\u062C\u0647\u064A\u0632 \u0627\u0644\u0637\u0628\u0627\u0639\u0629: '+imgs.length+' \u0635\u0648\u0631\u0629 \u0641\u064A \u0645\u0633\u062A\u0646\u062F \u0648\u0627\u062D\u062F + '+pdfs.length+' PDF'+(others?' \u2014 \u0648'+others+' \u0645\u0644\u0641 \u063A\u064A\u0631 \u0642\u0627\u0628\u0644 \u0644\u0644\u0637\u0628\u0627\u0639\u0629':''),'in')}
 // تحميل كل محتويات المجلد دفعة واحدة

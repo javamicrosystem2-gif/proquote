@@ -138,6 +138,12 @@ contextBridge.exposeInMainWorld('proquote', {
     logs: () => ipcRenderer.invoke('einvoice:logs')
   },
 
+  // ---------- الطابعات: قائمة النظام + طباعة صامتة على طابعة محفوظة لكل قسم ----------
+  printers: {
+    list: () => ipcRenderer.invoke('print:getPrinters'),
+    printHtml: (o) => ipcRenderer.invoke('print:html', o)
+  },
+
   onMenuNewQuote: (callback) => {
     const handler = () => callback();
     ipcRenderer.on('menu-new-quote', handler);

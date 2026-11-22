@@ -315,7 +315,7 @@ return {ok:ok,dupBlocked:dupBlocked,all:ok&&dupBlocked}}catch(e){return 'ERR:'+e
   // 40) طابعة البوليصة: بناء مقاس حراري 80مم + هيدر مضغوط + تفضيلات تُقرأ سليمة
   t = await js(`(function(){try{localStorage.setItem('pq5_wb', JSON.stringify([{id:'wbT1',number:'WB-777',date:'2026-01-01',clientName:'عميل طباعة',phone:'0100',address:'القاهرة',items:[{name:'صنف طباعة',size:'100',color:'أحمر',qty:5}],supplyNumber:'PO-1',at:1}]));
 _pvCurDoc={kind:'waybill',id:'wbT1'};
-document.getElementById('wbpSize').value='80xauto';document.getElementById('wbpHdr').value='50';document.getElementById('wbpTbl').value='70';document.getElementById('wbpCompactHdr').checked=true;document.getElementById('wbpShowSign').checked=false;
+document.getElementById('wbpLayout').value='thermal';document.getElementById('wbpSize').value='80xauto';document.getElementById('wbpHdr').value='50';document.getElementById('wbpTbl').value='70';document.getElementById('wbpCompactHdr').checked=true;document.getElementById('wbpShowSign').checked=false;
 const p=_wbpSet();const html=_wbpBuild(p);
 const dims=_wbpDims(p);
 return {w:dims[0],hasNum:html.includes('WB-777'),hasItem:html.includes('صنف طباعة'),noSign:!html.includes('توقيع المستلم'),hasHdr:html.includes('font-weight:800'),ok:dims[0]===80&&html.includes('WB-777')&&html.includes('صنف طباعة')&&!html.includes('توقيع المستلم')}}catch(e){return 'ERR:'+e.message}})()`);

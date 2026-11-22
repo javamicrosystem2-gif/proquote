@@ -34,6 +34,12 @@ if (LIC_PREVIEW_MODE) {
   try { require('../../shoot/probe-license').isolate(); } catch (e) { console.error('[lic-preview] isolation failed:', e.message); }
 }
 
+// وضع فحص الطباعة بذاكرة الطابعات (--probe-print: تشغيل جاف بلا ورق)
+const PROBE_PRINT_MODE = process.argv.includes('--probe-print');
+if (PROBE_PRINT_MODE) {
+  try { require('../../shoot/probe-print').isolate(); } catch (e) { console.error('[probe-print] isolation failed:', e.message); }
+}
+
 // وضع الفحص الحي لقسم المخزن والإدخال المتعدد (--probe-warehouse)
 const PROBE_WAREHOUSE_MODE = process.argv.includes('--probe-warehouse');
 if (PROBE_WAREHOUSE_MODE) {
@@ -392,6 +398,12 @@ app.whenReady().then(() => {
     return;
   }
 
+  // فحص الطباعة الصامتة وذاكرة الطابعات (جاف)
+  if (PROBE_PRINT_MODE) {
+    require('../../shoot/probe-print').run();
+    return;
+  }
+
   // فحص المخزن: إدخال متعدد + منتقى موحد + إنشاء أصناف تلقائي
   if (PROBE_WAREHOUSE_MODE) {
     require('../../shoot/probe-warehouse').run();
@@ -625,6 +637,48 @@ ipcMain.handle('license:getTier', () => license.getTier());
 ipcMain.handle('license:features', () => license.getAvailableFeatures());
 ipcMain.handle('license:sections', () => license.getAllowedSections());
 ipcMain.handle('license:sectionAllowed', (_evt, sec) => license.sectionAllowed(sec));
+
+// ===== ذاكرة الطابعات: طباعة صامتة على طابعة محددة لكل قسم =====
+// سرد طابعات النظام (نافذة مخفية مؤقتة)
+ipcMain.handle('print:getPrinters', async () => {
+  try {
+    const w = new BrowserWindow({ show: false, webPreferences: { sandbox: false } });
+    try { return await w.webContents.getPrintersAsync(); }
+    finally { try { w.destroy(); } catch (_) {} }
+  } catch (e) { return []; }
+});
+
+// طباعة HTML صامتة على طابعة بعينها — baseHref يحفظ الخطوط والأصول النسبية (شعار/خطوط)
+// PQ_PRINT_DRY=1: تشغيل جاف للفحص بلا استهلاك ورق (يعيد ما كان سيُطبع عليه)
+ipcMain.handle('print:html', async (_evt, o) => {
+  const opts = o || {};
+  if (process.env.PQ_PRINT_DRY === '1') {
+    return { ok: true, dry: true, printer: opts.printer || null, len: (opts.html || '').length };
+  }
+  let win = null;
+  try {
+    win = new BrowserWindow({ show: false, webPreferences: { sandbox: false } });
+    let html = String(opts.html || '');
+    const base = String(opts.baseHref || '');
+    if (base && /<head[^>]*>/i.test(html)) html = html.replace(/<head[^>]*>/i, m => m + '<base href="' + base.replace(/"/g, '%22') + '">');
+    else if (base) html = '<base href="' + base.replace(/"/g, '%22') + '">' + html;
+    await win.webContents.loadURL('data:text/html;charset=utf-8,' + encodeURIComponent(html));
+    // مهلة قصيرة لاستقرار الخطوط وصور QR (data-URLs تُحمَّل فوراً)
+    await new Promise(r => setTimeout(r, 600));
+    await win.webContents.print({
+      printer: opts.printer || undefined,
+      silent: opts.silent !== false,
+      printBackground: true,
+      landscape: !!opts.landscape,
+      copies: opts.copies || 1
+    });
+    return { ok: true, printer: opts.printer || null };
+  } catch (e) {
+    return { ok: false, error: (e && e.message) || 'فشلت الطباعة' };
+  } finally {
+    setTimeout(() => { try { if (win) win.destroy(); } catch (_) {} }, 900);
+  }
+});
 
 // قنوات الفاتورة الإلكترونية v2 (منظومات متعددة + فحص اتصال + تقديم من الخلفية)
 ipcMain.handle('einvoice:authorities', () => einvoice.listAuthorities());
