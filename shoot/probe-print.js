@@ -75,6 +75,43 @@ async function run() {
     t = await js(`(function(){var tc=document.querySelector('#TC .tt:last-child span');return tc?tc.textContent:'NO'})()`);
     R('قسم الملصقات يطبع على طابعته المحفوظة (PRN-LABEL-Y)', (t || '').indexOf('PRN-LABEL-Y') >= 0, t);
 
+    // ===== v2: الجذر الأول — deviceName يصل فعلاً (لم يعد printer المتجاهَل) =====
+    t = await js("(function(){return window.proquote.printers.printHtml({html:'<h1>x</h1>',printer:'PRN-DEVICE-TEST',silent:true}).then(function(r){return JSON.stringify(r)})})()");
+    const dr = JSON.parse(t || '{}');
+    R('deviceName يصل لطبقة الطباعة (الاسم الصحيح بواجهة Electron)', dr.deviceName === 'PRN-DEVICE-TEST', JSON.stringify(dr));
+
+    // ===== v2: الجذر الثالث — زر ⚙ يفتح المنتقي و«تذكّر» مفعّل ويحفظ بلا طباعة =====
+    await js("(function(){prnChangeFor('wbc');return true})()");
+    await sleep(700);
+    let t2 = await js("(function(){var b=document.getElementById('prnRemember');var m=document.getElementById('mPrnPick');return b&&b.checked&&m.classList.contains('show')})()");
+    R('⚙ يفتح المنتقي و«تذكّر» يبقى مفعلاً (كان يُلغيه)', t2 === true);
+    await js("(function(){var sel=document.getElementById('prnSel');if(sel.options.length)sel.value=sel.options[0].value;prnPickGo();return true})()");
+    await sleep(700);
+    t2 = await js("(function(){var tc=document.querySelector('#TC .tt:last-child span');return tc?tc.textContent:''})()");
+    R('⚙ يحفظ فوراً برسالة «حُفظت طابعة القسم» بلا محاولة طباعة', (t2 || '').indexOf('حُفظت طابعة القسم') === 0, t2);
+    t2 = await js("(function(){return (_prnSaved()||{})['wbc']||''})()");
+    R('الطابعة محفوظة فعلاً لقسم الملصقات عبر ⚙', !!t2, t2);
+
+    // ===== v2: المنتقي يميز الافتراضية ويعرضها =====
+    t2 = await js("(function(){var sel=document.getElementById('prnSel');if(!sel||!sel.options.length)return 'NO';return Array.from(sel.options).some(function(o){return o.textContent.indexOf('افتراضية النظام')>=0})?true:(sel.options.length>=1?'NO_DEFAULT_PRINTER':false)})()");
+    R('المنتقي يميز الطابعة الافتراضية للنظام بوسم واضح', t2 === true || t2 === 'NO_DEFAULT_PRINTER', t2);
+
+    // ===== v2: مودال الباركود — صف الطابعة + زر نافذة النظام =====
+    await js("(function(){localStorage.setItem('pq5_wi', JSON.stringify([{id:'wbcIt1',code:'WH-9',name:'صنف ملصق',unit:'قطعة',at:1}]));_wbcCurId='wbcIt1';whLabel('wbcIt1');return true})()");
+    await sleep(700);
+    t2 = await js("(function(){var m=document.getElementById('mWbc');var lbl=document.getElementById('wbcPrnLbl');var btns=Array.from(m.querySelectorAll('.md-f button'));return {open:m.classList.contains('show'),hasLbl:!!lbl&&lbl.textContent.indexOf('الطابعة المحفوظة')>=0,hasSys:btns.some(function(b){return b.getAttribute('onclick')&&b.getAttribute('onclick').indexOf('whPrintLabels(true)')>=0})}})()");
+    const wbcr = (() => { try { return typeof t2 === 'string' ? JSON.parse(t2) : t2; } catch (_) { return {}; } })();
+    R('مودال ملصق الباركود: صف الطابعة + زر «نافذة النظام» + الطابعة المحفوظة ظاهرة', wbcr.open === true && wbcr.hasLbl === true && wbcr.hasSys === true, JSON.stringify(wbcr));
+    await js("(function(){cm('mWbc');return true})()");
+
+    // ===== v2: الثبات عبر إعادة تحميل الصفحة (محاكاة إعادة التشغيل) =====
+    await js("(function(){var s=ls();s.printers=s.printers||{};s.printers['docs']='PRN-DOCS-KEEP';sv('pq5_s',s);return true})()");
+    await wc.reload();
+    await sleep(4500);
+    await js("(function(){try{document.getElementById('loginScreen').style.display='none'}catch(e){};return true})()");
+    t2 = await js("(function(){return ((_prnSaved()||{})['docs'])||''})()");
+    R('الثبات: الطابعة المحفوظة تبقى بعد إعادة تحميل كاملة للصفحة', t2 === 'PRN-DOCS-KEEP', t2);
+
     // ===== 5) البوليصة «مطابق للمعاينة»: نفس قالب المعاينة بالضبط + المنزلقات تحجّم =====
     await js(`(function(){
       localStorage.setItem('pq5_wb', JSON.stringify([{id:'wbP1',number:'WB-901',date:'2026-02-02',clientName:'عميل القالب',phone:'0111',address:'الجيزة',items:[{name:'تيشيرت قطن',size:'XL',color:'أزرق',qty:12},{name:'بنطال',size:'32',color:'أسود',qty:5}],showSize:true,showColor:true,extraCols:[{key:'x1',name:'رقم الكرتون',num:true}],at:1}]));

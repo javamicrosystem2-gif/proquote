@@ -653,7 +653,7 @@ ipcMain.handle('print:getPrinters', async () => {
 ipcMain.handle('print:html', async (_evt, o) => {
   const opts = o || {};
   if (process.env.PQ_PRINT_DRY === '1') {
-    return { ok: true, dry: true, printer: opts.printer || null, len: (opts.html || '').length };
+    return { ok: true, dry: true, deviceName: opts.printer || null, len: (opts.html || '').length };
   }
   let win = null;
   try {
@@ -665,18 +665,30 @@ ipcMain.handle('print:html', async (_evt, o) => {
     await win.webContents.loadURL('data:text/html;charset=utf-8,' + encodeURIComponent(html));
     // مهلة قصيرة لاستقرار الخطوط وصور QR (data-URLs تُحمَّل فوراً)
     await new Promise(r => setTimeout(r, 600));
-    await win.webContents.print({
-      printer: opts.printer || undefined,
+    // ملاحظة حرجة: خيار الطابعة اسمه deviceName (أي اسم آخر يُتجاهل بصمت → الطابعة الافتراضية)
+    // والانتظار بصيغة callback حتى ترد الطابعة فعلياً — إغلاق النافذة قبل الرد يُلغي المهمة
+    const printOpts = {
+      deviceName: opts.printer || undefined,
       silent: opts.silent !== false,
       printBackground: true,
-      landscape: !!opts.landscape,
-      copies: opts.copies || 1
+      landscape: !!opts.landscape
+    };
+    const result = await new Promise((resolve) => {
+      let done = false;
+      const finish = (r) => { if (!done) { done = true; resolve(r); } };
+      try {
+        win.webContents.print(printOpts, (success, failureReason) => {
+          if (success) finish({ ok: true, deviceName: opts.printer || null });
+          else finish({ ok: false, error: failureReason || 'رفضت الطابعة المهمة' });
+        });
+      } catch (e) { finish({ ok: false, error: e.message }); }
+      setTimeout(() => finish({ ok: false, error: 'انتهت مهلة رد الطابعة (60 ثانية) — تحقق أنها تعمل' }), 60000);
     });
-    return { ok: true, printer: opts.printer || null };
+    setTimeout(() => { try { if (win) win.destroy(); } catch (_) {} }, result.ok ? 1500 : 300);
+    return result;
   } catch (e) {
+    setTimeout(() => { try { if (win) win.destroy(); } catch (_) {} }, 300);
     return { ok: false, error: (e && e.message) || 'فشلت الطباعة' };
-  } finally {
-    setTimeout(() => { try { if (win) win.destroy(); } catch (_) {} }, 900);
   }
 });
 

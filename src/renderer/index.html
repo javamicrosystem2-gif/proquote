@@ -1172,8 +1172,8 @@ body[data-share-size="lg"] .btn-w.btn-sm i,body[data-share-size="lg"] .md-h .btn
 <div class="fg"><label class="fl">عدد النسخ</label><input type="number" class="fi" id="wbcCopies" value="1" min="1" max="500" style="text-align:center"></div>
 </div>
 <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:10px"><label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:11.5px;color:var(--t2)"><input type="checkbox" id="wbcShowName" checked style="accent-color:var(--acc)" onchange="wbcPrev()">إظهار اسم الصنف</label><label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:11.5px;color:var(--t2)"><input type="checkbox" id="wbcShowCode" checked style="accent-color:var(--acc)" onchange="wbcPrev()">إظهار الكود</label><label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:11.5px;color:var(--t2)"><input type="checkbox" id="wbcShowBc" checked style="accent-color:var(--acc)" onchange="wbcPrev()">إظهار الباركود</label><span style="font-size:10.5px;color:var(--t3)">تُحفظ إعداداتك تلقائياً لكل مرة</span></div>
-<div style="background:#fff;border-radius:8px;padding:10px;display:flex;align-items:center;justify-content:center;min-height:120px"><div id="wbcPrev"></div></div>
-</div><div class="md-f"><button class="btn btn-p" onclick="whPrintLabels()"><i class="fas fa-print"></i>طباعة</button><button class="btn btn-s" onclick="cm('mWbc')">إغلاق</button></div></div></div>
+<div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:10px"><span style="font-size:10.5px;color:var(--t3)">تُحفظ إعداداتك تلقائياً لكل مرة</span><div style="flex:1"></div><span id="wbcPrnLbl" style="font-size:10.5px;color:var(--acc)">الطابعة: —</span><button class="btn btn-s btn-xs" onclick="prnChangeFor('wbc')"><i class="fas fa-gear"></i> اختر الطابعة</button></div><div style="background:#fff;border-radius:8px;padding:10px;display:flex;align-items:center;justify-content:center;min-height:120px"><div id="wbcPrev"></div></div>
+</div><div class="md-f"><button class="btn btn-p" onclick="whPrintLabels()"><i class="fas fa-print"></i>طباعة</button><button class="btn btn-s" onclick="whPrintLabels(true)"><i class="fas fa-window-restore"></i>نافذة النظام</button><button class="btn btn-s" onclick="cm('mWbc')">إغلاق</button></div></div></div>
 
 <!-- مودال المناقصة -->
 <div class="mo" id="mTd"><div class="md md-lg"><div class="md-h"><h3 id="mTdt">مناقصة جديدة</h3><button class="md-x" onclick="cm('mTd')"><i class="fas fa-times"></i></button></div><div class="md-b"><input type="hidden" id="tdeId"><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px"><div class="fg"><label class="fl">رقم المناقصة</label><input class="fi" id="tdnu"></div><div class="fg"><label class="fl">ربط بعميل مسجل</label><select class="fi" id="tdcl" onchange="onTdClient()"><option value="">-- بدون ربط --</option></select></div><div class="fg"><label class="fl">الجهة</label><input class="fi" id="tdent" placeholder="اسم الجهة / الشركة"></div><div class="fg"><label class="fl">الموضوع</label><input class="fi" id="tdsub" placeholder="موضوع المناقصة"></div><div class="fg"><label class="fl">تاريخ الإعلان</label><input type="date" class="fi" id="tdad"></div><div class="fg"><label class="fl">آخر موعد للتقديم</label><input type="date" class="fi" id="tddl" onchange="var w=document.getElementById('tdbiWrap');if(w)w.style.display=this.value?'':'none'"></div><div class="fg"><label class="fl">فتح المظاريف</label><input type="date" class="fi" id="tdop"></div><div class="fg" id="tdbiWrap" style="display:none"><label class="fl">التأمين الابتدائي</label><input type="number" class="fi" id="tdbi" min="0" step="0.01" style="text-align:left;direction:ltr"></div><div class="fg"><label class="fl">التأمين النهائي</label><input type="number" class="fi" id="tdbf" min="0" step="0.01" style="text-align:left;direction:ltr"></div><div class="fg" style="display:none"><label class="fl">القيمة التقديرية</label><input type="number" class="fi" id="tdev" min="0" step="0.01" style="text-align:left;direction:ltr"></div><div class="fg"><label class="fl">تكلفة كراسة الشروط</label><input type="number" class="fi" id="tdbk" min="0" step="0.01" style="text-align:left;direction:ltr"></div></div>
@@ -2453,15 +2453,18 @@ const api=_prnApi();if(!api)return;
 try{
 const list=await api.list();
 if(!Array.isArray(list)||!list.length){if(sel)sel.innerHTML='<option value="">لم تُكتشف طابعات — استخدم نافذة النظام</option>';return}
-if(sel)sel.innerHTML=list.map(function(p){return '<option value="'+String(p.name).replace(/"/g,'&quot;')+'">'+String(p.name)+(p.description&&p.description!==p.name?(' — '+String(p.description).replace(/</g,'&lt;').slice(0,40)):'')+'</option>'}).join('');
+if(sel)sel.innerHTML=list.map(function(p){return '<option value="'+String(p.name).replace(/"/g,'&quot;')+'">'+String(p.name)+(p.isDefault?' (افتراضية النظام)':'')+(p.description&&p.description!==p.name?(' — '+String(p.description).replace(/</g,'&lt;').slice(0,40)):'')+'</option>'}).join('');
+var _defP=list.find(function(p){return p.isDefault});
 const cur=_prnSaved()[ctx];
-if(cur&&sel){const ex=list.some(function(p){return p.name===cur});sel.value=ex?cur:sel.value}
+if(cur&&sel){const ex=list.some(function(p){return p.name===cur});sel.value=ex?cur:(_defP?_defP.name:sel.value)}
+else if(!cur&&sel&&_defP){sel.value=_defP.name}
 }catch(e){if(sel)sel.innerHTML='<option value="">تعذّر جلب الطابعات — استخدم نافذة النظام</option>'}
 }
 async function prnPickGo(){
 const sel=document.getElementById('prnSel');
 const name=sel?sel.value:'';
 if(!name){toast('اختر طابعة أولاً','er');return}
+if(_prnQueue&&_prnQueue._changeOnly){var _cx=_prnQueue.ctx;_prnSave(_cx,name);cm('mPrnPick');toast('حُفظت طابعة القسم ('+(PRN_CTX_LBL[_cx]||_cx)+'): '+name,'ok');_prnQueue=null;return}
 if(document.getElementById('prnRemember').checked)_prnSave(_prnQueue.ctx,name);else _prnForget(_prnQueue.ctx);
 const q=_prnQueue;cm('mPrnPick');
 const api=_prnApi();
@@ -2472,7 +2475,7 @@ toast('فشلت الطباعة: '+((r&&r.error)||''),'er');return}
 _prnLegacy(q.html,q);
 }
 function prnSystemDlg(){const q=_prnQueue;if(!q)return;cm('mPrnPick');_prnLegacy(q.html,q)}
-function prnChangeFor(ctx){_prnQueue={ctx:ctx,html:'',landscape:false};prnOpenPicker(ctx);const b=document.getElementById('prnRemember');if(b)b.checked=false;const lb=document.getElementById('prnCtxLbl');if(lb)lb.textContent='تغيير طابعة القسم: '+(PRN_CTX_LBL[ctx]||ctx)}
+function prnChangeFor(ctx){_prnQueue={ctx:ctx,html:'',landscape:false,_changeOnly:true};prnOpenPicker(ctx);const b=document.getElementById('prnRemember');if(b)b.checked=true;const lb=document.getElementById('prnCtxLbl');if(lb)lb.textContent='تغيير طابعة القسم: '+(PRN_CTX_LBL[ctx]||ctx)+' — تُحفظ فوراً وتُستخدم تلقائياً'}
 function prQ(){if(_pvCurDoc&&_pvCurDoc.kind==='waybill'){wbpOpenPrint();return}const c=document.getElementById('qPA').innerHTML;pqPrint({ctx:'a4',body:c})}
 
 // ===== العملاء =====
@@ -3488,7 +3491,7 @@ document.getElementById('wbcItem').textContent=it.name;
 document.getElementById('wbcCode').textContent=it.code;
 // استرجاع التفضيلات المحفوظة
 try{const p=(ls().wbcPrefs)||{};if(p.size)document.getElementById('wbcSize').value=p.size;if(p.w)document.getElementById('wbcW').value=p.w;if(p.h)document.getElementById('wbcH').value=p.h;if(p.mode)document.getElementById('wbcMode').value=p.mode;if(p.bch)document.getElementById('wbcBcH').value=p.bch;if(p.bw)document.getElementById('wbcBw').value=p.bw;if(p.fs)document.getElementById('wbcFs').value=p.fs;if(p.copies)document.getElementById('wbcCopies').value=p.copies;if(p.showName!==undefined)document.getElementById('wbcShowName').checked=p.showName;if(p.showCode!==undefined)document.getElementById('wbcShowCode').checked=p.showCode;if(p.showBc!==undefined&&document.getElementById('wbcShowBc'))document.getElementById('wbcShowBc').checked=p.showBc}catch(e){}
-wbcOnSize();om('mWbc');wbcPrev()}
+wbcOnSize();try{var _wp2=(_prnSaved()||{})['wbc'];var _wl2=document.getElementById('wbcPrnLbl');if(_wl2)_wl2.textContent=_wp2?('الطابعة المحفوظة: '+_wp2):'لم تُحدد طابعة بعد — ستُختار عند أول طباعة'}catch(e){}om('mWbc');wbcPrev()}
 function wbcOnSize(){const v=document.getElementById('wbcSize').value;const cust=(v==='custom');document.getElementById('wbcCustomW').style.display=cust?'':'none';document.getElementById('wbcCustomH').style.display=cust?'':'none';wbcPrev()}
 function _wbcDims(){const v=document.getElementById('wbcSize').value;if(v==='custom')return [Math.max(20,parseInt(document.getElementById('wbcW').value)||45),Math.max(12,parseInt(document.getElementById('wbcH').value)||25)];const pr=v.split('x');return [parseInt(pr[0]),parseInt(pr[1])]}
 function _wbcSet(){return {size:document.getElementById('wbcSize').value,w:document.getElementById('wbcW').value,h:document.getElementById('wbcH').value,mode:document.getElementById('wbcMode').value,bch:document.getElementById('wbcBcH').value,bw:document.getElementById('wbcBw').value,fs:document.getElementById('wbcFs').value,copies:document.getElementById('wbcCopies').value,showName:document.getElementById('wbcShowName').checked,showCode:document.getElementById('wbcShowCode').checked,showBc:(document.getElementById('wbcShowBc')?document.getElementById('wbcShowBc').checked:true)}}
@@ -3506,7 +3509,7 @@ inner=inner.replace(/\s(width|height)="[^"]*"/g,'');
 const nmOn=document.getElementById('wbcShowName').checked;const cdOn=document.getElementById('wbcShowCode').checked;const bcOn=(document.getElementById('wbcShowBc'))?document.getElementById('wbcShowBc').checked:true;
 box.innerHTML='<div style="width:'+dims[0]+'mm;height:'+dims[1]+'mm;background:#fff;border:1px dashed #999;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;padding:1mm;box-sizing:border-box;color:#000">'+(nmOn?'<div style="font-family:Arial;color:#000;font-size:'+document.getElementById('wbcFs').value+'pt;font-weight:700;max-width:'+(dims[0]-2)+'mm;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+it.name.replace(/</g,'&lt;')+'</div>':'')+((bcOn&&inner)?('<div style="max-width:'+(dims[0]-2)+'mm;color:#000">'+inner.replace('<svg','<svg style="max-width:'+(dims[0]-2)+'mm;height:auto"')+'</div>'):'')+(cdOn?'<div style="font-family:Arial;color:#000;font-size:7pt;letter-spacing:1px">'+String(it.code)+'</div>':'')+'</div>'
 }catch(e){box.innerHTML='<div style="color:#c00;font-family:Arial;font-size:12px;padding:20px">تعذر التوليد</div>'}}
-function whPrintLabels(){
+function whPrintLabels(useSystem){
 const it=ld(K.wi).find(x=>x.id===_wbcCurId);if(!it){toast('اختر صنفاً أولاً','er');return}
 const p=_wbcSet();try{const s=ls();s.wbcPrefs=p;sv(K.s,s)}catch(e){}
 const dims=_wbcDims();const W=dims[0],H=dims[1];
@@ -3523,7 +3526,7 @@ html='<!DOCTYPE html><html><head><meta charset="UTF-8"><title>ملصقات A4</t
 }else{
 html='<!DOCTYPE html><html><head><meta charset="UTF-8"><title>ملصقات حرارية</title><style>@page{size:'+W+'mm '+H+'mm;margin:0}body{margin:0;font-family:Arial}.lbl{width:'+W+'mm;height:'+H+'mm;display:flex;flex-direction:column;align-items:center;justify-content:center;page-break-after:always;text-align:center;overflow:hidden;box-sizing:border-box;padding:0.5mm}.nm{font-size:'+p.fs+'pt;font-weight:700;max-width:'+(W-2)+'mm;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.cd{font-size:7pt;letter-spacing:1px}</style></head><body>'+Array(n).fill('<div class="lbl">'+lblInner+'</div>').join('')+'</body></html>';
 }
-pqPrint({ctx:'wbc',html:html})}
+if(useSystem){_prnLegacy(html,{});return}pqPrint({ctx:'wbc',html:html})}
 
 // ============================================================
 // ===== بطاقات الباقات والشراء (PayPal + طلب الكود بالبريد) =====
@@ -4788,7 +4791,7 @@ function dcvReset(){_dcScale=1;_dcRotate=0;dcvApply()}
 function dcvApply(){var img=document.getElementById('dcvImg');img.style.transform='scale('+_dcScale+') rotate('+_dcRotate+'deg)';document.getElementById('dcvZoomLbl').textContent=Math.round(_dcScale*100)+'%';document.getElementById('dcvScale').textContent='\u0627\u0644\u062A\u0643\u0628\u064A\u0631: '+Math.round(_dcScale*100)+'% · \u0627\u0644\u062F\u0648\u0631\u0627\u0646: '+_dcRotate+'\u00b0'}
 
 function dcvPrint(){if(!_dcvFile)return;var fl=_dcvFile;var nm=fl.title||fl.name||'\u0645\u0633\u062A\u0646\u062F'
-if((fl.type||'').startsWith('image/')){var w=window.open('','_blank');pqPrint({ctx:'a4',html:'<!DOCTYPE html><html><head><meta charset="UTF-8"><title>'+_prnEsc(nm)+'</title><style>@page{margin:8mm}body{margin:0;display:flex;align-items:center;justify-content:center;min-height:96vh}img{max-width:100%;max-height:96vh;object-fit:contain}</style></head><body><img src="'+fl.data+'"></body></html>'})}
+if((fl.type||'').startsWith('image/')){pqPrint({ctx:'docs',html:'<!DOCTYPE html><html><head><meta charset="UTF-8"><title>'+_prnEsc(nm)+'</title><style>@page{margin:8mm}body{margin:0;display:flex;align-items:center;justify-content:center;min-height:96vh}img{max-width:100%;max-height:96vh;object-fit:contain}</style></head><body><img src="'+fl.data+'"></body></html>'})}
 else if(_dcIsPdf(fl)){var w2=window.open(fl.data,'_blank');setTimeout(function(){try{w2.print()}catch(e){}},900)}
 else{toast('\u0647\u0630\u0627 \u0627\u0644\u0646\u0648\u0639 \u063A\u064A\u0631 \u0642\u0627\u0628\u0644 \u0644\u0644\u0637\u0628\u0627\u0639\u0629 \u0627\u0644\u0645\u0628\u0627\u0634\u0631\u0629','er')}}
 
@@ -4797,13 +4800,13 @@ function dcvShareWA(){if(!_dcvFile)return;_dcAnchorDl(_dcvFile);var nm=_dcvFile.
 function dcvShareEM(){if(!_dcvFile)return;_dcAnchorDl(_dcvFile);var nm=_dcvFile.title||_dcvFile.name||'مستند';var msg='السلام عليكم، تجدون في المرفقات المستند: '+nm;setTimeout(function(){window.location.href='mailto:?subject='+encodeURIComponent(nm)+'&body='+encodeURIComponent(msg)},400)}
 function dcPrintFile(folderId,fileId){const fl=_dcGetFile(folderId,fileId);if(!fl||!fl.data){toast('\u0627\u0644\u0645\u0633\u062A\u0646\u062F \u063A\u064A\u0631 \u0645\u062A\u0648\u0641\u0631','er');return}
 const type=fl.type||'';const nm=fl.title||fl.name||'\u0645\u0633\u062A\u0646\u062F';
-if(type.startsWith('image/')){const w=window.open('','_blank');pqPrint({ctx:'a4',html:'<!DOCTYPE html><html><head><meta charset="UTF-8"><title>'+_prnEsc(nm)+'</title><style>@page{margin:8mm}body{margin:0;display:flex;align-items:center;justify-content:center;min-height:96vh}img{max-width:100%;max-height:96vh;object-fit:contain}</style></head><body><img src="'+fl.data+'"></body></html>'})}
+if(type.startsWith('image/')){pqPrint({ctx:'docs',html:'<!DOCTYPE html><html><head><meta charset="UTF-8"><title>'+_prnEsc(nm)+'</title><style>@page{margin:8mm}body{margin:0;display:flex;align-items:center;justify-content:center;min-height:96vh}img{max-width:100%;max-height:96vh;object-fit:contain}</style></head><body><img src="'+fl.data+'"></body></html>'})}
 else if(_dcIsPdf(fl)){const w=window.open(fl.data,'_blank');setTimeout(()=>{try{w.print()}catch(e){}},900)}
 else{toast('\u0647\u0630\u0627 \u0627\u0644\u0646\u0648\u0639 \u063A\u064A\u0631 \u0642\u0627\u0628\u0644 \u0644\u0644\u0637\u0628\u0627\u0639\u0629 \u0627\u0644\u0645\u0628\u0627\u0634\u0631\u0629 \u2014 \u0627\u0633\u062A\u062E\u062F\u0645 \u0632\u0631 \u0627\u0644\u062A\u062D\u0645\u064A\u0644','er')}}
 // طباعة كل محتويات المجلد دفعة واحدة
 function dcPrintFolder(folderId){const f=(ld(K.dc)||[]).find(function(d){return d.id===folderId});if(!f)return;const files=(f.files||[]).filter(function(x){return x.data});if(!files.length){toast('\u0647\u0630\u0627 \u0627\u0644\u0645\u0644\u0641 \u0641\u0627\u0631\u063A','er');return}
 const imgs=files.filter(x=>(x.type||'').startsWith('image/'));const pdfs=files.filter(x=>_dcIsPdf(x));const others=files.length-imgs.length-pdfs.length;
-if(imgs.length){const html='<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8"><title>'+_prnEsc(f.name||'')+'</title><style>@page{margin:8mm}body{margin:0;font-family:Arial,sans-serif}.pg{page-break-after:always;display:flex;flex-direction:column;align-items:center;min-height:95vh;justify-content:center}.pg:last-child{page-break-after:auto}.cap{font-size:13px;font-weight:700;margin-bottom:6px;color:#111}img{max-width:100%;max-height:88vh;object-fit:contain}</style></head><body>'+imgs.map(x=>'<div class="pg"><div class="cap">'+_prnEsc(x.title||x.name||'')+'</div><img src="'+x.data+'"></div>').join('')+'</body></html>';pqPrint({ctx:'a4',html:html})}
+if(imgs.length){const html='<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8"><title>'+_prnEsc(f.name||'')+'</title><style>@page{margin:8mm}body{margin:0;font-family:Arial,sans-serif}.pg{page-break-after:always;display:flex;flex-direction:column;align-items:center;min-height:95vh;justify-content:center}.pg:last-child{page-break-after:auto}.cap{font-size:13px;font-weight:700;margin-bottom:6px;color:#111}img{max-width:100%;max-height:88vh;object-fit:contain}</style></head><body>'+imgs.map(x=>'<div class="pg"><div class="cap">'+_prnEsc(x.title||x.name||'')+'</div><img src="'+x.data+'"></div>').join('')+'</body></html>';pqPrint({ctx:'docs',html:html})}
 pdfs.forEach((x,i)=>{setTimeout(()=>{const pw=window.open(x.data,'_blank');setTimeout(()=>{try{pw.print()}catch(e){}},900)},1400*(i+1))});
 toast('\u062C\u0627\u0631\u064D \u062A\u062C\u0647\u064A\u0632 \u0627\u0644\u0637\u0628\u0627\u0639\u0629: '+imgs.length+' \u0635\u0648\u0631\u0629 \u0641\u064A \u0645\u0633\u062A\u0646\u062F \u0648\u0627\u062D\u062F + '+pdfs.length+' PDF'+(others?' \u2014 \u0648'+others+' \u0645\u0644\u0641 \u063A\u064A\u0631 \u0642\u0627\u0628\u0644 \u0644\u0644\u0637\u0628\u0627\u0639\u0629':''),'in')}
 // تحميل كل محتويات المجلد دفعة واحدة
