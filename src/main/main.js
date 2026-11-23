@@ -34,6 +34,12 @@ if (LIC_PREVIEW_MODE) {
   try { require('../../shoot/probe-license').isolate(); } catch (e) { console.error('[lic-preview] isolation failed:', e.message); }
 }
 
+// وضع فحص تجربة التحديث (--probe-upd)
+const PROBE_UPD_MODE = process.argv.includes('--probe-upd');
+if (PROBE_UPD_MODE) {
+  try { require('../../shoot/probe-upd').isolate(); } catch (e) { console.error('[probe-upd] isolation failed:', e.message); }
+}
+
 // وضع فحص الطباعة بذاكرة الطابعات (--probe-print: تشغيل جاف بلا ورق)
 const PROBE_PRINT_MODE = process.argv.includes('--probe-print');
 if (PROBE_PRINT_MODE) {
@@ -398,6 +404,12 @@ app.whenReady().then(() => {
     return;
   }
 
+  // فحص تجربة التحديث
+  if (PROBE_UPD_MODE) {
+    require('../../shoot/probe-upd').run();
+    return;
+  }
+
   // فحص الطباعة الصامتة وذاكرة الطابعات (جاف)
   if (PROBE_PRINT_MODE) {
     require('../../shoot/probe-print').run();
@@ -438,10 +450,10 @@ app.whenReady().then(() => {
   } catch (_) {}
   updater.init(mainWindow, _updFeed);
   updater.registerIpc();
-  // فحص تلقائي للتحديثات: بعد 10 ثوانٍ من الإقلاع ثم كل 6 ساعات
+  // فحص تلقائي للتحديثات: بعد 10 ثوانٍ من الإقلاع ثم كل ساعة
   // (يظهر تنبيه «تحديث جديد متاح» لكل المستخدمين عند رفع إصدار جديد على GitHub)
   setTimeout(() => { updater.checkForUpdates().catch(() => {}); }, 10000);
-  setInterval(() => { updater.checkForUpdates().catch(() => {}); }, 6 * 60 * 60 * 1000);
+  setInterval(() => { updater.checkForUpdates().catch(() => {}); }, 60 * 60 * 1000); // كل ساعة — كان 6 ساعات
   productImport.registerIpc();
   filestore.init();
   try { const _dm = dataMigrations.init(); console.log('[startup] data migrations:', JSON.stringify(_dm.health)); } catch (e) { console.error('[startup] data migrations error:', e.message); }
