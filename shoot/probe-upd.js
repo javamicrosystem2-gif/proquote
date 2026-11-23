@@ -77,6 +77,32 @@ async function run() {
     R('خطأ الفحص يظهر ببانر أحمر مع السبب', r4.shown === true && r4.txt.indexOf('فشل الاتصال') >= 0, t);
     await js(`(function(){updHide();try{document.getElementById('updBanner').style.borderColor='var(--acc)'}catch(e){};return true})()`);
 
+    // ===== v3: حصانة البانر — التسلسلات القاتلة =====
+    // أ) متاح ← خطأ لاحق: البانر يبقى بزر «تحميل الآن»
+    await js("(function(){_updDismissed=false;_updShown=false;updRender({status:'available',version:'9.99.0'});updRender({status:'error',error:'انقطاع شبكة (اختبار)'});return true})()");
+    t = await js("(function(){var b=document.getElementById('updBanner');return JSON.stringify({shown:b.style.display!=='none',txt:(document.getElementById('updTxt').textContent||''),hasDl:Array.from(b.querySelectorAll('button')).some(function(x){return (x.getAttribute('onclick')||'').indexOf('download')>=0})})})()");
+    const ra = JSON.parse(t || '{}');
+    R('متاح ← خطأ لاحق: البانر يبقى وزر «تحميل الآن» يعمل (قاتل المشكلة)', ra.shown === true && ra.hasDl === true && ra.txt.indexOf('متاح') >= 0, t);
+
+    // ب) متاح ← فحص جديد (checking): لا يُمسح ولا تنزع أزراره
+    await js("(function(){updRender({status:'available',version:'9.99.0'});updRender({status:'checking'});return true})()");
+    t = await js("(function(){var b=document.getElementById('updBanner');return JSON.stringify({txt:(document.getElementById('updTxt').textContent||''),hasDl:Array.from(b.querySelectorAll('button')).some(function(x){return (x.getAttribute('onclick')||'').indexOf('download')>=0})})})()");
+    const rb = JSON.parse(t || '{}');
+    R('متاح ← جارٍ التحقق لاحقاً: يُتجاهل ويبقى الزر', rb.hasDl === true && rb.txt.indexOf('متاح') >= 0, t);
+
+    // ج) متاح ← up-to-date لاحق: يُتجاهل والبانر يبقى
+    await js("(function(){updRender({status:'available',version:'9.99.0'});updRender({status:'up-to-date',version:'9.99.0'});return true})()");
+    t = await js("(function(){var b=document.getElementById('updBanner');return JSON.stringify({shown:b.style.display!=='none',hasDl:Array.from(b.querySelectorAll('button')).some(function(x){return (x.getAttribute('onclick')||'').indexOf('download')>=0})})})()");
+    const rc = JSON.parse(t || '{}');
+    R('متاح ← up-to-date لاحق: يُتجاهل والبانر يبقى (كان يمسحه تماماً)', rc.shown === true && rc.hasDl === true, t);
+    await js("(function(){updHide();return true})()");
+
+    // د) بانر الخطأ يحمل «إعادة المحاولة»
+    await js("(function(){_updShown=false;updRender({status:'error',error:'اختبار'});return true})()");
+    t = await js("(function(){var b=document.getElementById('updBanner');return Array.from(b.querySelectorAll('button')).some(function(x){return (x.getAttribute('onclick')||'').indexOf('updCheckNow')>=0})})()");
+    R('بانر الخطأ يحمل زر «إعادة المحاولة»', t === true);
+    await js("(function(){updHide();return true})()");
+
     // 5) الدورية: كل ساعة (كانت 6)
     const mainSrc = fs.readFileSync(path.join(__dirname, '..', 'src', 'main', 'main.js'), 'utf8');
     R('الفحص الدوري: كل ساعة بدل 6 ساعات', mainSrc.includes('60 * 60 * 1000') && !mainSrc.includes('6 * 60 * 60 * 1000'));

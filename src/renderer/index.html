@@ -2010,8 +2010,8 @@ if((so.items||[]).length){(so.items||[]).forEach(function(it){const ex={};shpExt
 toast('عُبّئت الأصناف من: '+so.number,'ok')}
 
 // ===== تنبيه التحديث التلقائي (يظهر لكل المستخدمين عند رفع إصدار جديد) =====
-let _updDismissed=false;
-function updHide(){var b=document.getElementById('updBanner');if(b)b.style.display='none';_updDismissed=true}
+let _updDismissed=false,_updShown=false;
+function updHide(){var b=document.getElementById('updBanner');if(b)b.style.display='none';_updDismissed=true;_updShown=false}
 async function updCheckNow(){_updDismissed=false;var st=document.getElementById('updManualStat');if(st)st.textContent='جارٍ الفحص…';try{updAction('check');var PQ=window.proquote;var t0=Date.now();var poll=setInterval(function(){var b=document.getElementById('updBanner');var bt=(document.getElementById('updTxt')||{}).textContent||'';
 if(b&&b.style.display!=='none'&&bt.indexOf('متاح')>=0){clearInterval(poll);if(st)st.textContent='تحديث متاح ✓';return}
 if(b&&b.style.display!=='none'&&bt.indexOf('تعذّر')>=0){clearInterval(poll);if(st)st.textContent='تعذّر الفحص — التفاصيل بالأعلى';return}
@@ -2023,15 +2023,21 @@ try{if(a==='check'){updRender({status:'checking'});PQ.updater.check()}
 if(a==='download'){PQ.updater.download()}
 if(a==='install'){PQ.updater.install()}}catch(e){}}
 function updRender(d){
-if(_updDismissed&&d.status==='available')return;
+try{console.log('[upd]',new Date().toISOString().slice(11,19),d&&d.status,d&&d.version||'',d&&d.error||'')}catch(e){}
 var b=document.getElementById('updBanner'),t=document.getElementById('updTxt'),btns=document.getElementById('updBtns');
 if(!b||!t||!btns)return;
-if(d.status==='checking'){t.textContent='جارٍ التحقق من التحديثات…';btns.innerHTML='';b.style.display='';return}
-if(d.status==='available'){t.innerHTML='تحديث جديد متاح ✓ الإصدار <b style="color:var(--acc)">'+(d.version||'')+'</b>';btns.innerHTML='<button class="btn btn-p btn-xs" onclick="updAction(\'download\')"><i class="fas fa-download"></i>تحميل الآن</button><button class="btn btn-s btn-xs" onclick="updHide()">لاحقاً</button>';b.style.display='';try{toast('🔄 تحديث جديد متاح — الإصدار '+(d.version||''),'ok')}catch(e){}return}
-if(d.status==='downloading'){t.textContent='جارٍ تحميل التحديث… '+(d.percent||0)+'%';btns.innerHTML='';b.style.display='';return}
-if(d.status==='downloaded'){t.innerHTML='تم تنزيل التحديث ✓ — أعد التشغيل للتثبيت';btns.innerHTML='<button class="btn btn-p btn-xs" onclick="updAction(\'install\')"><i class="fas fa-rotate"></i>إعادة التشغيل والتثبيت</button>';b.style.display='';return}
-if(d.status==='error'){t.innerHTML='<span style="color:var(--red)">تعذّر فحص التحديثات: '+(d.error||'خطأ غير معروف')+'</span>';btns.innerHTML='<button class="btn btn-s btn-xs" onclick="updHide()">إغلاق</button>';b.style.display='';b.style.borderColor='var(--red)';setTimeout(function(){try{b.style.borderColor='var(--acc)'}catch(e){}},12000);return}
-if(d.status==='up-to-date'){b.style.display='none';try{var _ms=document.getElementById('updManualStat');if(_ms&&_ms.textContent.indexOf('جارٍ')>=0)_ms.textContent='أنت على أحدث إصدار ✓'}catch(e){}}}
+var _st=d&&d.status;
+// حصانة البانر: بعد «متاح» لا يمسحه أي حدث لاحق (checking/up-to-date/error) — يبقى بزر تحميله
+if(_st==='available')_updShown=true;
+if(_updShown&&(_st==='checking'||_st==='up-to-date')){try{if(_st==='up-to-date'){var _ms=document.getElementById('updManualStat');if(_ms&&_ms.textContent.indexOf('جارٍ')>=0)_ms.textContent='أنت على أحدث إصدار ✓'}}catch(e){}return}
+if(_updShown&&_st==='error'){try{toast('انقطاع مؤقت — زر التحميل ما يزال متاحاً','in')}catch(e){}return}
+if(_st==='checking'){t.textContent='جارٍ التحقق من التحديثات…';btns.innerHTML='';b.style.display='';return}
+if(_st==='available'){t.innerHTML='تحديث جديد متاح ✓ الإصدار <b style="color:var(--acc)">'+(d.version||'')+'</b>';btns.innerHTML='<button class="btn btn-p btn-xs" onclick="updAction(\'download\')"><i class="fas fa-download"></i>تحميل الآن</button><button class="btn btn-s btn-xs" onclick="updHide()">لاحقاً</button>';b.style.display='';try{b.style.borderColor='var(--acc)'}catch(e){}try{toast('🔄 تحديث جديد متاح — الإصدار '+(d.version||''),'ok')}catch(e){}return}
+if(_st==='downloading'){t.textContent='جارٍ تحميل التحديث… '+(d.percent||0)+'%';btns.innerHTML='';b.style.display='';return}
+if(_st==='downloaded'){t.innerHTML='تم تنزيل التحديث ✓ — أعد التشغيل للتثبيت ('+(d.version||'')+')';btns.innerHTML='<button class="btn btn-p btn-xs" onclick="updAction(\'install\')"><i class="fas fa-rotate"></i>إعادة التشغيل والتثبيت</button>';b.style.display='';return}
+if(_st==='error'){t.innerHTML='<span style="color:var(--red)">تعذّر فحص التحديثات: '+(d.error||'خطأ غير معروف')+'</span>';btns.innerHTML='<button class="btn btn-p btn-xs" onclick="updCheckNow()"><i class="fas fa-arrows-rotate"></i>إعادة المحاولة</button><button class="btn btn-s btn-xs" onclick="updHide()">إغلاق</button>';b.style.display='';b.style.borderColor='var(--red)';return}
+if(_st==='up-to-date'){b.style.display='none';try{var _ms2=document.getElementById('updManualStat');if(_ms2&&_ms2.textContent.indexOf('جارٍ')>=0)_ms2.textContent='أنت على أحدث إصدار ✓'}catch(e){}}
+}
 (function(){try{var PQ=window.proquote;if(PQ&&PQ.updater&&PQ.updater.onUpdateStatus)PQ.updater.onUpdateStatus(function(d){updRender(d)})}catch(e){}})();
 
 // ===== أكواد المنتجات التلقائية (كل كود لمنتج واحد فقط — الموجود لا يُمس) =====
