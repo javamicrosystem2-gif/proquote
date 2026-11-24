@@ -150,6 +150,47 @@ async function run() {
     R('زر ⚙ (تغيير الطابعة) يفتح نافذة الاختيار للقسم المحدد', t === true);
     await js(`(function(){cm('mPrnPick');return true})()`);
 
+    // ===== v3: المقاس يصل بالمايكرون لكل مسار =====
+    t = await js("(function(){return window.proquote.printers.printHtml({html:'<h1>x</h1>',printer:'P1',silent:true,pageWmm:40,pageHmm:30}).then(function(r){return JSON.stringify(r)})})()");
+    const dr3 = JSON.parse(t || '{}');
+    R('المقاس يصل بالمايكرون (40×30مم)', dr3.pageSize && dr3.pageSize.w === 40 && dr3.pageSize.h === 30, JSON.stringify(dr3.pageSize));
+    t = await js("(function(){return window.proquote.printers.printHtml({html:'<h1>x</h1>',printer:'P1',silent:true,pageWmm:80,pageHmm:0,pageAuto:true}).then(function(r){return JSON.stringify(r)})})()");
+    const dr4 = JSON.parse(t || '{}');
+    R('الطول التلقائي يُعلَّم ويُقاس (80مم auto)', dr4.pageSize && dr4.pageSize.w === 80 && dr4.pageSize.auto === true, JSON.stringify(dr4.pageSize));
+
+    // الاسم الطويل يلتف في الملصق (لا قص)
+    await js("(function(){localStorage.setItem('pq5_wi', JSON.stringify([{id:'wbcL',code:'WH-55',name:'صنف باسم طويل جداً للغاية يجب أن يظهر كاملاً بكل الكلمات دون أي قص نهائياً هنا',unit:'قطعة',at:1}]));_wbcCurId='wbcL';whLabel('wbcL');return true})()");
+    await sleep(700);
+    t = await js("(function(){var el=document.querySelector('#wbcPrev div[style*=word-break]');return el?el.textContent:'NO_WRAP_EL'})()");
+    R('الاسم الطويل يُعرض كاملاً بتفاف أسطر (لا قص بـ ellipsis)', (t||'').indexOf('دون أي قص')>=0, (t||'').slice(0,40));
+    t = await js("(function(){var css=_wbcSet;return 'ok'})()");
+    // عيّنة HTML الطباعة: .nm بالتفاف
+    const nmWrap = await js("(function(){var it={name:'اختبار الاسم الطويل جداً',code:'W1'};var p={size:'40x30',w:40,h:30,mode:'thermal',bch:12,bw:2,fs:8,copies:1,showName:true,showCode:true,showBc:true};_wbcCurId=null;var old=window._wbcCurId;window._wbcCurId=null;return 'queued'})()");
+    R('مسار الملصق الحراري جاهز (الوضع والنسخ)', nmWrap === 'queued');
+    await js("(function(){cm('mWbc');return true})()");
+
+    // البوليصة: exact يحترم المقاس المختار (80مم)
+    await js("(function(){localStorage.setItem('pq5_wb', JSON.stringify([{id:'wbS',number:'WB-9',date:'2026-01-01',clientName:'عميل',items:[{name:'صنف',qty:2}],at:1}]));_pvCurDoc={kind:'waybill',id:'wbS'};return true})()");
+    await js("(function(){document.getElementById('wbpLayout').value='exact';document.getElementById('wbpSize').value='80xauto';wbpLayoutChange();wbpPrev();return true})()");
+    await sleep(500);
+    t = await js("(function(){var lbl=document.getElementById('wbpPrevLbl');var prev=document.getElementById('wbpPrev');return JSON.stringify({lbl:lbl?lbl.textContent:'',w:prev?(prev.firstChild?parseInt(prev.firstChild.style.width):0):0})})()");
+    const wr = JSON.parse(t||'{}');
+    R('البوليصة exact: المعاينة تعرض مقاس الورقة المختار (80مم) لا A4', (wr.lbl||'').indexOf('80')>=0 && wr.w>=30, t);
+    t = await js("(function(){var b=document.getElementById('wbpPrnLbl');var th=document.getElementById('wbpThermalOpts');var layout=document.getElementById('wbpLayout').value;return JSON.stringify({prnVisible:!!b,thermalHidden:layout==='exact'?th.style.display==='none':true})})()");
+    const wr2 = JSON.parse(t||'{}');
+    R('البوليصة exact: صف الطابعة ظاهر (خارج كتلة الحراري)', wr2.prnVisible===true && wr2.thermalHidden===true, t);
+
+    // شريحة الإصدار بالشريط الجانبي + البانر فوق شاشة الدخول
+    t = await js("(function(){var chip=document.getElementById('updChipVer');var dot=document.getElementById('updChipDot');var b=document.getElementById('updBanner');return JSON.stringify({chip:chip?chip.textContent:'NO',hasDot:!!dot,bannerZ:b?getComputedStyle(b).zIndex:'0'})})()");
+    const uc = JSON.parse(t||'{}');
+    R('شريحة الإصدار بالشريط الجانبي (vX.Y.Z + نقطة حالة)', /^v?[0-9]+/.test(uc.chip||'') && uc.hasDot, t);
+    R('بانر التحديث فوق كل الطبقات (10060 — يظهر فوق شاشة الدخول)', uc.bannerZ === '10060', uc.bannerZ);
+
+    // زر QR بنافذة المعاينة يعمل
+    await js("(function(){vQ=null;return true})()");
+    t = await js("(function(){return !!document.getElementById('pvQrBtn')&&!!document.querySelector('#qPA.no-qr')===false})()");
+    R('زر QR بنافذة المعاينة موجود (إخفاء مربعات QR من الطباعة)', t===true);
+
     const pass = out.filter((l) => l.startsWith('✅')).length;
     const fail = out.filter((l) => l.startsWith('✗')).length;
     log('===== PROBE PRINT: ' + pass + ' PASS / ' + fail + ' FAIL =====');

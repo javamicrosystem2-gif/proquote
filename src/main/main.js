@@ -664,33 +664,49 @@ ipcMain.handle('print:getPrinters', async () => {
 // PQ_PRINT_DRY=1: تشغيل جاف للفحص بلا استهلاك ورق (يعيد ما كان سيُطبع عليه)
 ipcMain.handle('print:html', async (_evt, o) => {
   const opts = o || {};
+  const pw = parseFloat(opts.pageWmm) || 0, ph = parseFloat(opts.pageHmm) || 0, pauto = opts.pageAuto === true;
   if (process.env.PQ_PRINT_DRY === '1') {
-    return { ok: true, dry: true, deviceName: opts.printer || null, len: (opts.html || '').length };
+    return { ok: true, dry: true, deviceName: opts.printer || null, pageSize: { w: pw, h: ph, auto: pauto }, len: (opts.html || '').length };
   }
   let win = null;
   try {
     win = new BrowserWindow({ show: false, webPreferences: { sandbox: false } });
     let html = String(opts.html || '');
     const base = String(opts.baseHref || '');
-    if (base && /<head[^>]*>/i.test(html)) html = html.replace(/<head[^>]*>/i, m => m + '<base href="' + base.replace(/"/g, '%22') + '">');
-    else if (base) html = '<base href="' + base.replace(/"/g, '%22') + '">' + html;
+    // حقن <base> فقط إن لم يوجد (تجنب الازدواج)
+    if (base && !/<bases/i.test(html)) {
+      if (/<head[^>]*>/i.test(html)) html = html.replace(/<head[^>]*>/i, m => m + '<base href="' + base.replace(/"/g, '%22') + '">');
+      else html = '<base href="' + base.replace(/"/g, '%22') + '">' + html;
+    }
     await win.webContents.loadURL('data:text/html;charset=utf-8,' + encodeURIComponent(html));
-    // مهلة قصيرة لاستقرار الخطوط وصور QR (data-URLs تُحمَّل فوراً)
-    await new Promise(r => setTimeout(r, 600));
-    // ملاحظة حرجة: خيار الطابعة اسمه deviceName (أي اسم آخر يُتجاهل بصمت → الطابعة الافتراضية)
-    // والانتظار بصيغة callback حتى ترد الطابعة فعلياً — إغلاق النافذة قبل الرد يُلغي المهمة
+    await new Promise(r => setTimeout(r, 600)); // استقرار الخطوط وصور QR
+    // المقاس بالمايكرون (واجهة Electron) — «الطول التلقائي» يُقاس من المحتوى الفعلي
+    let pageSize = null;
+    if (pw > 0) {
+      let hmm = ph;
+      if (pauto || hmm <= 0) {
+        try {
+          const px = await win.webContents.executeJavaScript('Math.max(document.documentElement.scrollHeight, document.body ? document.body.scrollHeight : 0)', true);
+          hmm = Math.max(10, Math.round((px / 96) * 25.4)); // px→مم (96dpi)
+        } catch (_) { hmm = 100; }
+      }
+      pageSize = { width: Math.max(353, Math.round(pw * 1000)), height: Math.max(353, Math.round(hmm * 1000)) };
+    }
+    // الطابعة: deviceName (أي اسم آخر يُتجاهل بصمت) + callback حتى ترد الطابعة فعلياً
     const printOpts = {
       deviceName: opts.printer || undefined,
       silent: opts.silent !== false,
       printBackground: true,
-      landscape: !!opts.landscape
+      landscape: !!opts.landscape,
+      margins: { marginType: 'none' }
     };
+    if (pageSize) printOpts.pageSize = pageSize;
     const result = await new Promise((resolve) => {
       let done = false;
       const finish = (r) => { if (!done) { done = true; resolve(r); } };
       try {
         win.webContents.print(printOpts, (success, failureReason) => {
-          if (success) finish({ ok: true, deviceName: opts.printer || null });
+          if (success) finish({ ok: true, deviceName: opts.printer || null, pageSize: pageSize });
           else finish({ ok: false, error: failureReason || 'رفضت الطابعة المهمة' });
         });
       } catch (e) { finish({ ok: false, error: e.message }); }
@@ -703,7 +719,6 @@ ipcMain.handle('print:html', async (_evt, o) => {
     return { ok: false, error: (e && e.message) || 'فشلت الطباعة' };
   }
 });
-
 // قنوات الفاتورة الإلكترونية v2 (منظومات متعددة + فحص اتصال + تقديم من الخلفية)
 ipcMain.handle('einvoice:authorities', () => einvoice.listAuthorities());
 ipcMain.handle('einvoice:list', () => einvoice.listProfiles());
