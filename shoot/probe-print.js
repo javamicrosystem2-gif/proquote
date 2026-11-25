@@ -171,9 +171,9 @@ async function run() {
 
     // البوليصة: exact يحترم المقاس المختار (80مم)
     await js("(function(){localStorage.setItem('pq5_wb', JSON.stringify([{id:'wbS',number:'WB-9',date:'2026-01-01',clientName:'عميل',items:[{name:'صنف',qty:2}],at:1}]));_pvCurDoc={kind:'waybill',id:'wbS'};return true})()");
-    await js("(function(){document.getElementById('wbpLayout').value='exact';document.getElementById('wbpSize').value='80xauto';wbpLayoutChange();wbpPrev();return true})()");
+    t = await js("(function(){try{document.getElementById('wbpLayout').value='exact';document.getElementById('wbpSize').value='80xauto';wbpLayoutChange();wbpPrev();return 'ok'}catch(e){return 'ERR:'+e.message}})()");
     await sleep(500);
-    t = await js("(function(){var lbl=document.getElementById('wbpPrevLbl');var prev=document.getElementById('wbpPrev');return JSON.stringify({lbl:lbl?lbl.textContent:'',w:prev?(prev.firstChild?parseInt(prev.firstChild.style.width):0):0})})()");
+    t = await js("(function(){var lbl=document.getElementById('wbpPrevLbl');var prev=document.getElementById('wbpPrev');return JSON.stringify({lbl:lbl?lbl.textContent:'',w:prev?((prev.firstChild&&parseFloat(prev.firstChild.style.width))||0):0})})()");
     const wr = JSON.parse(t||'{}');
     R('البوليصة exact: المعاينة تعرض مقاس الورقة المختار (80مم) لا A4', (wr.lbl||'').indexOf('80')>=0 && wr.w>=30, t);
     t = await js("(function(){var b=document.getElementById('wbpPrnLbl');var th=document.getElementById('wbpThermalOpts');var layout=document.getElementById('wbpLayout').value;return JSON.stringify({prnVisible:!!b,thermalHidden:layout==='exact'?th.style.display==='none':true})})()");
