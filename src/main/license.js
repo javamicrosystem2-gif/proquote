@@ -286,7 +286,7 @@ const TIER_FEATURES = {
 // الأقسام الستة والعشرون كما في الشريط الجانبي. لوحة التحكم والإعدادات مفتوحان دائماً.
 const ALWAYS_OPEN_SECTIONS = ['dash', 'settings'];
 const _PKG_QUOTES = ['quotes','purchase', 'tech', 'receipt', 'auth', 'custom', 'full', 'samples', 'supply', 'returns', 'tenders', 'shipping'];
-const _PKG_FINANCE = ['payments', 'receivables', 'rcpt'];
+const _PKG_FINANCE = ['payments', 'sorecv', 'receivables', 'rcpt'];
 const _PKG_MGMT = ['company', 'clients', 'products', 'warehouse', 'mfg', 'documents', 'emp', 'notes'];
 const _PKG_SYSTEM = ['ei', 'adm'];
 const _ALL_SECTIONS = ALWAYS_OPEN_SECTIONS.concat(_PKG_QUOTES, _PKG_FINANCE, _PKG_MGMT, _PKG_SYSTEM);

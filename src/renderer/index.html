@@ -252,6 +252,7 @@ body[data-share-size="lg"] .btn-w.btn-sm i,body[data-share-size="lg"] .md-h .btn
 <div class="sb-it" onclick="go('shipping')"><i class="fas fa-truck"></i><span data-i18n="nav.shipping">التوصيل والشحن</span><span class="sb-badge" id="shpCnt" style="background:#f59e0b;display:none">0</span></div>
 <div class="sb-sec" data-i18n="nav.finance">الأمور المالية</div>
 <div class="sb-it" onclick="go('payments')"><i class="fas fa-money-bill-wave"></i><span data-i18n="nav.payments">مدفوعات خارجية</span><span class="sb-badge" id="payCnt" style="background:var(--red)">0</span></div>
+<div class="sb-it" onclick="go('sorecv')"><i class="fas fa-arrow-down"></i><span data-i18n="nav.sorecv">إضافة دفعة مستلمة</span><span class="sb-badge" id="sorecvCnt" style="background:#25d366">0</span></div>
 <div class="sb-it" onclick="go('receivables')"><i class="fas fa-file-invoice"></i><span data-i18n="nav.receivables">مستحقات</span><span class="sb-badge" id="recCnt" style="background:var(--acc)">0</span></div>
 <div class="sb-it" onclick="go('rcpt')"><i class="fas fa-receipt"></i><span>إيصال نقدية</span><span class="sb-badge" id="rcptCnt" style="background:#25d366">0</span></div>
 <div class="sb-sec" data-i18n="nav.management">الإدارة</div>
@@ -443,7 +444,7 @@ body[data-share-size="lg"] .btn-w.btn-sm i,body[data-share-size="lg"] .md-h .btn
 
 <!-- مدفوعات -->
 <div class="pg" id="p-payments">
-<div class="topbar"><div><h2 data-i18n="page.payments.title">مدفوعات خارجية</h2><p>تسجيل المدفوعات المدفوعة والمرسلة والخارجة لأشخاص أو جهة — ومدفوعات أوامر التوريد المستلمة عبر «إضافة دفعة مستلمة»</p></div><div style="display:flex;gap:7px;flex-wrap:wrap"><div class="sbx"><i class="fas fa-search"></i><input class="fi" style="width:190px" placeholder="بحث..." id="sPay" oninput="rPayL()"></div><select class="fi" id="sPaySt" style="width:120px" onchange="rPayL()"><option value="">كل الحالات</option><option value="ongoing">مستمر</option><option value="settled">خالص</option></select><button class="btn btn-s btn-sm" id="payGroupBtn" onclick="togglePayGroup()"><i class="fas fa-layer-group"></i>تجميع حسب الجهة</button><button class="btn btn-s btn-sm" style="color:var(--acc);border-color:var(--acc)" onclick="openSoRecvPay()" title="دفعة مستلمة مربوطة بأمر توريد"><i class="fas fa-arrow-down"></i> إضافة دفعة مستلمة</button><button class="btn btn-p" onclick="openPay()"><i class="fas fa-plus"></i>دفعة جديدة</button></div></div>
+<div class="topbar"><div><h2 data-i18n="page.payments.title">مدفوعات خارجية</h2><p>تسجيل المدفوعات المدفوعة والمرسلة والخارجة لأشخاص أو جهة</p></div><div style="display:flex;gap:7px;flex-wrap:wrap"><div class="sbx"><i class="fas fa-search"></i><input class="fi" style="width:190px" placeholder="بحث..." id="sPay" oninput="rPayL()"></div><select class="fi" id="sPaySt" style="width:120px" onchange="rPayL()"><option value="">كل الحالات</option><option value="ongoing">مستمر</option><option value="settled">خالص</option></select><button class="btn btn-s btn-sm" id="payGroupBtn" onclick="togglePayGroup()"><i class="fas fa-layer-group"></i>تجميع حسب الجهة</button><button class="btn btn-p" onclick="openPay()"><i class="fas fa-plus"></i>دفعة جديدة</button></div></div>
 <div style="padding:20px 24px" class="fi-in"><div id="payView"></div></div></div>
 
 <!-- مودال إضافة دفعة مستلمة (ربط بأمر توريد) -->
@@ -457,6 +458,15 @@ body[data-share-size="lg"] .btn-w.btn-sm i,body[data-share-size="lg"] .md-h .btn
 </div>
 <div class="fg" style="margin-top:10px"><label class="fl">ملاحظات</label><input class="fi" id="soRecvNote" placeholder="ملاحظة على الدفعة (اختياري)"></div>
 </div><div class="md-f"><button class="btn btn-p" onclick="saveSoRecvPay()"><i class="fas fa-save"></i>حفظ الدفعة المستلمة</button><button class="btn btn-s" onclick="cm('mSoRecvPay')">إلغاء</button></div></div></div>
+
+<!-- إضافة دفعة مستلمة (أوامر التوريد) -->
+<div class="pg" id="p-sorecv">
+<div class="topbar"><div><h2 data-i18n="page.sorecv.title">إضافة دفعة مستلمة</h2><p>الدفعات المستلمة من العملاء مقابل أوامر التوريد — بسجل كامل بالتواريخ</p></div><div style="display:flex;gap:7px;flex-wrap:wrap"><div class="sbx"><i class="fas fa-search"></i><input class="fi" style="width:190px" placeholder="بحث..." id="sSorecv" oninput="rSoRecvL()"></div><button class="btn btn-p" onclick="openSoRecvPay()"><i class="fas fa-arrow-down"></i>دفعة مستلمة جديدة</button></div></div>
+<div style="padding:20px 24px" class="fi-in">
+<div style="background:var(--bg3);border:1px solid var(--brd);border-radius:10px;padding:12px 16px;margin-bottom:14px;display:flex;gap:14px;flex-wrap:wrap" id="sorecvSum"></div>
+<div style="background:var(--bg3);border:1px solid var(--brd);border-radius:10px;overflow:visible"><table class="dt"><thead><tr><th>التاريخ</th><th>أمر التوريد</th><th>العميل</th><th>طريقة الدفع</th><th>المبلغ المستلم</th><th>ملاحظة</th><th style="text-align:center">إجراءات</th></tr></thead><tbody id="sorecvTb"><tr><td colspan="7" style="text-align:center;padding:28px;color:var(--t3)"><i class="fas fa-arrow-down" style="font-size:28px;opacity:.3;display:block;margin-bottom:6px"></i>لا توجد دفعات مستلمة بعد</td></tr></tbody></table></div>
+</div>
+</div>
 
 <!-- مستحقات -->
 <div class="pg" id="p-receivables">
@@ -1558,7 +1568,7 @@ t34:{name:'T34 ذهبي',desc:'ذهبي وكحلي — فاصل بمعيّن أ�
 function mkQR(text,sz){try{if(!text)return'';var q=qrcode(0,'M');q.addData(text);q.make();return q.createDataURL(sz||3,2)}catch(e){return''}}
 
 // ===== نظام الإدارة والصلاحيات =====
-const USR_SECS=[['dash','لوحة التحكم'],['quotes','عروض الأسعار'],['clients','العملاء'],['products','الأصناف'],['tech','العرض الفني'],['receipt','إذن الاستلام'],['custom','عرض مخصص'],['full','عرض متكامل'],['purchase','طلب شراء'],['samples','العينات'],['supply','أمر التوريد'],['returns','المرتجعات'],['warehouse','المخزن'],['tenders','المناقصات'],['shipping','الشحن'],['auth','التفويض'],['payments','المدفوعات'],['receivables','المستحقات'],['rcpt','إيصال نقدية'],['mfg','التصنيع'],['documents','المستندات'],['emp','الموظفون'],['notes','النوتة'],['ei','الفاتورة الإلكترونية'],['company','الشركة'],['adm','الإدارة'],['settings','الإعدادات']];
+const USR_SECS=[['dash','لوحة التحكم'],['quotes','عروض الأسعار'],['clients','العملاء'],['products','الأصناف'],['tech','العرض الفني'],['receipt','إذن الاستلام'],['custom','عرض مخصص'],['full','عرض متكامل'],['purchase','طلب شراء'],['samples','العينات'],['supply','أمر التوريد'],['returns','المرتجعات'],['warehouse','المخزن'],['tenders','المناقصات'],['shipping','الشحن'],['auth','التفويض'],['payments','المدفوعات الخارجية'],['sorecv','إضافة دفعة مستلمة'],['receivables','المستحقات'],['rcpt','إيصال نقدية'],['mfg','التصنيع'],['documents','المستندات'],['emp','الموظفون'],['notes','النوتة'],['ei','الفاتورة الإلكترونية'],['company','الشركة'],['adm','الإدارة'],['settings','الإعدادات']];
 const USR_ROLES={manager:{l:'مسؤول',d:'كل الصلاحيات + الإدارة'},supervisor:{l:'مشرف',d:'تعديل كل الأقسام عدا الإدارة والإعدادات'},employee:{l:'موظف',d:'مشاهدة الكل + تعديل الأقسام المحددة'},viewer:{l:'مشاهدة فقط',d:'مشاهدة الأقسام المحددة بدون أي تعديل'}};
 const USR_EDIT_MODALS=['mQ','mC','mPd','mPVars','mVarPick','mTf','mRc','mRcCol','mSa','mSaCol','mSaStatus','mSaMissing','mSo','mSoCol','mSoStatus','mSoPay','mRt','mRtCol','mWh','mWi','mWMove','mWbc','mTd','mTdWonAsk','mTdAccept','mRcpt','mEmp','mAu','mAuCopy','mIo','mIoCol','mMfg','mMfgCol','mNote','mQCol','mTfCol','mDcFolder','mDcUpload','mWb','mCuTypes','mCu','mCompany','mMv','mMvCol','mWbCol','mShpCol'];
 let _usrCur=null;
@@ -1819,7 +1829,7 @@ async function subActivate(){const k=(document.getElementById('subKey').value||'
 
 
 function licReqWa(){try{licRequestKey&&licRequestKey('wa')}catch(e){}}
-function go(p){if(p==='sub'){try{openLicenseModal()}catch(e){};return}if(window._licBlocked){toast('فعّل الترخيص أولاً للمتابعة',"er");return}if(window._secGate&&!window._secGate(p))return;if(window._usrGate&&!_usrGate(p))return;document.querySelectorAll('.pg').forEach(e=>e.classList.remove('on'));document.querySelectorAll('.sb-it').forEach(e=>e.classList.remove('on'));const pg=document.getElementById('p-'+p);if(pg){pg.classList.add('on');const f=pg.querySelector(':scope>.topbar+*');if(f){f.classList.remove('fi-in');void f.offsetWidth;f.classList.add('fi-in')}}document.querySelectorAll('.sb-it').forEach(i=>{if(i.getAttribute('onclick')?.includes(p))i.classList.add('on')});_usrCurSec=p;if(p==='dash')updDash();if(p==='quotes')rql();if(p==='tech')rTfL();if(p==='receipt')rRcL();if(p==='custom'){rCuL();rCuTypesL();}if(p==='full')rFlL();if(p==='clients')rCG();if(p==='products')rPT();if(p==='warehouse')rWhL();if(p==='tenders')rTdL();if(p==='shipping'){rShpL();rCrL();}if(p==='auth'){rAuL();rAuTypesL();}if(p==='io')rIoL();if(p==='mfg')rMfgL();if(p==='notes')rNtL();if(p==='emp')rEmpL();if(p==='rcpt')rRcptL();if(p==='documents')rDcL();if(p==='samples')rSaL();if(p==='purchase')rPoL();if(p==='supply')rSoL();if(p==='returns')rRtL();if(p==='payments')rPayL();if(p==='receivables')rRecL();if(p==='ei'){rEiL();try{_eiBoot()}catch(e){}}if(p==='company')rCompL();;if(p==='adm')rAdmL();if(p==='settings'){ldSF();rTG();try{if(window.proquote&&window.proquote.getVersion){window.proquote.getVersion().then(function(v){var e=document.getElementById('aboutVer');if(e)e.textContent=v})}else{var e2=document.getElementById('aboutVer');if(e2)e2.textContent='ويب'}}catch(e){}try{rdrThemes()}catch(e){};try{ldStampSig()}catch(e){};try{rdrPlansAdmin()}catch(e){}}document.getElementById('MC').scrollTop=0}
+function go(p){if(p==='sub'){try{openLicenseModal()}catch(e){};return}if(window._licBlocked){toast('فعّل الترخيص أولاً للمتابعة',"er");return}if(window._secGate&&!window._secGate(p))return;if(window._usrGate&&!_usrGate(p))return;document.querySelectorAll('.pg').forEach(e=>e.classList.remove('on'));document.querySelectorAll('.sb-it').forEach(e=>e.classList.remove('on'));const pg=document.getElementById('p-'+p);if(pg){pg.classList.add('on');const f=pg.querySelector(':scope>.topbar+*');if(f){f.classList.remove('fi-in');void f.offsetWidth;f.classList.add('fi-in')}}document.querySelectorAll('.sb-it').forEach(i=>{if(i.getAttribute('onclick')?.includes(p))i.classList.add('on')});_usrCurSec=p;if(p==='dash')updDash();if(p==='quotes')rql();if(p==='tech')rTfL();if(p==='receipt')rRcL();if(p==='custom'){rCuL();rCuTypesL();}if(p==='full')rFlL();if(p==='clients')rCG();if(p==='products')rPT();if(p==='warehouse')rWhL();if(p==='tenders')rTdL();if(p==='shipping'){rShpL();rCrL();}if(p==='auth'){rAuL();rAuTypesL();}if(p==='io')rIoL();if(p==='mfg')rMfgL();if(p==='notes')rNtL();if(p==='emp')rEmpL();if(p==='rcpt')rRcptL();if(p==='documents')rDcL();if(p==='samples')rSaL();if(p==='purchase')rPoL();if(p==='supply')rSoL();if(p==='returns')rRtL();if(p==='payments')rPayL();if(p==='receivables')rRecL();if(p==='sorecv')rSoRecvL();if(p==='ei'){rEiL();try{_eiBoot()}catch(e){}}if(p==='company')rCompL();;if(p==='adm')rAdmL();if(p==='settings'){ldSF();rTG();try{if(window.proquote&&window.proquote.getVersion){window.proquote.getVersion().then(function(v){var e=document.getElementById('aboutVer');if(e)e.textContent=v})}else{var e2=document.getElementById('aboutVer');if(e2)e2.textContent='ويب'}}catch(e){}try{rdrThemes()}catch(e){};try{ldStampSig()}catch(e){};try{rdrPlansAdmin()}catch(e){}}document.getElementById('MC').scrollTop=0}
 function stab(t){document.querySelectorAll('.stab').forEach(e=>e.classList.remove('on'));document.querySelectorAll('.spanel').forEach(e=>e.classList.remove('on'));document.querySelector(`.stab[onclick*="${t}"]`)?.classList.add('on');document.getElementById('sp-'+t)?.classList.add('on');if(t==='tpl')rTG();if(t==='company')ldLogo()}
 function om(id){if(window._omGate&&!_omGate(id))return;document.getElementById(id).classList.add('show');document.body.style.overflow='hidden'}
 function cm(id){document.getElementById(id).classList.remove('show');document.body.style.overflow='';if(id==='mP'){try{document.getElementById('pvC').innerHTML='';_pvCurDoc=null;pvId=null}catch(e){}}if(id==='licLock'){var lk=document.getElementById('licLock');if(lk)lk.style.display='none'}else{try{licEnforce()}catch(e){}}}
@@ -3290,12 +3300,13 @@ function openSoRecvPay(){
 const sos=ld(K.so);
 const sel=document.getElementById('soRecvSo');
 if(!sos.length){toast('لا توجد أوامر توريد بعد — أنشئ أمر توريد أولاً','er');return}
-sel.innerHTML=sos.map(function(d){return '<option value="'+d.id+'">'+d.number+' — '+(d.clientName||'')+(d.totalAmount?(' ('+fmtN(d.totalAmount)+')'):'')+'</option>'}).join('');
+sel.innerHTML='<option value="">-- اختر أمر التوريد --</option>'+sos.map(function(d){return '<option value="'+d.id+'">'+d.number+' — '+(d.clientName||'')+(d.totalAmount?(' ('+fmtN(d.totalAmount)+')'):'')+'</option>'}).join('');
 document.getElementById('soRecvDate').value=new Date().toISOString().split('T')[0];
-document.getElementById('soRecvAmount').value='';
+document.getElementById('soRecvAmount').value='0';
 document.getElementById('soRecvMethod').value='cash';
 document.getElementById('soRecvNote').value='';
-soRecvOnSo();om('mSoRecvPay')}
+var box=document.getElementById('soRecvInfo');if(box)box.style.display='none';
+om('mSoRecvPay')}
 function soRecvOnSo(){
 const id=document.getElementById('soRecvSo').value;if(!id)return;
 const d=ld(K.so).find(function(x){return x.id===id});if(!d)return;
@@ -3305,7 +3316,43 @@ document.getElementById('soRecvClient').textContent=d.clientName||'—';
 document.getElementById('soRecvTotal').textContent=fmtN(total)+' '+((CU[ls().currency]||{}).s||'ر.س');
 document.getElementById('soRecvPaid').textContent=fmtN(paid);
 document.getElementById('soRecvRemain').textContent=fmtN(rem);
-document.getElementById('soRecvAmount').value=rem>0?rem:'';}
+}
+// ===== سجل الدفعات المستلمة (أوامر التوريد) =====
+function _soRecvAll(){
+const out=[];
+(ld(K.so)||[]).forEach(function(d){
+(d.payments||[]).forEach(function(p,i){if(p.received)out.push({soId:d.id,soNumber:d.number,clientName:d.clientName,payIndex:i,pay:p})});
+});
+out.sort(function(a,b){return (b.pay.at||0)-(a.pay.at||0)});
+return out}
+function rSoRecvL(){
+const se=(document.getElementById('sSorecv')?.value||'').toLowerCase();
+const all=_soRecvAll();
+const b=document.getElementById('sorecvCnt');if(b){b.textContent=all.length;b.style.display=all.length?'':'none'}
+const sum=document.getElementById('sorecvSum');
+if(sum){const tot=all.reduce(function(a,x){return a+(x.pay.amount||0)},0);const today=new Date().toISOString().slice(0,10);const tToday=all.filter(function(x){return (x.pay.date||'')===today}).reduce(function(a,x){return a+(x.pay.amount||0)},0);
+const cu=((CU[ls().currency]||{}).s)||'ر.س';
+sum.innerHTML='<span style="background:var(--bg2);border:1px solid var(--brd);border-radius:14px;padding:4px 12px;font-size:11.5px;color:var(--t2)">عدد الدفعات: <b style="color:#25d366">'+all.length+'</b></span><span style="background:var(--bg2);border:1px solid var(--brd);border-radius:14px;padding:4px 12px;font-size:11.5px;color:var(--t2)">إجمالي المستلم: <b style="color:var(--acc)">'+fmtN(tot)+' '+cu+'</b></span><span style="background:var(--bg2);border:1px solid var(--brd);border-radius:14px;padding:4px 12px;font-size:11.5px;color:var(--t2)">مستلم اليوم: <b style="color:#25d366">'+fmtN(tToday)+'</b></span>'}
+const fl=all.filter(function(x){return !se||(x.soNumber||'').toLowerCase().includes(se)||(x.clientName||'').toLowerCase().includes(se)||(x.pay.note||'').toLowerCase().includes(se)});
+const tb=document.getElementById('sorecvTb');
+if(!tb)return;
+if(!fl.length){tb.innerHTML='<tr><td colspan="7" style="text-align:center;padding:28px;color:var(--t3)"><i class="fas fa-arrow-down" style="font-size:28px;opacity:.3;display:block;margin-bottom:6px"></i>'+(all.length?'لا توجد نتائج':'لا توجد دفعات مستلمة بعد')+'</td></tr>';return}
+const cu2=((CU[ls().currency]||{}).s)||'ر.س';
+tb.innerHTML=fl.map(function(x){
+const m=FIN_METH[x.pay.method]||x.pay.method||'—';
+return '<tr><td style="color:var(--t3);font-size:11.5px">'+((x.pay.date&&fmtD(x.pay.date))||'—')+'</td><td style="font-weight:700;color:#a855f7">'+x.soNumber+'</td><td style="font-weight:600">'+(x.clientName||'—')+'</td><td style="font-size:11.5px">'+m+'</td><td style="font-weight:800;color:#25d366">'+fmtN(x.pay.amount||0)+' '+cu2+'</td><td style="font-size:11px;color:var(--t3)">'+(x.pay.note||'—')+'</td><td style="text-align:center"><button class="btn btn-d btn-xs" style="padding:2px 6px" title="حذف الدفعة" onclick="delSoRecvPay(\''+x.soId+'\','+x.payIndex+')"><i class="fas fa-trash" style="font-size:9px"></i></button></td></tr>'}).join('')}
+function delSoRecvPay(soId,payIndex){
+if(!confirm('حذف هذه الدفعة المستلمة؟ سيُعاد حساب حالة الدفع لأمر التوريد.'))return;
+const sos=ld(K.so);const i=sos.findIndex(function(x){return x.id===soId});if(i<0)return;
+const d=sos[i];d.payments=d.payments||[];if(!d.payments[payIndex])return;
+d.payments.splice(payIndex,1);
+const paidNow=(d.payments||[]).reduce(function(a,p){return a+(p.amount||0)},0);
+d.paidAmount=paidNow;
+d.paymentStatus=paidNow<=0?null:(paidNow>=(d.totalAmount||0)?'complete':'partial_paid');
+sos[i]=d;sv(K.so,sos);
+rSoRecvL();try{rSoL()}catch(e){}
+toast('حُذفت الدفعة المستلمة','ok')}
+
 function saveSoRecvPay(){
 const id=document.getElementById('soRecvSo').value;if(!id){toast('اختر أمر التوريد','er');return}
 const sos=ld(K.so);const i2=sos.findIndex(function(x){return x.id===id});if(i2<0)return;
@@ -3318,7 +3365,7 @@ const paidNow=d.payments.reduce(function(a,p){return a+(p.amount||0)},0);
 d.paidAmount=paidNow;
 d.paymentStatus=(paidNow>=(d.totalAmount||0))?'complete':'partial_paid';
 sos[i2]=d;sv(K.so,sos);
-cm('mSoRecvPay');try{rSoL()}catch(e){};try{rPayL()}catch(e){}
+cm('mSoRecvPay');try{rSoL()}catch(e){};try{rSoRecvL()}catch(e){}
 toast('تمت إضافة الدفعة المستلمة لأمر التوريد '+d.number+' ✓','ok')}
 
 function soPayFor(id){_soPayTargetId=id;_rdrPayInsts();om('mSoPay')}
