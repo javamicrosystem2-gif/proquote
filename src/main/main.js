@@ -700,6 +700,7 @@ ipcMain.handle('print:html', async (_evt, o) => {
       landscape: !!opts.landscape,
       margins: { marginType: 'none' }
     };
+    if (opts.scaleFactor && opts.scaleFactor > 0) printOpts.scaleFactor = opts.scaleFactor;
     if (pageSize) printOpts.pageSize = pageSize;
     const result = await new Promise((resolve) => {
       let done = false;
