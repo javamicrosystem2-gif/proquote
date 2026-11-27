@@ -1485,9 +1485,9 @@ body[data-share-size="lg"] .btn-w.btn-sm i,body[data-share-size="lg"] .md-h .btn
 <div class="fg" id="wbpCH" style="display:none"><label class="fl">الارتفاع (مم — 0=تلقائي)</label><input type="number" class="fi" id="wbpH" value="0" min="0" max="300" style="text-align:left;direction:ltr"></div>
 </div>
 <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;margin-bottom:10px">
-<div class="fg"><label class="fl">تكبير الهيدر <b id="wbpHdrLbl">60%</b></label><input type="range" id="wbpHdr" min="30" max="100" value="60" style="width:100%;accent-color:var(--acc)" oninput="document.getElementById('wbpHdrLbl').textContent=this.value+'%'"></div>
-<div class="fg"><label class="fl">تكبير الأصناف <b id="wbpTblLbl">75%</b></label><input type="range" id="wbpTbl" min="50" max="120" value="75" style="width:100%;accent-color:var(--acc)" oninput="document.getElementById('wbpTblLbl').textContent=this.value+'%'"></div>
-<div class="fg"><label class="fl">تكبير الخط العام <b id="wbpFsLbl">80%</b></label><input type="range" id="wbpFs" min="60" max="110" value="80" style="width:100%;accent-color:var(--acc)" oninput="document.getElementById('wbpFsLbl').textContent=this.value+'%'"></div>
+<div class="fg"><label class="fl">تكبير الهيدر <b id="wbpHdrLbl">60%</b></label><input type="range" id="wbpHdr" min="30" max="100" value="60" style="width:100%;accent-color:var(--acc)" oninput="document.getElementById('wbpHdrLbl').textContent=this.value+'%';wbpPrev()"></div>
+<div class="fg"><label class="fl">تكبير الأصناف <b id="wbpTblLbl">75%</b></label><input type="range" id="wbpTbl" min="50" max="120" value="75" style="width:100%;accent-color:var(--acc)" oninput="document.getElementById('wbpTblLbl').textContent=this.value+'%';wbpPrev()"></div>
+<div class="fg"><label class="fl">تكبير الخط العام <b id="wbpFsLbl">80%</b></label><input type="range" id="wbpFs" min="60" max="110" value="80" style="width:100%;accent-color:var(--acc)" oninput="document.getElementById('wbpFsLbl').textContent=this.value+'%';wbpPrev()"></div>
 <div class="fg"><label class="fl">الهامش (مم)</label><input type="number" class="fi" id="wbpMargin" value="2" min="0" max="10" style="text-align:center"></div>
 <div class="fg"><label class="fl">حجم الطباعة <b id="wbpPrintScaleLbl">100%</b></label><input type="range" id="wbpPrintScale" min="50" max="160" value="100" style="width:100%;accent-color:var(--acc)" oninput="document.getElementById('wbpPrintScaleLbl').textContent=this.value+'%';wbpPrev()"></div>
 </div>
@@ -2295,14 +2295,12 @@ _dcMakePdf([fl],fl.title||'',name+'.pdf').then(function(blob){if(blob){_dcSaveBl
 function dcDownloadAll(folderId){
 var f=(ld(K.dc)||[]).find(function(d){return d.id===folderId});if(!f)return;
 var files=(f.files||[]).filter(function(x){return x.data});if(!files.length){toast('هذا الملف فارغ','er');return}
-var imgs=files.filter(_dcIsImg);
-if(!imgs.length){toast('لا توجد صور قابلة للدمج — استخدم التحميل الفردي','er');return}
-var nonImgs=files.filter(function(x){return !_dcIsImg(x)});
-toast('جارٍ دمج '+imgs.length+' صورة في PDF واحد'+(nonImgs.length?(' + '+nonImgs.length+' ملفًا غير صوري في الفهرس'):'')+'…','in');
-_dcMakePdf(files,f.name,(f.name||'documents').replace(/[^a-zA-Z0-9_-]/g,'_')+'.pdf').then(function(blob){
-if(!blob)return;
-_dcSaveBlob(blob,(f.name||'documents').replace(/[^a-zA-Z0-9_-]/g,'_')+'.pdf');
-toast('تم تحميل PDF واحد يجمع '+imgs.length+' صورة'+(nonImgs.length?(' + فهرس '+nonImgs.length+' ملفًا آخر'):'')+' ✓','ok')})}
+if(!window.proquote||!window.proquote.documents){toast('الدمج متاح في نسخة الكمبيوتر فقط — استخدم التحميل الفردي','er');return}
+toast('جارٍ دمج '+files.length+' مستندًا في ملف PDF واحد…','in');
+window.proquote.documents.mergeAll({files:files.map(function(x){return {title:x.title,name:x.name,type:x.type,data:x.data}}),name:(f.name||'documents')}).then(function(r){
+if(!r||!r.ok){toast((r&&r.error)||'تعذر الدمج','er');return}
+var a=document.createElement('a');a.href='data:application/pdf;base64,'+r.b64;a.download=(f.name||'documents').replace(/[^a-zA-Z0-9_-]/g,'_')+'.pdf';document.body.appendChild(a);a.click();a.remove();
+toast('تم تحميل ملف PDF واحد يجمع '+files.length+' مستند ('+r.pages+' صفحة) ✓','ok')})}
 // مشاركة الكل = PDF واحد + واتساب
 function dcShareFolderWA(folderId){
 var f=(ld(K.dc)||[]).find(function(d){return d.id===folderId});if(!f)return;
@@ -4792,12 +4790,15 @@ const se=(document.getElementById('sRec')?.value||'').toLowerCase();
 let fl=sfFilter('receivables',recs);
 fl.sort((a,b)=>b.at-a.at);
 const view=document.getElementById('recView');cntBadge();
-if(!fl.length){view.innerHTML='<div style="background:var(--bg3);border:1px solid var(--brd);border-radius:10px;padding:40px;text-align:center;color:var(--t3)"><i class="fas fa-file-invoice" style="font-size:34px;opacity:.25;display:block;margin-bottom:8px"></i><p>'+(!recs.length?'لا توجد مستحقات':'لا توجد نتائج')+'</p></div>';return}
+if(!fl.length){
+if(!recs.length){try{var _sbal=(ld(K.so)||[]).some(function(d){return Math.max(0,(d.totalAmount||0)-(d.payments||[]).reduce(function(a,p){return a+(p.amount||0)},0))>0.009});if(_sbal){view.style.display='none';return}}catch(e){}}
+view.style.display='';
+view.innerHTML='<div style="background:var(--bg3);border:1px solid var(--brd);border-radius:10px;padding:40px;text-align:center;color:var(--t3)"><i class="fas fa-file-invoice" style="font-size:34px;opacity:.25;display:block;margin-bottom:8px"></i><p>'+(!recs.length?'لا توجد مستحقات':'لا توجد نتائج')+'</p></div>';return}
 if(_recGroupMode){
 const groups={};fl.forEach(p=>{const e=p.entity||'—';if(!groups[e])groups[e]={items:[],total:0,settled:true};groups[e].items.push(p);groups[e].total+=(p.amount||0);groups[e].paid=(groups[e].paid||0)+(p.paid||0);if(p.status!=='settled')groups[e].settled=false});
 view.innerHTML=Object.entries(groups).map(([entity,g])=>{const gStatus=g.settled?'settled':'ongoing';const gst=FIN_ST[gStatus];const esc=entity.replace(/'/g,"\\'");return`<div class="sc" style="margin-bottom:11px"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px"><div style="display:flex;align-items:center;gap:10px"><div style="width:38px;height:38px;border-radius:9px;background:var(--acc2);display:flex;align-items:center;justify-content:center"><i class="fas fa-file-invoice" style="color:var(--acc);font-size:14px"></i></div><div><div style="font-size:14px;font-weight:700">${entity}</div><div style="font-size:10px;color:var(--t3)">${g.items.length} مستحق</div></div></div><div style="text-align:left"><div style="font-size:16px;font-weight:800;color:${g.total-(g.paid||0)>0?'var(--red)':'#25d366'}">${fmtN(Math.max(0,g.total-(g.paid||0)))} ${cu}</div><div style="font-size:10px;color:var(--t3)">من ${fmtN(g.total)} · مدفوع: ${fmtN(g.paid||0)}</div><span class="stb ${gst.c}" style="margin-top:3px"><span class="st-dot"></span>${gst.l}</span></div></div><div style="display:flex;gap:6px;margin-top:8px"><button class="btn btn-p btn-xs" style="flex:1" onclick="addRecForName('${esc}')"><i class="fas fa-plus"></i>إضافة مستحق</button><button class="btn btn-s btn-xs" style="flex:1" onclick="viewRecsForName('${esc}')"><i class="fas fa-list"></i>شاهد كافة المستحقات</button></div></div>`}).join('')
 }else{
-view.innerHTML='<div style="background:var(--bg3);border:1px solid var(--brd);border-radius:10px;overflow:visible"><table class="dt"><thead><tr><th>التاريخ</th><th>الجهة / الشخص</th><th>السبب</th><th>المبلغ</th><th>الحالة</th><th style="text-align:center">إجراءات</th></tr></thead><tbody>'+fl.map(p=>{const st=FIN_ST[p.status]||FIN_ST.ongoing;return`<tr><td style="color:var(--t3);font-size:11.5px">${fmtD(p.date)}</td><td style="font-weight:600">${p.entity||'—'}</td><td style="font-size:11.5px;color:var(--t2)">${p.reason||'—'}</td><td><div style="font-size:16px;font-weight:800;color:${(p.amount||0)-(p.paid||0)>0?'var(--red)':'#25d366'}">${fmtN(Math.max(0,(p.amount||0)-(p.paid||0)))} ${cu}</div><div style="font-size:10px;color:var(--t3)">من ${fmtN(p.amount||0)}${p.paid?` · مدفوع: ${fmtN(p.paid)}`:''}${p.payments&&p.payments.length?` <span style="font-size:9px;color:var(--t3)">(${p.payments.length} دفعة)</span>`:''}${p.paid?` <span style="font-size:9px;color:#25d366">مدفوع: ${fmtN(p.paid)}</span>`:''}</td><td><span class="stb ${st.c}"><span class="st-dot"></span>${st.l}</span></td><td style="text-align:center"><div class="am"><button class="btn btn-s btn-xs" style="padding:3px 5px" onclick="tglA(this)"><i class="fas fa-ellipsis-v"></i></button><div class="add"><button onclick="addRecFor('${p.id}')"><i class="fas fa-plus"></i>إضافة مستحق</button><button onclick="viewRecsFor('${p.id}')"><i class="fas fa-list"></i>شاهد كافة المستحقات</button><button onclick="edRec('${p.id}')"><i class="fas fa-pen"></i>تعديل</button><button onclick="toggleRecStatus('${p.id}')"><i class="fas fa-flag"></i>تبديل الحالة</button><button class="dg" onclick="delRec('${p.id}')"><i class="fas fa-trash"></i>حذف</button></div></div></td></tr>`}).join('')+'</tbody></table></div>'
+view.style.display='';view.innerHTML='<div style="background:var(--bg3);border:1px solid var(--brd);border-radius:10px;overflow:visible"><table class="dt"><thead><tr><th>التاريخ</th><th>الجهة / الشخص</th><th>السبب</th><th>المبلغ</th><th>الحالة</th><th style="text-align:center">إجراءات</th></tr></thead><tbody>'+fl.map(p=>{const st=FIN_ST[p.status]||FIN_ST.ongoing;return`<tr><td style="color:var(--t3);font-size:11.5px">${fmtD(p.date)}</td><td style="font-weight:600">${p.entity||'—'}</td><td style="font-size:11.5px;color:var(--t2)">${p.reason||'—'}</td><td><div style="font-size:16px;font-weight:800;color:${(p.amount||0)-(p.paid||0)>0?'var(--red)':'#25d366'}">${fmtN(Math.max(0,(p.amount||0)-(p.paid||0)))} ${cu}</div><div style="font-size:10px;color:var(--t3)">من ${fmtN(p.amount||0)}${p.paid?` · مدفوع: ${fmtN(p.paid)}`:''}${p.payments&&p.payments.length?` <span style="font-size:9px;color:var(--t3)">(${p.payments.length} دفعة)</span>`:''}${p.paid?` <span style="font-size:9px;color:#25d366">مدفوع: ${fmtN(p.paid)}</span>`:''}</td><td><span class="stb ${st.c}"><span class="st-dot"></span>${st.l}</span></td><td style="text-align:center"><div class="am"><button class="btn btn-s btn-xs" style="padding:3px 5px" onclick="tglA(this)"><i class="fas fa-ellipsis-v"></i></button><div class="add"><button onclick="addRecFor('${p.id}')"><i class="fas fa-plus"></i>إضافة مستحق</button><button onclick="viewRecsFor('${p.id}')"><i class="fas fa-list"></i>شاهد كافة المستحقات</button><button onclick="edRec('${p.id}')"><i class="fas fa-pen"></i>تعديل</button><button onclick="toggleRecStatus('${p.id}')"><i class="fas fa-flag"></i>تبديل الحالة</button><button class="dg" onclick="delRec('${p.id}')"><i class="fas fa-trash"></i>حذف</button></div></div></td></tr>`}).join('')+'</tbody></table></div>'
 }
 }
 function toggleRecGroup(){_recGroupMode=!_recGroupMode;document.getElementById('recGroupBtn').classList.toggle('btn-p',_recGroupMode);rRecL()}
@@ -5058,8 +5059,6 @@ if(imgs.length){const html='<!DOCTYPE html><html dir="rtl"><head><meta charset="
 pdfs.forEach((x,i)=>{setTimeout(()=>{const pw=window.open(x.data,'_blank');setTimeout(()=>{try{pw.print()}catch(e){}},900)},1400*(i+1))});
 toast('\u062C\u0627\u0631\u064D \u062A\u062C\u0647\u064A\u0632 \u0627\u0644\u0637\u0628\u0627\u0639\u0629: '+imgs.length+' \u0635\u0648\u0631\u0629 \u0641\u064A \u0645\u0633\u062A\u0646\u062F \u0648\u0627\u062D\u062F + '+pdfs.length+' PDF'+(others?' \u2014 \u0648'+others+' \u0645\u0644\u0641 \u063A\u064A\u0631 \u0642\u0627\u0628\u0644 \u0644\u0644\u0637\u0628\u0627\u0639\u0629':''),'in')}
 // تحميل كل محتويات المجلد دفعة واحدة
-function dcDownloadAll(folderId){const f=(ld(K.dc)||[]).find(function(d){return d.id===folderId});if(!f)return;const files=(f.files||[]).filter(function(x){return x.data});if(!files.length){toast('\u0647\u0630\u0627 \u0627\u0644\u0645\u0644\u0641 \u0641\u0627\u0631\u063A','er');return}
-files.forEach((x,i)=>setTimeout(()=>_dcAnchorDl(x),450*i));toast('\u062C\u0627\u0631\u064D \u062A\u062D\u0645\u064A\u0644 '+files.length+' \u0645\u0644\u0641\u064B \u0625\u0644\u0649 \u0645\u062C\u0644\u0644\u062F \u0627\u0644\u062A\u0646\u0632\u064A\u0644\u0627\u062A','ok')}
 // مشاركة كل محتويات المجلد واتساب (تحميل الكل + فتح محادثة)
 function dcShareFolderWA(folderId){const f=(ld(K.dc)||[]).find(function(d){return d.id===folderId});if(!f)return;const files=(f.files||[]).filter(function(x){return x.data});if(!files.length){toast('\u0647\u0630\u0627 \u0627\u0644\u0645\u0644\u0641 \u0641\u0627\u0631\u063A','er');return}
 files.forEach((x,i)=>setTimeout(()=>_dcAnchorDl(x),450*i));
@@ -5072,9 +5071,14 @@ var _dcPendFiles=[];
 function dcUploadDlg(folderId){document.getElementById('dcUploadFolder').value=folderId||'';document.getElementById('dcUploadTitle').value='';document.getElementById('dcUploadNote').value='';document.getElementById('dcFile').value='';_dcPendFiles=[];document.getElementById('dcDrop').classList.remove('has');document.getElementById('dcDropPh').innerHTML=`<i class="fas fa-cloud-arrow-up" style="font-size:26px;color:var(--t3);margin-bottom:5px;display:block"></i><div style="font-size:12px;font-weight:600;color:var(--t2)">اضغط لاختيار ملف</div><div style="font-size:10px;color:var(--t3)">PDF, PNG, JPG, DOCX...</div>`;om('mDcUpload')}
 function dcFilePicked(ev){_dcPendFiles=Array.from(ev.target.files||[]);_dcRdrPickList()}
 function _dcRdrPickList(){
-var el=document.getElementById('dcDrop');
-if(!el)return;
-if(!_dcPendFiles.length){el.innerHTML=_dcDropDefaultHtml();return}
+// تكتب في dcPickList فقط — لا تمس dcDrop (كانت تدمر حقل الإدخال فتعطل كل أزرار الرفع)
+var el=document.getElementById('dcPickList');
+var ph=document.getElementById('dcDropPh');
+var drop=document.getElementById('dcDrop');
+if(!el||!ph)return;
+if(!_dcPendFiles.length){el.innerHTML='';ph.style.display='';if(drop)drop.classList.remove('has');return}
+ph.style.display='none';
+if(drop)drop.classList.add('has');
 var total=_dcPendFiles.reduce(function(a,f){return a+f.size},0);
 var oversize=_dcPendFiles.filter(function(f){return f.size>10*1024*1024}).length;
 el.innerHTML='<div style="text-align:right;max-height:180px;overflow-y:auto;width:100%">'+

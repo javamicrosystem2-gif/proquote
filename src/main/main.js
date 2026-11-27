@@ -39,6 +39,11 @@ const PROBE_UPD_MODE = process.argv.includes('--probe-upd');
 if (PROBE_UPD_MODE) {
   try { require('../../shoot/probe-upd').isolate(); } catch (e) { console.error('[probe-upd] isolation failed:', e.message); }
 }
+// وضع فحص المستندات (--probe-dc)
+const PROBE_DC_MODE = process.argv.includes('--probe-dc');
+if (PROBE_DC_MODE) {
+  try { require('../../shoot/probe-dc').isolate(); } catch (e) { console.error('[probe-dc] isolation failed:', e.message); }
+}
 
 // وضع فحص الطباعة بذاكرة الطابعات (--probe-print: تشغيل جاف بلا ورق)
 const PROBE_PRINT_MODE = process.argv.includes('--probe-print');
@@ -130,6 +135,7 @@ const productImport = require('./product-import');
 const filestore = require('./filestore');
 const dataMigrations = require('./data-migrations');
 const einvoice = require('./einvoice');
+const { PDFDocument } = require('pdf-lib');
 
 // منع فتح أكثر من نافذة رئيسية
 let mainWindow = null;
@@ -407,6 +413,12 @@ app.whenReady().then(() => {
   // فحص تجربة التحديث
   if (PROBE_UPD_MODE) {
     require('../../shoot/probe-upd').run();
+    return;
+  }
+
+  // فحص المستندات: رفع + دمج PDF
+  if (PROBE_DC_MODE) {
+    require('../../shoot/probe-dc').run();
     return;
   }
 
@@ -721,6 +733,43 @@ ipcMain.handle('print:html', async (_evt, o) => {
   }
 });
 // قنوات الفاتورة الإلكترونية v2 (منظومات متعددة + فحص اتصال + تقديم من الخلفية)
+// ===== المستندات: دمج كل ملفات المجلد (صور + PDF) في ملف PDF واحد =====
+ipcMain.handle('dc:mergeAll', async (_evt, payload) => {
+  try {
+    const files = (payload && payload.files || []).filter(x => x && x.data);
+    if (!files.length) return { ok: false, error: 'لا توجد ملفات للدمج' };
+    const out = await PDFDocument.create();
+    let pages = 0;
+    for (const x of files) {
+      const b64 = String(x.data || '').split(',')[1] || '';
+      const buf = Buffer.from(b64, 'base64');
+      const mime = String(x.type || '').toLowerCase();
+      try {
+        if (mime.includes('pdf')) {
+          const src = await PDFDocument.load(buf, { ignoreEncryption: true });
+          const cp = await out.copyPages(src, src.getPageIndices());
+          cp.forEach(pg => { out.addPage(pg); pages++; });
+        } else if (mime.includes('png')) {
+          const img = await out.embedPng(buf);
+          const pg = out.addPage([img.width, img.height]);
+          pg.drawImage(img, { x: 0, y: 0, width: img.width, height: img.height });
+          pages++;
+        } else if (mime.includes('jpeg') || mime.includes('jpg')) {
+          const img = await out.embedJpg(buf);
+          const pg = out.addPage([img.width, img.height]);
+          pg.drawImage(img, { x: 0, y: 0, width: img.width, height: img.height });
+          pages++;
+        }
+      } catch (e) { console.error('[dc-merge] skip', (x.title || x.name || ''), e.message); }
+    }
+    if (!pages) return { ok: false, error: 'تعذر دمج الملفات — الصيغ غير مدعومة للدمج' };
+    const bytes = await out.save();
+    return { ok: true, pages, b64: Buffer.from(bytes).toString('base64'), name: ((payload && payload.name) || 'folder') };
+  } catch (e) {
+    return { ok: false, error: (e && e.message) || 'فشل الدمج' };
+  }
+});
+
 ipcMain.handle('einvoice:authorities', () => einvoice.listAuthorities());
 ipcMain.handle('einvoice:list', () => einvoice.listProfiles());
 ipcMain.handle('einvoice:save', (_evt, p) => einvoice.saveProfile(p));

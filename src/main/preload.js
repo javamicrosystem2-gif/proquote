@@ -144,6 +144,11 @@ contextBridge.exposeInMainWorld('proquote', {
     printHtml: (o) => ipcRenderer.invoke('print:html', o)
   },
 
+  // ---------- المستندات: دمج ملفات المجلد في PDF واحد ----------
+  documents: {
+    mergeAll: (payload) => ipcRenderer.invoke('dc:mergeAll', payload)
+  },
+
   onMenuNewQuote: (callback) => {
     const handler = () => callback();
     ipcRenderer.on('menu-new-quote', handler);
